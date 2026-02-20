@@ -37,7 +37,7 @@ import { correctFloat, isNumber, merge } from '../../Shared/Utilities.js';
 /**
  * Bell curve class
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.bellcurve
  *
@@ -225,6 +225,7 @@ class BellcurveSeries extends AreaSplineSeries {
  *
  * */
 
+/** @internal */
 interface BellcurveSeries extends DerivedComposition.SeriesComposition {
     pointClass: typeof BellcurvePoint;
 }
@@ -237,6 +238,7 @@ DerivedComposition.compose(BellcurveSeries);
  *
  * */
 
+/** @internal */
 declare module '../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         bellcurve: typeof BellcurveSeries;
@@ -250,4 +252,5 @@ SeriesRegistry.registerSeriesType('bellcurve', BellcurveSeries);
  *
  * */
 
+/** @internal */
 export default BellcurveSeries;
