@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Hønsi
+ *  Author: Torstein Honsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -73,8 +73,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/css/boxplot/
      *         Box plot in styled mode
      *
-     * @type {Highcharts.DashStyleValue}
-     *
      * @default Solid
      *
      * @since 8.1.0
@@ -92,8 +90,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/box-plot-styling/
      *         Box plot styling
      *
-     * @type {Highcharts.ColorType}
-     *
      * @default #ffffff
      *
      * @since 3.0
@@ -104,13 +100,11 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
 
     /**
      * The length of a BoxPlot point's lower whisker. Overrides
-     * [whiskerLength](#boxplot.options.whiskerLength), overridden by
+     * [whiskerLength](#boxplot.options.whiskerLength), overriden by
      * [lowerWhiskerLength](#boxplot.point.lowerWhiskerLength).
      *
      * @sample {highcharts} highcharts/series-boxplot/whisker-length
      *         Configuring whisker length
-     *
-     * @type {number|string}
      *
      * @product highcharts
      */
@@ -132,8 +126,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/error-bar-styling/
      *         Error bar styling
      *
-     * @type {Highcharts.ColorType}
-     *
      * @since 3.0
      *
      * @product highcharts
@@ -148,8 +140,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      *
      * @sample {highcharts} highcharts/css/boxplot/
      *         Box plot in styled mode
-     *
-     * @type {Highcharts.DashStyleValue}
      *
      * @default Solid
      *
@@ -171,8 +161,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      *
      * @sample {highcharts} highcharts/css/boxplot/
      *         Box plot in styled mode
-     *
-     * @type {number|null}
      *
      * @since 3.0
      *
@@ -197,8 +185,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/error-bar-styling/
      *         Error bar styling
      *
-     * @type {Highcharts.ColorType}
-     *
      * @since 3.0
      *
      * @product highcharts
@@ -217,8 +203,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      *
      * @sample {highcharts} highcharts/plotoptions/error-bar-styling/
      *         Error bar styling
-     *
-     * @type {Highcharts.DashStyleValue}
      *
      * @default Solid
      *
@@ -245,8 +229,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/error-bar-styling/
      *         Error bar styling
      *
-     * @type {number}
-     *
      * @since 3.0
      *
      * @product highcharts
@@ -255,13 +237,11 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
 
     /**
      * The length of a BoxPlot point's upper whisker. Overrides
-     * [whiskerLength](#boxplot.options.whiskerLength), overridden by
+     * [whiskerLength](#boxplot.options.whiskerLength), overriden by
      * [upperWhiskerLength](#boxplot.point.upperWhiskerLength).
      *
      * @sample {highcharts} highcharts/series-boxplot/whisker-length
      *         Configuring whisker length
-     *
-     * @type {number|string}
      *
      * @product highcharts
      */
@@ -280,8 +260,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/css/boxplot/
      *         Box plot in styled mode
      *
-     * @type {Highcharts.ColorType}
-     *
      * @since 3.0
      *
      * @product highcharts
@@ -296,8 +274,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      *
      * @sample {highcharts} highcharts/css/boxplot/
      *         Box plot in styled mode
-     *
-     * @type {Highcharts.DashStyleValue}
      *
      * @default Solid
      *
@@ -316,7 +292,7 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * boxplot series and on specific boxplot points. Whisker lengths defined
      * on points override whisker lengths defined on a boxplot series.
      *
-     * Overridden by [whiskerLength](#boxplot.point.whiskerLength),
+     * Overriden by [whiskerLength](#boxplot.point.whiskerLength),
      * [upperWhiskerLength](#boxplot.point.upperWhiskerLength), and
      * [lowerWhiskerLength](#boxPlot.point.lowerWhiskerLength)
      *
@@ -325,8 +301,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      *
      * @sample {highcharts} highcharts/series-boxplot/whisker-length
      *         Configuring whisker lengths
-     *
-     * @type {number|string}
      *
      * @since 3.0
      *
@@ -418,8 +392,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
      * @sample {highcharts} highcharts/series/data-array-of-objects/
      *         Config objects
      *
-     * @type {Array<Array<(number|string),number,number,number,number>|Array<(number|string),number,number,number,number,number>|*>}
-     *
      * @extends series.line.data
      *
      * @excluding marker
@@ -454,8 +426,6 @@ export interface BoxPlotSeriesOptions extends ColumnSeriesOptions {
     lineWidth?: number;
 
     tooltip?: BoxPlotSeriesTooltipOptions;
-
-    threshold?: number|null;
 }
 
 export interface BoxPlotSeriesTooltipOptions
