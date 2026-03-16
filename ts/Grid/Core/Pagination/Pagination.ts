@@ -437,11 +437,15 @@ class Pagination {
             totalPages
         } = this.controller;
 
-        const startItem = (currentPage - 1) * currentPageSize + 1;
-        const endItem = Math.min(
+        let startItem = (currentPage - 1) * currentPageSize + 1;
+        let endItem = Math.min(
             currentPage * currentPageSize,
             totalItems
         );
+
+        if (totalItems === 0) {
+            startItem = endItem = 0;
+        }
 
         const pageInfoText = formatText(this.lang?.pageInfo ?? '', {
             start: startItem,
