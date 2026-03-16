@@ -9,35 +9,24 @@ Use the exported `ChartOptions` type for the `options` prop instead of importing
 ```tsx
 import { useState } from "react";
 import { Chart, type ChartOptions } from "@highcharts/react";
+import { LineSeries } from "@highcharts/react/series/Line";
 
 export default function App() {
   const [options] = useState<ChartOptions>({
-    series: [{ type: "line", data: [1, 2, 3] }]
+    chart: {
+      backgroundColor: "#f8f8ff"
+    }
   });
 
-  return <Chart options={options} />;
+  return (
+    <Chart options={options}>
+      <LineSeries data={[1, 2, 3]} />
+    </Chart>
+  );
 }
 ```
 
 ## Other useful exported types
-
-### `SeriesProps`
-
-Use `SeriesProps` when you need to type data passed to the generic `Series` component:
-
-```tsx
-import { useState } from "react";
-import { Series, type SeriesProps } from "@highcharts/react";
-
-export default function App() {
-  const [lineSeries] = useState<SeriesProps>({
-    type: "line",
-    data: [1, 2, 3]
-  });
-
-  return <Series {...lineSeries} />;
-}
-```
 
 ### `HighchartsReactRefObject`
 
@@ -47,9 +36,9 @@ Use `HighchartsReactRefObject` to type refs that access the chart instance:
 import { useEffect, useRef } from "react";
 import {
   Chart,
-  Series,
   type HighchartsReactRefObject
 } from "@highcharts/react";
+import { LineSeries } from "@highcharts/react/series/Line";
 
 export default function App() {
   const chartRef = useRef<HighchartsReactRefObject>(null);
@@ -60,7 +49,7 @@ export default function App() {
 
   return (
     <Chart ref={chartRef}>
-      <Series data={[1, 2, 3]} />
+      <LineSeries data={[1, 2, 3]} />
     </Chart>
   );
 }
