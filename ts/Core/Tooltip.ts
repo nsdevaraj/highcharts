@@ -1962,10 +1962,12 @@ class Tooltip {
         // Renderer only exists when tooltip is outside.
         if (renderer && container) {
             // Corrects positions, occurs with tooltip positioner (#16944)
-            const { scrollLeft = 0, scrollTop = 0 } = chart
-                .scrollablePlotArea?.scrollingContainer || {};
-            pos.x += scrollLeft + left - distance;
-            pos.y += scrollTop + top - distance;
+            if (positioner || fixed) {
+                const { scrollLeft = 0, scrollTop = 0 } = chart
+                    .scrollablePlotArea?.scrollingContainer || {};
+                pos.x += scrollLeft + left - distance;
+                pos.y += scrollTop + top - distance;
+            }
 
             // Pad it by the border width and distance. Add 2 to make room for
             // the default shadow (#19314).
