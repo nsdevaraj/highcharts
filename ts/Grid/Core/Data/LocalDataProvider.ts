@@ -41,6 +41,9 @@ import DataTable from '../../../Data/DataTable.js';
 import ChainModifier from '../../../Data/Modifiers/ChainModifier.js';
 import DataConnector from '../../../Data/Connectors/DataConnector.js';
 import DataProviderRegistry from './DataProviderRegistry.js';
+import {
+    getGridRowPinningOptions
+} from '../RowPinning/RowPinningController.js';
 import { uniqueKey } from '../../../Core/Utilities.js';
 import { defined, isNumber, isString } from '../../../Shared/Utilities.js';
 
@@ -624,7 +627,7 @@ export class LocalDataProvider extends DataProvider {
 
     private getConfiguredIdColumn(): string | undefined {
         return this.options.idColumn ??
-            this.querying.grid.options?.rendering?.rows?.pinning?.idColumn;
+            getGridRowPinningOptions(this.querying.grid)?.idColumn;
     }
 
     private getRowIdFromTable(

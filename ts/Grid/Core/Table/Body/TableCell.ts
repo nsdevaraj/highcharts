@@ -157,16 +157,7 @@ class TableCell extends Cell {
         this.htmlElement.style.opacity = '0.5';
 
         if (!defined(value)) {
-            if (this.row.pinnedSection && this.row.id !== void 0) {
-                const rowData = await grid.dataProvider
-                    ?.getOriginalRowObjectByRowId(this.row.id);
-                value = rowData?.[this.column.id] as DataTableCellType;
-            } else {
-                value = await grid.dataProvider?.getValue(
-                    this.column.id,
-                    this.row.index
-                );
-            }
+            value = await this.getSourceValue();
 
             // Discard stale response if cell was reused for a different row
             if (fetchToken !== this.asyncFetchToken) {
@@ -249,18 +240,7 @@ class TableCell extends Cell {
      * content.
      */
     private async updateDataset(): Promise<boolean> {
-        const dp = this.column.viewport.grid.dataProvider;
-        let oldValue: DataTableCellType | undefined;
-
-        if (this.row.pinnedSection && this.row.id !== void 0) {
-            const rowData = await dp?.getOriginalRowObjectByRowId(this.row.id);
-            oldValue = rowData?.[this.column.id] as DataTableCellType;
-        } else {
-            oldValue = await dp?.getValue(
-                this.column.id,
-                this.row.index
-            );
-        }
+        const oldValue = await this.getSourceValue();
 
         if (oldValue === this.value) {
             // Abort if the value is the same as in the data table.
@@ -291,18 +271,47 @@ class TableCell extends Cell {
         return true;
     }
 
-    private async syncRenderedMirrorCells(rowId: RowId): Promise<void> {
+    private async getSourceValue(): Promise<DataTableCellType | undefined> {
+        if (this.row.pinnedSection) {
+            return this.row.data[this.column.id] as DataTableCellType;
+        }
+
+        return await this.column.viewport.grid.dataProvider?.getValue(
+            this.column.id,
+            this.row.index
+        );
+    }
+
+    private async getRenderedMirrorRows(rowId: RowId): Promise<TableRow[]> {
         const vp = this.column.viewport;
-        const mirrorRows = new Set([
-            vp.getRenderedPinnedRowById(rowId, 'top'),
-            vp.getRenderedPinnedRowById(rowId, 'bottom'),
-            vp.getRenderedRowByIndex(
-                (await vp.grid.dataProvider?.getRowIndex(rowId)) ?? -1
-            )
-        ]);
+        const renderedRows = new Set<TableRow>();
+        const mainRowIndex = await vp.grid.dataProvider?.getRowIndex(rowId);
+
+        const topRow = vp.getRenderedPinnedRowById(rowId, 'top');
+        if (topRow) {
+            renderedRows.add(topRow);
+        }
+
+        const bottomRow = vp.getRenderedPinnedRowById(rowId, 'bottom');
+        if (bottomRow) {
+            renderedRows.add(bottomRow);
+        }
+
+        if (typeof mainRowIndex === 'number') {
+            const scrollRow = vp.getRenderedRowByIndex(mainRowIndex);
+            if (scrollRow) {
+                renderedRows.add(scrollRow);
+            }
+        }
+
+        return Array.from(renderedRows);
+    }
+
+    private async syncRenderedMirrorCells(rowId: RowId): Promise<void> {
+        const mirrorRows = await this.getRenderedMirrorRows(rowId);
 
         for (const row of mirrorRows) {
-            if (!row || row === this.row) {
+            if (row === this.row) {
                 continue;
             }
 

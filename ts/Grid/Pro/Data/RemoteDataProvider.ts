@@ -174,6 +174,11 @@ export class RemoteDataProvider extends DataProvider {
         this.pendingControllers.clear();
     }
 
+    private resetPinnedRowCache(): void {
+        this.pinnedRowCache.clear();
+        this.warnedPinnedCacheMisses.clear();
+    }
+
     private async getChunkForRowIndex(rowIndex: number): Promise<DataChunk> {
         // When pagination enabled, all rows for current page are in chunk 0
         // When disabled, calculate chunk from global index
@@ -684,8 +689,7 @@ export class RemoteDataProvider extends DataProvider {
         this.columnIds = null;
         this.prePaginationRowCount = null;
         this.rowCount = null;
-        this.pinnedRowCache.clear();
-        this.warnedPinnedCacheMisses.clear();
+        this.resetPinnedRowCache();
 
         // When pagination is enabled, update the total items count
         // for the pagination controller (used to calculate total pages).
@@ -703,8 +707,7 @@ export class RemoteDataProvider extends DataProvider {
         this.columnIds = null;
         this.prePaginationRowCount = null;
         this.rowCount = null;
-        this.pinnedRowCache.clear();
-        this.warnedPinnedCacheMisses.clear();
+        this.resetPinnedRowCache();
         this.lastQueryFingerprint = null;
         this.requestEpoch++;
     }

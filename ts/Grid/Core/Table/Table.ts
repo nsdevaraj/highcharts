@@ -24,7 +24,6 @@
 
 import TableRow from './Body/TableRow.js';
 import type DataTable from '../../../Data/DataTable';
-import type { CellType as DataTableCellType } from '../../../Data/DataTable';
 import type { RowId } from '../Data/DataProvider';
 
 import GridUtils from '../GridUtils.js';
@@ -42,6 +41,9 @@ import Cell from './Cell.js';
 import { defined, fireEvent, getStyle } from '../../../Shared/Utilities.js';
 import CellContextMenu from './Body/CellContextMenu.js';
 import CellContextMenuBuiltInActions from './Body/CellContextMenuBuiltInActions.js';
+import {
+    getGridRowPinningOptions
+} from '../RowPinning/RowPinningController.js';
 
 const { makeHTMLElement } = GridUtils;
 
@@ -1118,15 +1120,11 @@ class Table {
         };
         const hasPinning = pinnedRows.topIds.length > 0 ||
             pinnedRows.bottomIds.length > 0;
+        const pinnedSections = this.getPinnedSections(pinnedRows);
         this.ensurePinnedBodiesRendered(hasPinning);
 
         if (!hasPinning) {
-            this.pinnedTopRows.forEach((row): void => row.destroy());
-            this.pinnedBottomRows.forEach((row): void => row.destroy());
-            this.pinnedTopRows.length = 0;
-            this.pinnedBottomRows.length = 0;
-            this.pinnedTopRowById.clear();
-            this.pinnedBottomRowById.clear();
+            this.clearPinnedRows();
             this.tbodyElement.style.display = '';
             if (!deferLayout) {
                 this.setTbodyMinHeight();
@@ -1137,31 +1135,26 @@ class Table {
             return { missingPinnedRowIds: [] };
         }
 
-        const topMissing = await this.syncPinnedRowsByIds(
-            this.pinnedTopRows,
-            this.pinnedTopTbodyElement,
-            pinnedRows.topIds,
-            'top'
-        );
-        const bottomMissing = await this.syncPinnedRowsByIds(
-            this.pinnedBottomRows,
-            this.pinnedBottomTbodyElement,
-            pinnedRows.bottomIds,
-            'bottom'
-        );
+        const missingPinnedRowIds: RowId[] = [];
+        for (const section of pinnedSections) {
+            missingPinnedRowIds.push(...await this.syncPinnedRowsByIds(
+                section.rows,
+                section.tbody,
+                section.rowIds,
+                section.position
+            ));
+        }
 
         this.rebuildPinnedRowLookupMaps();
         this.updateScrollableRowAttributes();
         await this.syncAriaRowIndexes();
 
-        this.pinnedTopTbodyElement.classList.toggle(
-            Globals.getClassName('pinnedTbodyElementActive'),
-            pinnedRows.topIds.length > 0
-        );
-        this.pinnedBottomTbodyElement.classList.toggle(
-            Globals.getClassName('pinnedTbodyElementActive'),
-            pinnedRows.bottomIds.length > 0
-        );
+        for (const section of pinnedSections) {
+            section.tbody.classList.toggle(
+                Globals.getClassName('pinnedTbodyElementActive'),
+                section.rowIds.length > 0
+            );
+        }
         this.tbodyElement.style.display = '';
         if (!deferLayout) {
             this.setTbodyMinHeight();
@@ -1170,7 +1163,7 @@ class Table {
             this.applyPinnedScrollbarCompensation();
         }
         return {
-            missingPinnedRowIds: [...topMissing, ...bottomMissing]
+            missingPinnedRowIds
         };
     }
 
@@ -1183,18 +1176,10 @@ class Table {
     private getPinnedBodyMaxHeight(
         position: 'top'|'bottom'
     ): number|string|undefined {
-        const pinningOptions = this.grid.options?.rendering?.rows?.pinning;
-        const userPinningOptions = this.grid.userOptions?.rendering?.rows
-            ?.pinning;
+        const pinningOptions = getGridRowPinningOptions(this.grid);
         return position === 'top' ?
-            (
-                pinningOptions?.top?.maxHeight ??
-                userPinningOptions?.top?.maxHeight
-            ) :
-            (
-                pinningOptions?.bottom?.maxHeight ??
-                userPinningOptions?.bottom?.maxHeight
-            );
+            pinningOptions?.top?.maxHeight :
+            pinningOptions?.bottom?.maxHeight;
     }
 
     /**
@@ -1254,14 +1239,9 @@ class Table {
             tbody.style.overflowX = maxHeight ? 'hidden' : '';
         };
 
-        apply(
-            this.pinnedTopTbodyElement,
-            this.getPinnedBodyMaxHeight('top')
-        );
-        apply(
-            this.pinnedBottomTbodyElement,
-            this.getPinnedBodyMaxHeight('bottom')
-        );
+        for (const section of this.getPinnedSections()) {
+            apply(section.tbody, this.getPinnedBodyMaxHeight(section.position));
+        }
     }
 
     private syncPinnedHorizontalScroll(scrollLeft: number): void {
@@ -1269,21 +1249,15 @@ class Table {
             return;
         }
 
-        this.pinnedTopTbodyElement.scrollLeft = scrollLeft;
-        this.pinnedBottomTbodyElement.scrollLeft = scrollLeft;
-
         const offset = -scrollLeft;
         const transform = offset ? `translateX(${offset}px)` : '';
 
-        for (let i = 0, iEnd = this.pinnedTopRows.length; i < iEnd; ++i) {
-            this.pinnedTopRows[i].htmlElement.style.transform = transform;
-        }
-        for (
-            let i = 0, iEnd = this.pinnedBottomRows.length;
-            i < iEnd;
-            ++i
-        ) {
-            this.pinnedBottomRows[i].htmlElement.style.transform = transform;
+        for (const section of this.getPinnedSections()) {
+            section.tbody.scrollLeft = scrollLeft;
+
+            for (let i = 0, iEnd = section.rows.length; i < iEnd; ++i) {
+                section.rows[i].htmlElement.style.transform = transform;
+            }
         }
     }
 
@@ -1310,28 +1284,15 @@ class Table {
 
             if (!row) {
                 row = new TableRow(this, nextIndex);
-                row.pinnedSection = section;
-                row.id = rowId;
+                await row.syncPinned(rowId, section, rowData, nextIndex, false);
                 await row.init();
                 await row.render();
                 tbody.appendChild(row.htmlElement);
             } else {
-                row.index = nextIndex;
-                row.id = rowId;
-                row.pinnedSection = section;
-                row.setRowAttributes();
-                row.updateRowAttributes();
+                await row.syncPinned(rowId, section, rowData, nextIndex, false);
                 if (!row.htmlElement.isConnected) {
                     tbody.appendChild(row.htmlElement);
                 }
-            }
-
-            for (let c = 0, cEnd = row.cells.length; c < cEnd; ++c) {
-                const cell = row.cells[c] as TableCell;
-                const columnId = cell.column.id;
-                await cell.setValue(
-                    rowData[columnId] as DataTableCellType
-                );
             }
 
             row.reflow();
@@ -1351,17 +1312,13 @@ class Table {
     }
 
     private rebuildPinnedRowLookupMaps(): void {
-        this.pinnedTopRowById.clear();
-        this.pinnedBottomRowById.clear();
+        for (const section of this.getPinnedSections()) {
+            section.rowById.clear();
 
-        for (const row of this.pinnedTopRows) {
-            if (row.id !== void 0) {
-                this.pinnedTopRowById.set(row.id, row);
-            }
-        }
-        for (const row of this.pinnedBottomRows) {
-            if (row.id !== void 0) {
-                this.pinnedBottomRowById.set(row.id, row);
+            for (const row of section.rows) {
+                if (row.id !== void 0) {
+                    section.rowById.set(row.id, row);
+                }
             }
         }
     }
@@ -1427,15 +1384,17 @@ class Table {
                 '';
         };
 
-        applyToPinnedBody(this.pinnedTopTbodyElement);
-        applyToPinnedBody(this.pinnedBottomTbodyElement);
+        for (const section of this.getPinnedSections()) {
+            applyToPinnedBody(section.tbody);
+        }
 
         if (!this.pinnedScrollbarCompensationQueued) {
             this.pinnedScrollbarCompensationQueued = true;
             requestAnimationFrame((): void => {
                 this.pinnedScrollbarCompensationQueued = false;
-                applyToPinnedBody(this.pinnedTopTbodyElement);
-                applyToPinnedBody(this.pinnedBottomTbodyElement);
+                for (const section of this.getPinnedSections()) {
+                    applyToPinnedBody(section.tbody);
+                }
             });
         }
     }
@@ -1448,36 +1407,68 @@ class Table {
      * Whether pinned tbody elements should be attached.
      */
     private ensurePinnedBodiesRendered(shouldRender: boolean): void {
-        const {
-            tableElement,
-            pinnedTopTbodyElement,
-            pinnedBottomTbodyElement
-        } = this;
-        const topConnected = (
-            pinnedTopTbodyElement.parentElement === tableElement
-        );
-        const bottomConnected = (
-            pinnedBottomTbodyElement.parentElement === tableElement
-        );
-
         if (!shouldRender) {
-            if (topConnected) {
-                pinnedTopTbodyElement.remove();
-            }
-            if (bottomConnected) {
-                pinnedBottomTbodyElement.remove();
+            for (const section of this.getPinnedSections()) {
+                if (section.tbody.parentElement === this.tableElement) {
+                    section.tbody.remove();
+                }
             }
             return;
         }
 
-        if (!topConnected) {
-            tableElement.insertBefore(pinnedTopTbodyElement, this.tbodyElement);
-        }
-        if (!bottomConnected) {
-            tableElement.appendChild(pinnedBottomTbodyElement);
+        for (const section of this.getPinnedSections()) {
+            if (section.tbody.parentElement === this.tableElement) {
+                continue;
+            }
+
+            if (section.position === 'top') {
+                this.tableElement.insertBefore(
+                    section.tbody,
+                    this.tbodyElement
+                );
+            } else {
+                this.tableElement.appendChild(section.tbody);
+            }
         }
     }
 
+    private clearPinnedRows(): void {
+        for (const section of this.getPinnedSections()) {
+            section.rows.forEach((row): void => row.destroy());
+            section.rows.length = 0;
+            section.rowById.clear();
+        }
+    }
+
+    private getPinnedSections(
+        pinnedRows: { topIds: RowId[]; bottomIds: RowId[] } = {
+            topIds: [],
+            bottomIds: []
+        }
+    ): PinnedSectionDescriptor[] {
+        return [{
+            position: 'top',
+            rowIds: pinnedRows.topIds,
+            rows: this.pinnedTopRows,
+            tbody: this.pinnedTopTbodyElement,
+            rowById: this.pinnedTopRowById
+        }, {
+            position: 'bottom',
+            rowIds: pinnedRows.bottomIds,
+            rows: this.pinnedBottomRows,
+            tbody: this.pinnedBottomTbodyElement,
+            rowById: this.pinnedBottomRowById
+        }];
+    }
+
+}
+
+interface PinnedSectionDescriptor {
+    position: 'top'|'bottom';
+    rowIds: RowId[];
+    rows: TableRow[];
+    tbody: HTMLElement;
+    rowById: Map<RowId, TableRow>;
 }
 
 export type FocusCursor =

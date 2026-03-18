@@ -148,13 +148,6 @@ built-in leaf actions.
 Nested levels do not use implicit defaults. You must provide submenu `items`
 explicitly.
 
-## Keyboard navigation
-
-- `ArrowRight`: Opens the focused branch submenu and focuses its first item.
-- `ArrowLeft`: Closes the current submenu and focuses its parent branch item.
-- `Escape`: Closes the current submenu and focuses parent. Press repeatedly to
-  close parent levels up to the root menu.
-
 ## Callback context
 
 The menu item callback receives a single `cell` argument:

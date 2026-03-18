@@ -139,10 +139,7 @@ class TableRow extends Row {
      */
     public async update(): Promise<void> {
         if (this.pinnedSection) {
-            this.updateRowAttributes();
-            this.updateParityClass();
-            this.updateStateClasses();
-            this.reflow();
+            await this.syncPinned(this.id, this.pinnedSection, this.data);
             return;
         }
 
@@ -193,6 +190,28 @@ class TableRow extends Row {
         for (let i = 0, iEnd = this.cells.length; i < iEnd; ++i) {
             const cell = this.cells[i] as TableCell;
             await cell.setValue();
+        }
+
+        if (doReflow) {
+            this.reflow();
+        }
+    }
+
+    public async syncPinned(
+        rowId: RowId | undefined,
+        section: 'top'|'bottom',
+        data: DataTableRowObject,
+        index: number = this.index,
+        doReflow: boolean = true
+    ): Promise<void> {
+        this.index = index;
+        this.id = rowId;
+        this.pinnedSection = section;
+        this.data = data;
+        this.setRowAttributes();
+
+        if (this.rendered) {
+            await this.syncCellsWithRowData();
         }
 
         if (doReflow) {
@@ -369,6 +388,15 @@ class TableRow extends Row {
             this.viewport.grid.syncedRowIndex === this.index
         ) {
             el.classList.add(Globals.getClassName('syncedRow'));
+        }
+    }
+
+    private async syncCellsWithRowData(): Promise<void> {
+        for (let i = 0, iEnd = this.cells.length; i < iEnd; ++i) {
+            const cell = this.cells[i] as TableCell;
+            await cell.setValue(
+                this.data[cell.column.id]
+            );
         }
     }
 

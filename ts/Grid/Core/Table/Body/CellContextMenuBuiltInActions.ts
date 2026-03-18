@@ -30,6 +30,11 @@ import type {
 } from '../../Options';
 import type { GridIconName } from '../../UI/SvgIcons';
 
+import {
+    hasConfiguredGridRowPinningOptions,
+    getGridRowPinningOptions
+} from '../../RowPinning/RowPinningController.js';
+
 /* *
  *
  *  Constants
@@ -43,6 +48,43 @@ export const defaultBuiltInCellContextMenuActions: CellContextMenuActionId[] = [
     'pinRowBottom',
     'unpinRow'
 ];
+
+const builtInActionDefinitions: Record<
+    CellContextMenuActionId,
+    BuiltInActionDefinition
+> = {
+    pinRowTop: {
+        getLabel: (cell: TableCell): string =>
+            cell.row.viewport.grid.options?.lang?.pinRowTop || 'Pin row to top',
+        icon: 'pin',
+        isDisabled: (cell, rowId): boolean =>
+            isPinnedStateDisabled('pinRowTop', cell, rowId),
+        onClick: (cell, rowId): void => {
+            void cell.row.viewport.grid.pinRow(rowId, 'top');
+        }
+    },
+    pinRowBottom: {
+        getLabel: (cell: TableCell): string =>
+            cell.row.viewport.grid.options?.lang?.pinRowBottom ||
+            'Pin row to bottom',
+        icon: 'pin',
+        isDisabled: (cell, rowId): boolean =>
+            isPinnedStateDisabled('pinRowBottom', cell, rowId),
+        onClick: (cell, rowId): void => {
+            void cell.row.viewport.grid.pinRow(rowId, 'bottom');
+        }
+    },
+    unpinRow: {
+        getLabel: (cell: TableCell): string =>
+            cell.row.viewport.grid.options?.lang?.unpinRow || 'Unpin row',
+        icon: 'unpin',
+        isDisabled: (cell, rowId): boolean =>
+            isPinnedStateDisabled('unpinRow', cell, rowId),
+        onClick: (cell, rowId): void => {
+            void cell.row.viewport.grid.unpinRow(rowId);
+        }
+    }
+};
 
 export interface ResolvedCellContextMenuActionItemOptions {
     label: string;
@@ -58,6 +100,16 @@ export interface ResolvedCellContextMenuActionItemOptions {
 export type ResolvedCellContextMenuItemOptions =
     CellContextMenuDividerItemOptions |
     ResolvedCellContextMenuActionItemOptions;
+
+interface BuiltInActionDefinition {
+    getLabel: (cell: TableCell) => string;
+    icon: GridIconName;
+    isDisabled: (
+        cell: TableCell,
+        rowId: string|number|undefined
+    ) => boolean;
+    onClick: (cell: TableCell, rowId: string|number) => void;
+}
 
 /* *
  *
@@ -174,10 +226,8 @@ function getCurrentRowId(cell: TableCell): (string|number|undefined) {
  */
 function isPinningOptionEnabled(cell: TableCell): boolean {
     const grid = cell.row.viewport.grid;
-    const pinningOptions = grid.userOptions?.rendering?.rows?.pinning;
-
-    if (pinningOptions) {
-        return pinningOptions.enabled !== false;
+    if (hasConfiguredGridRowPinningOptions(grid)) {
+        return getGridRowPinningOptions(grid)?.enabled !== false;
     }
 
     return !!grid.rowPinning?.isEnabled();
@@ -211,51 +261,22 @@ function isContextMenuEnabled(cell: TableCell): boolean {
 }
 
 /**
- * Resolves the default built-in action label.
- *
- * @param cell
- * Table cell for the context menu.
+ * Returns the built-in action definition for a given action ID.
  *
  * @param actionId
  * Built-in action id.
  *
  * @return
- * Built-in label.
+ * Built-in action definition when known.
  */
-function getBuiltInLabel(
-    cell: TableCell,
-    actionId: CellContextMenuActionId
-): string {
-    const lang = cell.row.viewport.grid.options?.lang;
-    switch (actionId) {
-        case 'pinRowTop':
-            return lang?.pinRowTop || 'Pin row to top';
-        case 'pinRowBottom':
-            return lang?.pinRowBottom || 'Pin row to bottom';
-        case 'unpinRow':
-            return lang?.unpinRow || 'Unpin row';
+function getBuiltInActionDefinition(
+    actionId: string
+): BuiltInActionDefinition | undefined {
+    if (actionId in builtInActionDefinitions) {
+        return builtInActionDefinitions[actionId as CellContextMenuActionId];
     }
-}
 
-/**
- * Resolves the default built-in action icon.
- *
- * @param actionId
- * Built-in action id.
- *
- * @return
- * Built-in icon id.
- */
-function getBuiltInIcon(
-    actionId: CellContextMenuActionId
-): GridIconName {
-    switch (actionId) {
-        case 'pinRowTop':
-        case 'pinRowBottom':
-            return 'pin';
-        case 'unpinRow':
-            return 'unpin';
-    }
+    warnUnknownBuiltInAction(actionId);
 }
 
 /**
@@ -300,42 +321,6 @@ function isPinnedStateDisabled(
 }
 
 /**
- * Returns the click handler for a built-in row pinning action.
- *
- * @param actionId
- * Built-in action id.
- *
- * @param cell
- * Table cell for the context menu.
- *
- * @return
- * Click callback for the built-in action.
- */
-function getBuiltInActionClick(
-    actionId: CellContextMenuActionId,
-    cell: TableCell
-): (() => void) {
-    return (): void => {
-        const rowId = getCurrentRowId(cell);
-        if (rowId === void 0) {
-            return;
-        }
-
-        const grid = cell.row.viewport.grid;
-        if (actionId === 'pinRowTop') {
-            void grid.pinRow(rowId, 'top');
-            return;
-        }
-        if (actionId === 'pinRowBottom') {
-            void grid.pinRow(rowId, 'bottom');
-            return;
-        }
-
-        void grid.unpinRow(rowId);
-    };
-}
-
-/**
  * Resolves one built-in action declaration into a regular action item.
  *
  * @param actionId
@@ -359,27 +344,29 @@ function resolveBuiltInAction(
     override?: CellContextMenuBuiltInItemOptions,
     isBranch?: boolean
 ): (ResolvedCellContextMenuActionItemOptions|undefined) {
-    if (
-        actionId !== 'pinRowTop' &&
-        actionId !== 'pinRowBottom' &&
-        actionId !== 'unpinRow'
-    ) {
-        warnUnknownBuiltInAction(actionId);
+    const definition = getBuiltInActionDefinition(actionId);
+    if (!definition) {
         return;
     }
 
     const rowId = getCurrentRowId(cell);
     const disabled = isBranch ?
         !!override?.disabled :
-        isPinnedStateDisabled(actionId, cell, rowId) || !!override?.disabled;
+        definition.isDisabled(cell, rowId) || !!override?.disabled;
 
     return {
-        label: override?.label || getBuiltInLabel(cell, actionId),
-        icon: override?.icon || getBuiltInIcon(actionId),
+        label: override?.label || definition.getLabel(cell),
+        icon: override?.icon || definition.icon,
         disabled,
         onClick: isBranch ?
             void 0 :
-            getBuiltInActionClick(actionId, cell)
+            (): void => {
+                if (rowId === void 0) {
+                    return;
+                }
+
+                definition.onClick(cell, rowId);
+            }
     };
 }
 

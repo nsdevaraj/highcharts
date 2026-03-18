@@ -244,7 +244,6 @@ class RowsVirtualizer {
             this.viewport.reflow();
         }
 
-        await this.updateGridMetrics();
         await this.viewport.refreshPinnedRowsFromQueryCycle();
 
         // Load & render rows
@@ -261,8 +260,6 @@ class RowsVirtualizer {
      * re-rendered, e.g., after a sort or filter operation.
      */
     public async rerender(): Promise<void> {
-        await this.updateGridMetrics();
-
         const tbody = this.viewport.tbodyElement;
         let rows = this.viewport.rows;
 
@@ -502,10 +499,6 @@ class RowsVirtualizer {
             await this.updateGridMetrics();
 
             const rowCount = this.rowCount;
-            if (!defined(rowCount)) {
-                return;
-            }
-
             if (rowCount === 0) {
                 if (vp.rows.length) {
                     for (let i = 0, iEnd = vp.rows.length; i < iEnd; ++i) {

@@ -22,7 +22,7 @@
  * */
 
 import type Grid from '../../Core/Grid';
-import type { RowObject as DataTableRowObject } from '../../../Data/DataTable';
+import type Options from '../../Core/Options';
 import type { RowId as DataProviderRowId } from '../Data/DataProvider';
 
 /* *
@@ -33,6 +33,43 @@ import type { RowId as DataProviderRowId } from '../Data/DataProvider';
 
 export type RowId = DataProviderRowId;
 export type RowPinningPosition = 'top'|'bottom';
+export type GridRowPinningOptions = NonNullable<
+    NonNullable<
+        NonNullable<Options['rendering']>['rows']
+    >['pinning']
+>;
+
+/**
+ * Snapshot of pinned row IDs by section.
+ */
+export interface RowPinningState {
+    topIds: RowId[];
+    bottomIds: RowId[];
+}
+
+/**
+ * Returns whether row pinning was explicitly configured by the user.
+ *
+ * @param grid
+ * Grid instance options container.
+ */
+export function hasConfiguredGridRowPinningOptions(
+    grid: Pick<Grid, 'userOptions'>
+): boolean {
+    return grid.userOptions?.rendering?.rows?.pinning !== void 0;
+}
+
+/**
+ * Returns merged row pinning options from the grid.
+ *
+ * @param grid
+ * Grid instance options container.
+ */
+export function getGridRowPinningOptions(
+    grid: Pick<Grid, 'options'>
+): (GridRowPinningOptions | undefined) {
+    return grid.options?.rendering?.rows?.pinning;
+}
 
 /* *
  *
@@ -60,16 +97,40 @@ class RowPinningController {
         this.grid = grid;
     }
 
-    private getPinningOptions(): {
-        enabled?: boolean;
-        idColumn?: string;
-        topIds?: RowId[];
-        bottomIds?: RowId[];
-        resolve?: (row: DataTableRowObject) => ('top'|'bottom'|null|undefined);
-    }|undefined {
-        return (
-            this.grid.userOptions?.rendering?.rows?.pinning ||
-            this.grid.options?.rendering?.rows?.pinning
+    public getPinningOptions(): ReturnType<typeof getGridRowPinningOptions> {
+        return getGridRowPinningOptions(this.grid);
+    }
+
+    private clearState(clearExplicitUnpinned: boolean = false): void {
+        this.topRowIds.length = 0;
+        this.bottomRowIds.length = 0;
+        this.resolvedTopRowIds.length = 0;
+        this.resolvedBottomRowIds.length = 0;
+
+        if (clearExplicitUnpinned) {
+            this.explicitUnpinned.clear();
+        }
+    }
+
+    private static normalizeSections(
+        topIds: RowId[],
+        bottomIds: RowId[]
+    ): { topIds: RowId[]; bottomIds: RowId[] } {
+        const uniqueTopIds = RowPinningController.uniqueRowIds(topIds);
+        const topSet = new Set(uniqueTopIds);
+        const uniqueBottomIds = RowPinningController.uniqueRowIds(bottomIds)
+            .filter((rowId): boolean => !topSet.has(rowId));
+
+        return {
+            topIds: uniqueTopIds,
+            bottomIds: uniqueBottomIds
+        };
+    }
+
+    private getExplicitPinnedRows(): { topIds: RowId[]; bottomIds: RowId[] } {
+        return RowPinningController.normalizeSections(
+            this.topRowIds,
+            this.bottomRowIds
         );
     }
 
@@ -84,18 +145,14 @@ class RowPinningController {
         const bottom = pinningOptions?.bottomIds || [];
 
         if (!this.isOptionEnabled()) {
-            this.topRowIds.length = 0;
-            this.bottomRowIds.length = 0;
-            this.resolvedTopRowIds.length = 0;
-            this.resolvedBottomRowIds.length = 0;
-            this.explicitUnpinned.clear();
+            this.clearState(true);
             return;
         }
 
-        this.topRowIds = RowPinningController.uniqueRowIds(top);
-        this.bottomRowIds = RowPinningController.uniqueRowIds(bottom).filter((
-            rowId
-        ): boolean => !this.topRowIds.includes(rowId));
+        const normalized = RowPinningController.normalizeSections(top, bottom);
+
+        this.topRowIds = normalized.topIds;
+        this.bottomRowIds = normalized.bottomIds;
         this.resolvedTopRowIds.length = 0;
         this.resolvedBottomRowIds.length = 0;
     }
@@ -111,10 +168,11 @@ class RowPinningController {
             return false;
         }
 
+        const explicit = this.getExplicitPinnedRows();
         const pinningOptions = this.getPinningOptions();
         return !!(
-            this.topRowIds.length ||
-            this.bottomRowIds.length ||
+            explicit.topIds.length ||
+            explicit.bottomIds.length ||
             this.resolvedTopRowIds.length ||
             this.resolvedBottomRowIds.length ||
             pinningOptions?.resolve
@@ -136,33 +194,16 @@ class RowPinningController {
         }
 
         this.explicitUnpinned.delete(rowId);
-
-        const source = (
-            position === 'top' ?
-                this.topRowIds :
-                this.bottomRowIds
-        );
-        const other = (
-            position === 'top' ?
-                this.bottomRowIds :
-                this.topRowIds
+        const next = this.previewPinnedRowsChange(
+            this.getExplicitPinnedRows(),
+            'pin',
+            rowId,
+            position,
+            index
         );
 
-        const existingIndex = source.indexOf(rowId);
-        if (existingIndex !== -1) {
-            source.splice(existingIndex, 1);
-        }
-
-        const otherIndex = other.indexOf(rowId);
-        if (otherIndex !== -1) {
-            other.splice(otherIndex, 1);
-        }
-
-        if (typeof index === 'number' && index >= 0) {
-            source.splice(Math.min(index, source.length), 0, rowId);
-        } else {
-            source.push(rowId);
-        }
+        this.topRowIds = next.topIds;
+        this.bottomRowIds = next.bottomIds;
     }
 
     public unpinRow(rowId: RowId): void {
@@ -171,24 +212,57 @@ class RowPinningController {
             return;
         }
 
-        const topIndex = this.topRowIds.indexOf(rowId);
-        if (topIndex !== -1) {
-            this.topRowIds.splice(topIndex, 1);
-        }
-
-        const bottomIndex = this.bottomRowIds.indexOf(rowId);
-        if (bottomIndex !== -1) {
-            this.bottomRowIds.splice(bottomIndex, 1);
-        }
-
+        const next = this.previewPinnedRowsChange(
+            this.getExplicitPinnedRows(),
+            'unpin',
+            rowId
+        );
+        this.topRowIds = next.topIds;
+        this.bottomRowIds = next.bottomIds;
         this.explicitUnpinned.add(rowId);
     }
 
+    public previewPinnedRowsChange(
+        previous: RowPinningState,
+        action: 'pin'|'unpin',
+        rowId: RowId,
+        position: RowPinningPosition = 'top',
+        index?: number
+    ): RowPinningState {
+        const topIds = previous.topIds.slice();
+        const bottomIds = previous.bottomIds.slice();
+        const source = position === 'top' ? topIds : bottomIds;
+        const other = position === 'top' ? bottomIds : topIds;
+
+        const sourceIndex = source.indexOf(rowId);
+        if (sourceIndex !== -1) {
+            source.splice(sourceIndex, 1);
+        }
+
+        const otherIndex = other.indexOf(rowId);
+        if (otherIndex !== -1) {
+            other.splice(otherIndex, 1);
+        }
+
+        if (action === 'pin') {
+            if (typeof index === 'number' && index >= 0) {
+                source.splice(Math.min(index, source.length), 0, rowId);
+            } else {
+                source.push(rowId);
+            }
+        }
+
+        return { topIds, bottomIds };
+    }
+
     public setResolvedIds(topIds: RowId[], bottomIds: RowId[]): void {
-        this.resolvedTopRowIds = RowPinningController.uniqueRowIds(topIds);
-        this.resolvedBottomRowIds = RowPinningController.uniqueRowIds(
+        const normalized = RowPinningController.normalizeSections(
+            topIds,
             bottomIds
-        ).filter((rowId): boolean => !this.resolvedTopRowIds.includes(rowId));
+        );
+
+        this.resolvedTopRowIds = normalized.topIds;
+        this.resolvedBottomRowIds = normalized.bottomIds;
     }
 
     public pruneMissingExplicitIds(rowIds: RowId[]): void {
@@ -215,16 +289,22 @@ class RowPinningController {
             };
         }
 
-        const topIds = RowPinningController.uniqueRowIds([
-            ...this.topRowIds,
-            ...this.resolvedTopRowIds
-        ]).filter((rowId): boolean => !this.explicitUnpinned.has(rowId));
+        const normalized = RowPinningController.normalizeSections(
+            [
+                ...this.topRowIds,
+                ...this.resolvedTopRowIds
+            ],
+            [
+                ...this.bottomRowIds,
+                ...this.resolvedBottomRowIds
+            ]
+        );
 
+        const topIds = normalized.topIds.filter((rowId): boolean =>
+            !this.explicitUnpinned.has(rowId)
+        );
         const topSet = new Set(topIds);
-        const bottomIds = RowPinningController.uniqueRowIds([
-            ...this.bottomRowIds,
-            ...this.resolvedBottomRowIds
-        ]).filter((rowId): boolean =>
+        const bottomIds = normalized.bottomIds.filter((rowId): boolean =>
             !this.explicitUnpinned.has(rowId) && !topSet.has(rowId)
         );
 
@@ -249,9 +329,11 @@ class RowPinningController {
             return;
         }
 
-        const explicitTop = this.topRowIds.slice();
-        const explicitBottom = this.bottomRowIds.slice();
-        const used = new Set<RowId>([...explicitTop, ...explicitBottom]);
+        const explicit = this.getExplicitPinnedRows();
+        const used = new Set<RowId>([
+            ...explicit.topIds,
+            ...explicit.bottomIds
+        ]);
         const topResolved: RowId[] = [];
         const bottomResolved: RowId[] = [];
 
