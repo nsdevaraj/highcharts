@@ -57,23 +57,66 @@ import {
 
 declare module '../Core/Chart/ChartBase'{
     interface ChartBase {
+        /**
+         * The data parser for this chart.
+         */
         data?: Data;
+
+        /** @internal */
         hasDataDef?: boolean;
+
+        /** @internal */
         liveDataURL?: string;
     }
 }
 declare module '../Core/Options' {
     interface Options {
+
+        /**
+         * The Data module provides a simplified interface for adding data to
+         * a chart from sources like CVS, HTML tables or grid views. See also
+         * the [tutorial article on the Data module](
+         * https://www.highcharts.com/docs/working-with-data/data-module).
+         *
+         * It requires the `modules/data.js` file to be loaded.
+         *
+         * Please note that the default way of adding data in Highcharts,
+         * without the need of a module, is through the
+         * [series._type_.data](#series.line.data) option.
+         *
+         * @sample {highcharts} highcharts/demo/column-parsed/
+         *         HTML table
+         * @sample {highcharts} highcharts/data/csv/
+         *         CSV
+         *
+         * @since    4.0
+         * @requires modules/data
+         */
         data?: DataOptions;
     }
 }
 
 type DataValueType = (number|string|null);
 
+/** @internal */
 interface DataAfterCompleteCallbackFunction {
-    (dataInstance: Data, dataOptions?: Partial<Options>): void;
+    (dataInstance: Data, chartOptions?: Partial<Options>): void;
 }
 
+/**
+ * Callback function to modify the CSV before parsing it by the data module.
+ *
+ * @callback Highcharts.DataBeforeParseCallbackFunction
+ *
+ * @param {string} csv
+ *        The CSV to modify.
+ *
+ * @param {Highcharts.Data} ctx
+ *        The Data instance.
+ *
+ * @return {string}
+ *         The CSV to parse.
+ */
 interface DataBeforeParseCallbackFunction {
     (csv: string, ctx: Data): string;
 }
@@ -86,12 +129,33 @@ interface DataColumnsArray extends Array<DataValueType> {
     unsorted?: boolean;
 }
 
+/**
+ * Callback function that gets called after parsing data.
+ *
+ * @param {Highcharts.Options} chartOptions
+ *        The chart options that were used.
+ */
 interface DataCompleteCallbackFunction {
     (chartOptions: Partial<Options>): void;
 }
 
 interface DataOptions {
+    /**
+     * The afterComplete hook is used internally to avoid conflict with the
+     * externally available complete option.
+     * @internal
+     */
     afterComplete?: DataAfterCompleteCallbackFunction;
+
+    /**
+     * A callback function to modify the CSV before parsing it. Returns the
+     * modified string.
+     *
+     * @sample {highcharts} highcharts/demo/line-csv/
+     *         Modify CSV before parse
+     *
+     * @since 6.1
+     */
     beforeParse?: DataBeforeParseCallbackFunction;
     columns?: Array<DataColumnsArray>;
     columnsURL?: string;
@@ -101,7 +165,6 @@ interface DataOptions {
     csvURL?: string;
     dataRefreshRate?: number;
     dateFormat?: string;
-    dateFormats?: undefined;
     decimalPoint?: string;
     enablePolling?: boolean;
     endColumn?: number;
@@ -1031,9 +1094,8 @@ class Data {
 
                 // If the calculated format is not valid, we need to present an
                 // error.
-
                 if (
-                    !(options.dateFormats || self.dateFormats)[calculatedFormat]
+                    !self.dateFormats[calculatedFormat]
                 ) {
                     // This should emit an event instead
                     fireEvent(self, 'deduceDateFailed');
@@ -2092,9 +2154,9 @@ class Data {
             // Set the complete handler
             options.afterComplete = function (
                 dataInstance: Data,
-                dataOptions?: Partial<Options>
+                dataChartOptions?: Partial<Options>
             ): void {
-                if (!dataOptions) {
+                if (!dataChartOptions) {
                     return;
                 }
 
@@ -2117,14 +2179,14 @@ class Data {
                     xAxis.update({}, false);
                 } else {
                     // Prefer smooth points update when no axis update
-                    (dataOptions?.series || []).forEach(function (
+                    (dataChartOptions?.series || []).forEach(function (
                         seriesOptions: SeriesOptions
                     ): void {
                         delete seriesOptions.pointStart;
                     });
                 }
 
-                chart.update(dataOptions, redraw, true);
+                chart.update(dataChartOptions, redraw, true);
             };
             // Apply it
             merge(true, chartOptions.data, options);
@@ -2443,6 +2505,9 @@ export default Data;
  * @param {string} csv
  *        The CSV to modify.
  *
+ * @param {Highcharts.Data} ctx
+ *        The Data instance.
+ *
  * @return {string}
  *         The CSV to parse.
  */
@@ -2543,7 +2608,7 @@ export default Data;
  */
 
 /**
- * A callback function to modify the CSV before parsing it. Return the modified
+ * A callback function to modify the CSV before parsing it. Returns the modified
  * string.
  *
  * @sample {highcharts} highcharts/demo/line-csv/

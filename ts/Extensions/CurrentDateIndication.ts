@@ -58,7 +58,7 @@ declare module '../Core/Axis/AxisOptions' {
     }
 }
 
-interface CurrentDateIndicatorLabelOptions extends PlotLineLabelOptions{
+interface CurrentDateIndicatorLabelOptions extends PlotLineLabelOptions {
     /**
      * Format of the label. This options is passed as the first argument to
      * [dateFormat](/class-reference/Highcharts.Time#dateFormat) function.
@@ -217,7 +217,8 @@ function wrapPlotLineOrBandGetLabelText(
     defaultLabelOptions: (PlotBandLabelOptions|PlotLineLabelOptions)
 ): string {
     if (
-        this.options?.className?.indexOf(
+        this.options.className && // has a className
+        this.options.className.indexOf(
             'highcharts-current-date-indicator'
         ) !== -1 &&
         typeof this.options.label?.formatter === 'function'
