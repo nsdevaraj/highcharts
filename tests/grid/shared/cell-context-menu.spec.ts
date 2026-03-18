@@ -61,6 +61,21 @@ test.describe('Cell Context Menu', () => {
 
                 await expect(page.locator('.hcg-popup')).toHaveCount(0);
             });
+
+            test('ContextMenu key opens the menu from a focused cell', async ({
+                page
+            }) => {
+                const productCell = page.locator(
+                    'tbody tr[data-row-index="1"] td[data-column-id="product"]'
+                );
+
+                await productCell.focus();
+                await page.keyboard.press('ContextMenu');
+
+                const popup = page.locator('.hcg-popup');
+                await expect(popup).toBeVisible();
+                await expect(popup).toContainText('Show context');
+            });
         });
     }
 

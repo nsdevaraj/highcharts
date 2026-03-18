@@ -668,27 +668,24 @@ class Table {
             return;
         }
 
-        // Disabled until meaningful functionality is ready.
+        const isContextMenuKey = (
+            e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey)
+        );
 
-
-        // const isContextMenuKey = (
-        //     e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey)
-        // );
-
-        // if (isContextMenuKey && 'column' in cell && 'row' in cell) {
-        //     const tableCell = cell as TableCell;
-        //     const rect = tableCell.htmlElement.getBoundingClientRect();
-        //     const opened = this.openCellContextMenu(
-        //         tableCell,
-        //         rect.left + 4,
-        //         rect.bottom - 2
-        //     );
-        //     if (opened) {
-        //         e.preventDefault();
-        //         e.stopPropagation();
-        //         return;
-        //     }
-        // }
+        if (isContextMenuKey && 'column' in cell && 'row' in cell) {
+            const tableCell = cell as TableCell;
+            const rect = tableCell.htmlElement.getBoundingClientRect();
+            const opened = this.openCellContextMenu(
+                tableCell,
+                rect.left + 4,
+                rect.bottom - 2
+            );
+            if (opened) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+        }
 
         (cell as { onKeyDown(e: KeyboardEvent): void }).onKeyDown(e);
     };
