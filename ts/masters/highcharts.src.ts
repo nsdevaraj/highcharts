@@ -31,7 +31,7 @@ import Pointer from '../Core/Pointer.js';
 import Legend from '../Core/Legend/Legend.js';
 import LegendSymbol from '../Core/Legend/LegendSymbol.js';
 import Chart from '../Core/Chart/Chart.js';
-import ScrollablePlotArea from '../Extensions/ScrollablePlotArea.js';
+import { ScrollablePlotArea } from '../Extensions/ScrollablePlotArea.js';
 import StackingAxis from '../Core/Axis/Stacking/StackingAxis.js';
 import StackItem from '../Core/Axis/Stacking/StackItem.js';
 import DataTableCore from '../Data/DataTableCore.js';
