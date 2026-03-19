@@ -1,5 +1,5 @@
 ---
- name: Highcharts Grid Pro Demo
+ name: Row pinning
  authors:
    - Mikkel Espolin Birkeland
  js_wrap: b

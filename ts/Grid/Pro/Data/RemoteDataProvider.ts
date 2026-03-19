@@ -39,6 +39,7 @@ import { DataProvider } from '../../Core/Data/DataProvider.js';
 import DataProviderRegistry from '../../Core/Data/DataProviderRegistry.js';
 import { createQueryFingerprint } from './QuerySerializer.js';
 import { dataSourceFetch } from './DataSourceHelper.js';
+import { isArray } from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -663,7 +664,7 @@ export class RemoteDataProvider extends DataProvider {
             return 'string';
         }
 
-        if (!Array.isArray(column)) {
+        if (!isArray(column)) {
             // Typed array
             return 'number';
         }

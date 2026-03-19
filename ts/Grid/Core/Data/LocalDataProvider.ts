@@ -45,7 +45,12 @@ import {
     getGridRowPinningOptions
 } from '../RowPinning/RowPinningController.js';
 import { uniqueKey } from '../../../Core/Utilities.js';
-import { defined, isNumber, isString } from '../../../Shared/Utilities.js';
+import {
+    defined,
+    isArray,
+    isNumber,
+    isString
+} from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -639,13 +644,13 @@ export class LocalDataProvider extends DataProvider {
 
         if (row && idColumn && table.hasColumns([idColumn])) {
             const value = row[idColumn];
-            if (typeof value === 'string' || typeof value === 'number') {
+            if (isString(value) || isNumber(value)) {
                 return value;
             }
         }
 
         const originalIndex = table.getOriginalRowIndex(rowIndex);
-        if (typeof originalIndex === 'number') {
+        if (isNumber(originalIndex)) {
             return originalIndex;
         }
 
@@ -684,7 +689,7 @@ export class LocalDataProvider extends DataProvider {
             return Promise.resolve('string');
         }
 
-        if (!Array.isArray(column)) {
+        if (!isArray(column)) {
             // Typed array
             return Promise.resolve('number');
         }

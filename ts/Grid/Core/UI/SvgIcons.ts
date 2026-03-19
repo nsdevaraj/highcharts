@@ -26,7 +26,7 @@
 
 import Globals from '../Globals.js';
 import { setHTMLContent } from '../GridUtils.js';
-import { defined } from '../../../Shared/Utilities.js';
+import { defined, isString } from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -419,7 +419,7 @@ export function createGridIcon(
         return createSvgFromDefinition(icons.filter, className);
     }
 
-    if (typeof value === 'string') {
+    if (isString(value)) {
         return parseSvgString(value, className);
     }
 

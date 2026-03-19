@@ -1,0 +1,14 @@
+---
+name: Row pinning
+authors:
+  - Mikkel Espolin Birkeland
+js_wrap: b
+alt_text: >-
+  Data grid with top and bottom pinned rows
+tags:
+  - Highcharts Grid demo
+categories:
+  - General:
+        priority: 70
+use_png_thumbnail: true
+...

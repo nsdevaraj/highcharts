@@ -25,6 +25,8 @@ import type Grid from '../../Core/Grid';
 import type Options from '../../Core/Options';
 import type { RowId as DataProviderRowId } from '../Data/DataProvider';
 
+import { erase, isNumber, isString } from '../../../Shared/Utilities.js';
+
 /* *
  *
  *  Declarations
@@ -236,12 +238,12 @@ class RowPinningController {
 
         const sourceIndex = source.indexOf(rowId);
         if (sourceIndex !== -1) {
-            source.splice(sourceIndex, 1);
+            erase(source, rowId);
         }
 
         const otherIndex = other.indexOf(rowId);
         if (otherIndex !== -1) {
-            other.splice(otherIndex, 1);
+            erase(other, rowId);
         }
 
         if (action === 'pin') {
@@ -414,7 +416,7 @@ class RowPinningController {
         const seen = new Set<RowId>();
 
         for (const value of values) {
-            if (typeof value !== 'number' && typeof value !== 'string') {
+            if (!isNumber(value) && !isString(value)) {
                 continue;
             }
 

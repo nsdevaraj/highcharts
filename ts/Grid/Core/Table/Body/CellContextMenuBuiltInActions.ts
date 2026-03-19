@@ -34,6 +34,12 @@ import {
     hasConfiguredGridRowPinningOptions,
     getGridRowPinningOptions
 } from '../../RowPinning/RowPinningController.js';
+import {
+    isArray,
+    isNumber,
+    isObject,
+    isString
+} from '../../../../Shared/Utilities.js';
 
 /* *
  *
@@ -174,10 +180,9 @@ function hasNestedItems(
     items: CellContextMenuItemOptions[];
 } {
     return (
-        typeof item === 'object' &&
-        !!item &&
+        isObject(item, true) &&
         'items' in item &&
-        Array.isArray(item.items)
+        isArray(item.items)
     );
 }
 
@@ -210,7 +215,7 @@ function warnUnknownBuiltInAction(actionId: string): void {
  */
 function getCurrentRowId(cell: TableCell): (string|number|undefined) {
     const rowId = cell.row.id;
-    if (typeof rowId === 'string' || typeof rowId === 'number') {
+    if (isString(rowId) || isNumber(rowId)) {
         return rowId;
     }
 }
