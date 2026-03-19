@@ -1861,6 +1861,11 @@ class Data {
                     xhr: XMLHttpRequest,
                     text: (string|Error)
                 ): void {
+                    if (!chart.options) {
+                        // If the chart is destroyed, ignore the error as
+                        // a cancelled request.
+                        return;
+                    }
                     return error(
                         `Request failed - ${xhr.status} \n` +
                             (typeof text === 'string' ? text : text.message),
