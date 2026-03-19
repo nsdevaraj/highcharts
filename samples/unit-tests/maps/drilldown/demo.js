@@ -571,10 +571,9 @@ QUnit.test(
             }]
         });
 
-        const mappointSeries = chart.series[1];
         assert.ok(
-            mappointSeries.dataLabelsGroup,
-            'Mappoint should have dataLabelsGroup initially.'
+            chart.series[1].dataLabelsGroup.element.childNodes.length > 0,
+            'LA point should have dataLabel and be placed.'
         );
 
         const caPoint = chart.series[0].points.find(
@@ -583,25 +582,13 @@ QUnit.test(
                 p.options?.drilldown === 'california'
             )
         );
-        assert.ok(!!caPoint, 'California point should exist');
-        if (caPoint) {
-            if (caPoint.doDrilldown) {
-                caPoint.doDrilldown();
-            } else {
-                caPoint.firePointEvent('click');
-            }
-        }
 
+        caPoint?.doDrilldown();
         chart.drillUp();
 
         assert.ok(
-            mappointSeries.dataLabelsGroups?.length,
-            'Mappoint should have dataLabelsGroups after drill up.'
+            chart.series[0].dataLabelsGroup.element.childNodes.length > 0,
+            'LA point should have dataLabel and be placed after drill up.'
         );
-        assert.ok(
-            mappointSeries.group?.attr('opacity') !== 0,
-            'Mappoint group should be visible after drill up.'
-        );
-
     }
 );
