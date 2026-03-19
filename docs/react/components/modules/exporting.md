@@ -5,7 +5,7 @@ You can add the [exporting module](https://www.highcharts.com/docs/export-module
 ```tsx
 import { Chart } from "@highcharts/react";
 import { LineSeries } from "@highcharts/react/series/Line";
-import { Exporting } from "@highcharts/react/modules/exporting";
+import { Exporting } from "@highcharts/react/modules/Exporting";
 
 export default function ExportingChart() {
   return (

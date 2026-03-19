@@ -363,6 +363,7 @@ module.exports = {
                             'react/components/modules/accessibility',
                             'react/components/modules/exporting',
                             'react/components/modules/data',
+                            'react/components/modules/boost',
                             'react/components/modules/drilldown',
                             'react/components/modules/broken-axis',
                             'react/components/modules/draggable-points',

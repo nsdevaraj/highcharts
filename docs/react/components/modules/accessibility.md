@@ -5,7 +5,7 @@ You can add the [accessibility module](https://www.highcharts.com/docs/accessibi
 ```tsx
 import { Chart } from "@highcharts/react";
 import { LineSeries } from "@highcharts/react/series/Line";
-import { Accessibility } from "@highcharts/react/modules/accessibility";
+import { Accessibility } from "@highcharts/react/modules/Accessibility";
 
 export default function AccessibilityChart() {
   return (

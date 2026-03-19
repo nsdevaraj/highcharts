@@ -77,8 +77,8 @@ You can load additional Highcharts modules using dedicated React components:
 ```tsx
 import { Chart } from "@highcharts/react";
 import { LineSeries } from "@highcharts/react/series/Line";
-import { Accessibility } from "@highcharts/react/modules/accessibility";
-import { Exporting } from "@highcharts/react/modules/exporting";
+import { Accessibility } from "@highcharts/react/modules/Accessibility";
+import { Exporting } from "@highcharts/react/modules/Exporting";
 
 export default function ModulesChart() {
   return (
