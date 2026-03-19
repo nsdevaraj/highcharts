@@ -57,7 +57,7 @@ When a cell is focused, open the context menu using the `ContextMenu` key or
 Each item supports:
 
 - `label`: Text shown in the menu
-- `icon`: Optional built-in Grid icon name (see `GridIconName` in the API)
+- `icon`: Optional built-in Grid icon name (see [`GridIconName`](https://api.highcharts.com/grid/typedoc/modules/Grid_Core_UI_SvgIcons.html#GridIconName) in the API)
 - `separator: true`: Renders a divider instead of a clickable item
 - `disabled: true`: Disables the item
 - `onClick(cell)`: Callback invoked when the item is clicked

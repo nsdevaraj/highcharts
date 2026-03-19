@@ -536,11 +536,8 @@ class Table {
             this.rowsVirtualizer.applyMeasuredRowHeight(measuredRowHeight);
         }
         this.setTbodyMinHeight();
-        for (let i = 0, iEnd = this.pinnedTopRows.length; i < iEnd; ++i) {
-            this.pinnedTopRows[i].reflow();
-        }
-        for (let i = 0, iEnd = this.pinnedBottomRows.length; i < iEnd; ++i) {
-            this.pinnedBottomRows[i].reflow();
+        for (const row of this.pinnedTopRows.concat(this.pinnedBottomRows)) {
+            row.reflow();
         }
         this.applyPinnedBodyMaxHeights();
         this.applyPinnedScrollbarCompensation();

@@ -35,6 +35,7 @@ import {
     getGridRowPinningOptions
 } from '../../RowPinning/RowPinningController.js';
 import {
+    defined,
     isArray,
     isNumber,
     isObject,
@@ -250,12 +251,8 @@ function isPinningOptionEnabled(cell: TableCell): boolean {
 function isContextMenuEnabled(cell: TableCell): boolean {
     const options = cell.column?.options.cells?.contextMenu;
 
-    if (options?.enabled === false) {
-        return false;
-    }
-
-    if (options?.enabled === true) {
-        return true;
+    if (defined(options?.enabled)) {
+        return options.enabled;
     }
 
     if (options?.items !== void 0) {

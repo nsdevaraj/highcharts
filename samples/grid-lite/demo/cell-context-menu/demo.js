@@ -204,20 +204,21 @@ function deleteRow(cell) {
     void grid.viewport.updateRows();
 }
 
+function clipboardOnClick(cell) {
+    const value = String(cell.value);
+    copyToClipboard(value)
+        .then(function () {
+            logEvent('Copied "' + value + '" to clipboard!');
+        })
+        .catch(function () {
+            logEvent('Could not copy "' + value + '" to clipboard.');
+        });
+}
+
 const menuItems = [{
     label: 'Copy cell content',
     icon: 'clipboard',
-    onClick: function (cell) {
-        const value = String(cell.value);
-
-        copyToClipboard(value)
-            .then(function () {
-                logEvent('Copied "' + value + '" to clipboard!');
-            })
-            .catch(function () {
-                logEvent('Could not copy "' + value + '" to clipboard.');
-            });
-    }
+    onClick: clipboardOnClick
 }, {
     separator: true
 }, {
@@ -226,10 +227,7 @@ const menuItems = [{
     items: [
         'pinRowTop',
         'pinRowBottom',
-        {
-            actionId: 'unpinRow',
-            icon: 'unpin'
-        }
+        'unpinRow'
     ]
 }, {
     label: 'Edit',
@@ -274,6 +272,11 @@ Grid.grid('container', {
             ],
             weight: [100, 40, 0.5, 200, 120],
             price: [1.5, 2.53, 5, 4.5, 3.2]
+        }
+    },
+    rendering: {
+        rows: {
+            pinning: {}
         }
     },
     columnDefaults: {
