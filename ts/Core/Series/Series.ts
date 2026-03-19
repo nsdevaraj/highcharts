@@ -5486,7 +5486,7 @@ export default Series;
  * have to cast the series options to specific series types, to get all
  * possible options for a series.
  *
- * @example
+ * ```js
  * // TypeScript example
  * Highcharts.chart('container', {
  *     series: [{
@@ -5494,6 +5494,7 @@ export default Series;
  *         data: [[0, 1], [2, 3]]
  *     } as Highcharts.SeriesLineOptions ]
  * });
+ * ```
  *
  * @type      {Array<*>}
  * @apioption series
