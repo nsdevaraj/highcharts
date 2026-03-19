@@ -1,4 +1,39 @@
 // Grid sparklines
+
+/**
+ * Check if a URL string points to an allowed Highcharts host.
+ *
+ * Falls back to using the current origin as base for relative URLs.
+ */
+function isHighchartsHost(urlString) {
+    if (typeof urlString !== 'string' || urlString.length === 0) {
+        return false;
+    }
+
+    try {
+        const base = (typeof window !== 'undefined' && window.location && window.location.origin) ?
+            window.location.origin :
+            'https://highcharts.com';
+
+        const parsed = new URL(urlString, base);
+        const hostname = parsed.hostname.toLowerCase();
+        const protocol = parsed.protocol.toLowerCase();
+
+        if (protocol !== 'http:' && protocol !== 'https:') {
+            return false;
+        }
+
+        const allowedHosts = [
+            'highcharts.com',
+            'www.highcharts.com'
+        ];
+
+        return allowedHosts.indexOf(hostname) !== -1;
+    } catch (e) {
+        return false;
+    }
+}
+
 function hero() {
     // Data preparation
     const data = new Grid.DataTable({
@@ -1917,7 +1952,7 @@ function buildDemo() {
         buttonString +=  `<a href="${product.url}" 
         target="_blank" class="hc-button hc-button--white hc-button--size-100">
         ${product.name}`;
-        if (product.icon.indexOf('highcharts.com') !== -1) {
+        if (isHighchartsHost(product.icon)) {
             // eslint-disable-next-line max-len
             buttonString += `<img src="${product.icon}" height="12" width="12"></a>`;
         } else {
