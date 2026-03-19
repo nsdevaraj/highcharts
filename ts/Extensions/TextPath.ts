@@ -383,7 +383,8 @@ function drawTextPath(
     }
 }
 
-function compose(SVGElementClass: typeof SVGElement): void {
+/** @internal */
+export function composeTextPath(SVGElementClass: typeof SVGElement): void {
     addEvent(SVGElementClass, 'afterGetBBox', setPolygon);
     addEvent(SVGElementClass, 'beforeAddingDataLabel', drawTextPath);
 
@@ -393,9 +394,3 @@ function compose(SVGElementClass: typeof SVGElement): void {
         svgElementProto.setTextPath = setTextPath;
     }
 }
-
-const TextPath = {
-    compose
-};
-
-export default TextPath;
