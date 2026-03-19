@@ -5138,8 +5138,41 @@ class Series {
      * @internal
      */
     public drawLegendSymbol(legend: Legend, item: Legend.Item): void {
-        LegendSymbol[this.options.legendSymbol || 'rectangle']
-            ?.call(this, legend, item);
+        const renderer = this.chart.renderer,
+            legendSymbol = this.options.legendSymbol,
+            symbol = (!legendSymbol || legendSymbol === 'rectangle') ?
+                'square' : legendSymbol;
+
+        // Basic symbol
+        if (
+            symbol &&
+            renderer.symbols[symbol as keyof typeof renderer.symbols]
+        ) {
+            const legendItem = item.legendItem || {},
+                { options, symbolHeight, symbolWidth } = legend,
+                squareSymbol = options.squareSymbol,
+                adjustedSymbolWidth = squareSymbol ? symbolHeight : symbolWidth;
+
+            legendItem.symbol = renderer
+                .symbol(
+                    symbol as keyof typeof renderer.symbols,
+                    squareSymbol ? (symbolWidth - symbolHeight) / 2 : 0,
+                    (legend.baseline || 0) - symbolHeight + 1,
+                    adjustedSymbolWidth,
+                    symbolHeight,
+                    { r: options.symbolRadius ?? symbolHeight / 2 }
+                )
+                .addClass('highcharts-point')
+                .attr({
+                    zIndex: 3
+                })
+                .add(legendItem.group);
+
+        // Symbol function defined in LegendSymbol
+        } else {
+            LegendSymbol[legendSymbol as keyof typeof LegendSymbol]
+                ?.call(this, legend, item);
+        }
     }
 
     // eslint-enable valid-jsdoc
