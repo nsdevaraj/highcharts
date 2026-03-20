@@ -118,7 +118,7 @@ export class Column {
      */
     public filtering?: ColumnFiltering;
 
-    /**
+
     /* *
     *
     *  Constructor
@@ -215,7 +215,7 @@ export class Column {
     }
 
     /**
-     * Resolves the raw value for a table cell.
+     * Resolves the display value for a table cell.
      *
      * @param cell
      * The cell to resolve the value for.

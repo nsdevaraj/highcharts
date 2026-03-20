@@ -59,7 +59,9 @@ import type CSSObject from '../../Core/Renderer/CSSObject';
 export type CellFormatterCallback = (this: Cell) => string;
 
 /**
- * Callback function to resolve the raw value of the cell.
+ * Callback function to resolve the value of an unbound column cell.
+ * For bound columns, overrides only the rendered content - sorting,
+ * filtering, and export remain unaffected.
  */
 export type CellValueGetterCallback = (
     this: TableCell,
@@ -534,8 +536,9 @@ export interface ColumnCellOptions {
     formatter?: CellFormatterCallback;
 
     /**
-     * Callback function for resolving the raw value for a cell.
-     * If defined, it takes precedence over values from the data provider.
+     * Callback function to resolve the value of an unbound column cell.
+     * For bound columns, overrides only the rendered content - sorting,
+     * filtering, and export remain unaffected.
      */
     valueGetter?: CellValueGetterCallback;
 
