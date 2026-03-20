@@ -30,15 +30,20 @@ import type {
 } from './PaginationOptions';
 import type { DeepPartial } from '../../../Shared/Types';
 
-import Icons from './Icons.js';
+import { createGridIcon } from '../UI/SvgIcons.js';
 import Globals from '../Globals.js';
 import GridUtils from '../GridUtils.js';
-import Utilities from '../../../Core/Utilities.js';
 import AST from '../../../Core/Renderer/HTML/AST.js';
 import PaginationController from '../Querying/PaginationController';
+import {
+    defined,
+    fireEvent,
+    isObject,
+    merge
+} from '../../../Shared/Utilities.js';
 
 const { makeHTMLElement, formatText } = GridUtils;
-const { defined, fireEvent, isObject, merge } = Utilities;
+
 const paginationAlignments = [
     'left',
     'center',
@@ -291,8 +296,8 @@ class Pagination {
                 'nav',
                 {
                     className: alignmentClass ?
-                        `${Globals.getClassName('paginationWrapper')} ${alignmentClass}` :
-                        Globals.getClassName('paginationWrapper')
+                        `${Globals.getClassName('pagination')} ${alignmentClass}` :
+                        Globals.getClassName('pagination')
                 },
                 position === 'footer' ?
                     this.paginationContainer : grid.contentWrapper
@@ -314,9 +319,9 @@ class Pagination {
     }
 
     private getAlignmentClass(): string {
-        const alignment = this.options?.alignment || 'distributed';
+        const align = this.options?.align || '';
 
-        return alignmentClassName(alignment);
+        return alignmentClassName(align);
     }
 
     public updateAlignmentClass(): void {
@@ -387,10 +392,14 @@ class Pagination {
         }
 
         this.paginationContainer = customContainer;
+        const alignmentClass = this.getAlignmentClass();
+        const className = alignmentClass ?
+            `${Globals.getClassName('pagination')} ${alignmentClass}` :
+            Globals.getClassName('pagination');
 
         // Set content wrapper to the custom container
         this.contentWrapper = makeHTMLElement('div', {
-            className: Globals.getClassName('paginationContainer')
+            className: className
         }, customContainer);
     }
 
@@ -428,7 +437,10 @@ class Pagination {
             totalPages
         } = this.controller;
 
-        const startItem = (currentPage - 1) * currentPageSize + 1;
+        const startItem = Math.min(
+            Math.max(0, (currentPage - 1) * currentPageSize + 1),
+            totalItems
+        );
         const endItem = Math.min(
             currentPage * currentPageSize,
             totalItems
@@ -449,10 +461,13 @@ class Pagination {
      * Render the controls buttons and page numbers.
      */
     public renderControls(): void {
+
         const navContainer = makeHTMLElement('div', {
-            className: Globals.getClassName('paginationControlsContainer')
+            className: Globals.getClassName('paginationControls')
         }, this.contentWrapper);
+
         const controls = this.options?.controls || {};
+
 
         // Render first/previous buttons
         if (controls.firstLastButtons) {
@@ -469,9 +484,6 @@ class Pagination {
             this.renderPageNumbers(navContainer);
         }
 
-        // Render dropdown page selector
-        this.renderDropdownPageSelector(navContainer);
-
         // Render next button
         if (controls.previousNextButtons) {
             this.renderNextButton(navContainer);
@@ -481,6 +493,7 @@ class Pagination {
         if (controls.firstLastButtons) {
             this.renderLastButton(navContainer);
         }
+
     }
 
     /**
@@ -525,11 +538,14 @@ class Pagination {
             return;
         }
 
-        // Create first button
+        const firstIconEl = createGridIcon(
+            'doubleChevronLeft',
+            this.grid.options?.rendering?.icons
+        );
         this.firstButton = makeHTMLElement('button', {
-            className: Globals.getClassName('button'),
-            innerHTML: Icons.first
+            className: Globals.getClassName('button')
         }, container);
+        this.firstButton.appendChild(firstIconEl);
         this.firstButton.title = this.lang?.firstPage ?? '';
 
         // Set aria-label for a11y
@@ -567,11 +583,15 @@ class Pagination {
             return;
         }
 
-        // Create previous button
+        const prevIconName = 'chevronLeft';
+        const prevIconEl = createGridIcon(
+            prevIconName,
+            this.grid.options?.rendering?.icons
+        );
         this.prevButton = makeHTMLElement('button', {
-            className: Globals.getClassName('button'),
-            innerHTML: Icons.previous
+            className: Globals.getClassName('button')
         }, container);
+        this.prevButton.appendChild(prevIconEl);
         this.prevButton.title = this.lang?.previousPage ?? '';
 
         // Set aria-label for a11y
@@ -609,11 +629,15 @@ class Pagination {
             return;
         }
 
-        // Create next button
+        const nextIconName = 'chevronRight';
+        const nextIconEl = createGridIcon(
+            nextIconName,
+            this.grid.options?.rendering?.icons
+        );
         this.nextButton = makeHTMLElement('button', {
-            className: Globals.getClassName('button'),
-            innerHTML: Icons.next
+            className: Globals.getClassName('button')
         }, container);
+        this.nextButton.appendChild(nextIconEl);
         this.nextButton.title = this.lang?.nextPage ?? '';
 
         // Set aria-label for a11y
@@ -648,11 +672,15 @@ class Pagination {
             return;
         }
 
-        // Create last button
+        const lastIconName = 'doubleChevronRight';
+        const lastIconEl = createGridIcon(
+            lastIconName,
+            this.grid.options?.rendering?.icons
+        );
         this.lastButton = makeHTMLElement('button', {
-            className: Globals.getClassName('button'),
-            innerHTML: Icons.last
+            className: Globals.getClassName('button')
         }, container);
+        this.lastButton.appendChild(lastIconEl);
         this.lastButton.title = this.lang?.lastPage ?? '';
 
         // Set aria-label for a11y
@@ -688,7 +716,7 @@ class Pagination {
         }
 
         this.pageNumbersContainer = makeHTMLElement('div', {
-            className: Globals.getClassName('paginationNavButtonsContainer')
+            className: Globals.getClassName('paginationPages')
         }, container);
 
         this.updatePageNumbers();
@@ -839,8 +867,6 @@ class Pagination {
             });
         }
 
-        // Update dropdown selector if it exists
-        this.updateDropdownPageSelector();
     }
 
     /**
@@ -1177,11 +1203,10 @@ class Pagination {
      * Destroy the pagination instance.
      */
     public destroy(): void {
-        const position = this.options?.position;
-
-        if (position === 'footer') {
-            // For footer position, remove the entire tfoot element.
-            this.paginationContainer?.parentElement?.parentElement?.remove();
+        // Fixed container removal when switching from custom to footer.
+        const tfoot = this.paginationContainer?.closest('tfoot');
+        if (tfoot) {
+            tfoot.remove();
         } else {
             this.contentWrapper?.remove();
         }

@@ -64,15 +64,13 @@ const {
     getLevelOptions,
     updateRootId
 } = TU;
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
     arrayMax,
     clamp,
     correctFloat,
     crisp,
     defined,
-    error,
     extend,
     fireEvent,
     isArray,
@@ -84,7 +82,8 @@ const {
     pushUnique,
     splat,
     stableSort
-} = U;
+} from '../../Shared/Utilities.js';
+import { error } from '../../Core/Utilities.js';
 
 Series.keepProps.push('simulation', 'hadOutsideDataLabels');
 
@@ -258,7 +257,6 @@ class TreemapSeries extends ScatterSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     public algorithmCalcPoints(
         directionChange: boolean,
@@ -1895,7 +1893,6 @@ class TreemapSeries extends ScatterSeries {
         }
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

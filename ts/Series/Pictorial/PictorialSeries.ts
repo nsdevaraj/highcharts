@@ -34,8 +34,14 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 import StackItem from '../../Core/Axis/Stacking/StackItem.js';
 import SVGAttributes from '../../Core/Renderer/SVG/SVGAttributes.js';
 import SVGRenderer from '../../Core/Renderer/SVG/SVGRenderer.js';
-import U from '../../Core/Utilities.js';
 import { PictorialPathOptions } from './PictorialSeriesOptions';
+import {
+    addEvent,
+    defined,
+    merge,
+    objectEach,
+    pick
+} from '../../Shared/Utilities.js';
 
 const ColumnSeries: typeof ColumnSeriesType = SeriesRegistry.seriesTypes.column;
 
@@ -50,13 +56,6 @@ const {
     rescalePatternFill
 } = PictorialUtilities;
 
-const {
-    addEvent,
-    defined,
-    merge,
-    objectEach,
-    pick
-} = U;
 export interface StackShadowOptions {
     borderColor?: ColorType;
     borderWidth?: number;
@@ -137,7 +136,6 @@ class PictorialSeries extends ColumnSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Animate in the series. Called internally twice. First with the `init`
@@ -262,7 +260,6 @@ class PictorialSeries extends ColumnSeries {
         return extremes;
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

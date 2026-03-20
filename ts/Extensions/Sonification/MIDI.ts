@@ -17,9 +17,9 @@
 
 import type TimelineChannel from './TimelineChannel';
 import SonificationInstrument from './SonificationInstrument.js';
-import U from '../../Core/Utilities.js';
-const { pick } = U;
+import { pick } from '../../Shared/Utilities.js';
 
+/** @internal */
 interface MIDIEvent {
     timeMS: number;
     type: 'NON'|'NOF'|'CTRL_CHG';
@@ -203,4 +203,5 @@ function toMIDI(channels: TimelineChannel[]): Uint8Array {
             }, [] as number[])));
 }
 
+/** @internal */
 export default toMIDI;

@@ -25,12 +25,7 @@ import H from '../Globals.js';
 import D from '../Defaults.js';
 const { defaultOptions } = D;
 import Point from './Point.js';
-import U from '../Utilities.js';
-const {
-    extend,
-    extendClass,
-    merge
-} = U;
+import { extend, extendClass, merge } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -117,10 +112,10 @@ namespace SeriesRegistry {
      * @param {Highcharts.SeriesOptionsType|Highcharts.Dictionary<*>} options
      * The additional default options that are merged with the parent's options.
      *
-     * @param {Highcharts.Dictionary<*>} [props]
+     * @param {Highcharts.Dictionary<*>} [seriesProto]
      * The properties (functions and primitives) to set on the new prototype.
      *
-     * @param {Highcharts.Dictionary<*>} [pointProps]
+     * @param {Highcharts.Dictionary<*>} [pointProto]
      * Members for a series-specific extension of the {@link Point} prototype if
      * needed.
      *

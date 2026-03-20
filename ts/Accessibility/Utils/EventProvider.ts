@@ -19,12 +19,11 @@
  *
  * */
 
+import { addEvent, type EventOptions } from '../../Shared/Utilities.js';
 import type { EventCallback } from '../../Core/Callback';
 
 import H from '../../Core/Globals.js';
 import DOMElementType from '../../Core/Renderer/DOMElementType';
-import U from '../../Core/Utilities.js';
-const { addEvent } = U;
 
 /* *
  *
@@ -66,13 +65,12 @@ class EventProvider {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     public addEvent<T>(
         el: (Class<T>|T),
         type: string,
         fn: (EventCallback<T>|Function),
-        options?: U.EventOptions
+        options?: EventOptions
     ): Function;
     /**
      * Add an event to an element and keep track of it for later removal.

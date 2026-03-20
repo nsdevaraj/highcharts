@@ -31,14 +31,13 @@ import type TreemapSeries from '../../../Series/Treemap/TreemapSeries';
 
 import Color from '../../Color/Color.js';
 const { parse: color } = Color;
-import U from '../../Utilities.js';
-const {
+import {
     addEvent,
     extend,
     merge,
     pick,
     splat
-} = U;
+} from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -323,12 +322,12 @@ namespace ColorAxisComposition {
      */
     export function pointSetVisible(
         this: PointComposition,
-        vis?: boolean
+        visible?: boolean
     ): void {
         const point = this,
-            method = vis ? 'show' : 'hide';
+            method = visible ? 'show' : 'hide';
 
-        point.visible = point.options.visible = Boolean(vis);
+        point.visible = point.options.visible = Boolean(visible);
 
         // Show and hide associated elements
         ['graphic', 'dataLabel'].forEach(function (key: string): void {

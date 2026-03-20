@@ -30,13 +30,7 @@ import type { DataConnectorTypeOptions } from './Connectors/DataConnectorType';
 import type DataPoolOptions from './DataPoolOptions';
 
 import DataConnector from './Connectors/DataConnector.js';
-import U from '../Core/Utilities.js';
-const {
-    addEvent,
-    fireEvent,
-    merge
-} = U;
-
+import { addEvent, fireEvent, merge } from '../Shared/Utilities.js';
 
 /* *
  *
@@ -331,10 +325,10 @@ class DataPool implements DataEventEmitter<Event> {
     /**
      * Sets connector options under the specified `options.id`.
      *
-     * @param options
+     * @param {object} options
      * Connector options to set.
      *
-     * @param update
+     * @param {boolean} [update]
      * Whether to update the existing connector with the new options and reload
      * it (`true`) or replace it with a new connector instance (`false`).
      */

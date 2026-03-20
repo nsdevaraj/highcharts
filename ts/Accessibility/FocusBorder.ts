@@ -28,11 +28,7 @@ import type SVGAttributes from '../Core/Renderer/SVG/SVGAttributes';
 
 import Chart from '../Core/Chart/Chart.js';
 import SVGElement from '../Core/Renderer/SVG/SVGElement.js';
-import U from '../Core/Utilities.js';
-const {
-    addEvent,
-    pick
-} = U;
+import { addEvent, pick } from '../Shared/Utilities.js';
 
 /* *
  *
@@ -229,7 +225,7 @@ namespace FocusBorderComposition {
      * Add hook to destroy focus border if SVG element is destroyed, unless
      * hook already exists.
      * @private
-     * @param el Element to add destroy hook to
+     * @param {object} el Element to add destroy hook to
      */
     function svgElementAddDestroyFocusBorderHook(
         el: SVGElementCompositon
@@ -377,8 +373,8 @@ namespace FocusBorderComposition {
      * Add hooks to update the focus border of an element when the element
      * size/position is updated, unless already added.
      * @private
-     * @param el Element to add update hooks to
-     * @param updateParams Parameters to pass through to addFocusBorder when updating.
+     * @param {object} el Element to add update hooks to
+     * @param {...*} updateParams Parameters to pass through to addFocusBorder when updating.
      */
     function avgElementAddUpdateFocusBorderHooks(
         el: SVGElementCompositon,
@@ -408,7 +404,7 @@ namespace FocusBorderComposition {
      * Remove hook from SVG element added by addDestroyFocusBorderHook, if
      * existing.
      * @private
-     * @param el Element to remove destroy hook from
+     * @param {object} el Element to remove destroy hook from
      */
     function svgElementRemoveDestroyFocusBorderHook(
         el: SVGElementCompositon
@@ -444,7 +440,7 @@ namespace FocusBorderComposition {
      * Remove hooks from SVG element added by addUpdateFocusBorderHooks, if
      * existing.
      * @private
-     * @param el Element to remove update hooks from
+     * @param {object} el Element to remove update hooks from
      */
     function svgElementRemoveUpdateFocusBorderHooks(
         el: SVGElementCompositon

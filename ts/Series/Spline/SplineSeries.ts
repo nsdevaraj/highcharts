@@ -25,11 +25,7 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const {
     line: LineSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
-    merge,
-    pick
-} = U;
+import { merge, pick } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -84,7 +80,6 @@ class SplineSeries extends LineSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Get the spline segment from a given point's previous neighbour to the
@@ -258,7 +253,6 @@ class SplineSeries extends LineSeries {
         return ret;
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

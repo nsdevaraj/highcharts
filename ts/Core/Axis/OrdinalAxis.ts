@@ -29,18 +29,16 @@ import Axis from './Axis.js';
 import DataTableCore from '../../Data/DataTableCore.js';
 import H from '../Globals.js';
 import Series from '../Series/Series.js';
-import U from '../Utilities.js';
-const {
-    addEvent,
+import {
     correctFloat,
-    css,
     defined,
-    error,
+    isString,
     isNumber,
     pick,
-    timeUnits,
-    isString
-} = U;
+    css,
+    addEvent
+} from '../../Shared/Utilities.js';
+import { error, timeUnits } from '../Utilities.js';
 
 /* *
  *
@@ -147,15 +145,6 @@ namespace OrdinalAxis {
      * Extends the axis with ordinal support.
      *
      * @internal
-     *
-     * @param AxisClass
-     * Axis class to extend.
-     *
-     * @param ChartClass
-     * Chart class to use.
-     *
-     * @param SeriesClass
-     * Series class to use.
      */
     export function compose<T extends typeof Axis>(
         AxisClass: T,

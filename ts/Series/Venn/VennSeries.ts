@@ -63,15 +63,14 @@ const {
 import VennPoint from './VennPoint.js';
 import VennSeriesDefaults from './VennSeriesDefaults.js';
 import VennUtils from './VennUtils.js';
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
     extend,
     isArray,
     isNumber,
     isObject,
     merge
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -411,7 +410,6 @@ class VennSeries extends ScatterSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     public animate(init?: boolean): void {
         if (!init) {
@@ -659,7 +657,6 @@ class VennSeries extends ScatterSeries {
         }
     }
 
-    /* eslint-enable valid-jsdoc */
 }
 
 /* *

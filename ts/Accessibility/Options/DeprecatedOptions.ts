@@ -81,11 +81,8 @@ import type Series from '../../Core/Series/Series';
 
 import Axis from '../../Core/Axis/Axis.js';
 import Chart from '../../Core/Chart/Chart.js';
-import U from '../../Core/Utilities.js';
-const {
-    error,
-    pick
-} = U;
+import { pick } from '../../Shared/Utilities.js';
+import { error } from '../../Core/Utilities.js';
 
 /* *
  *
@@ -177,13 +174,12 @@ declare module '../../Core/Series/SeriesOptions'{
  *
  * */
 
-/* eslint-disable valid-jsdoc */
 
 /**
  * Set a new option on a root prop, where the option is defined as an array of
  * suboptions.
  * @private
- * @param root
+ * @param {Record<string, *>} root
  * @param {Array<string>} optionAsArray
  * @param {*} val
  * @return {void}

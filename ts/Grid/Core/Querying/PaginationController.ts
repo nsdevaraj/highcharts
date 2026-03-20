@@ -64,7 +64,7 @@ class PaginationController {
     /**
      * The number of rows before pagination.
      */
-    private _totalItems?: number;
+    public totalItemsCount?: number;
 
 
     /* *
@@ -92,10 +92,10 @@ class PaginationController {
     * */
 
     /**
-     * Total number of items (rows)
+     * Total number of items (rows before pagination).
      */
     public get totalItems(): number {
-        return this._totalItems ?? this.querying.grid.dataTable?.rowCount ?? 0;
+        return this.totalItemsCount ?? 0;
     }
 
     /**
@@ -108,14 +108,19 @@ class PaginationController {
     }
 
     /**
-     * Clamps the current page to the total number of pages.
+     * Clamps the current page to the valid range [1, totalPages].
      */
     public clampPage(): void {
-        if (this.currentPage <= this.totalPages) {
+        const target = Math.max(
+            1,
+            Math.min(this.currentPage, this.totalPages || 1)
+        );
+
+        if (this.currentPage === target) {
             return;
         }
 
-        this.currentPage = this.totalPages;
+        this.currentPage = target;
         this.querying.shouldBeUpdated = true;
     }
 
@@ -188,7 +193,7 @@ class PaginationController {
             rowsCountBeforePagination
         );
 
-        this._totalItems = rowsCountBeforePagination;
+        this.totalItemsCount = rowsCountBeforePagination;
 
         return new RangeModifier({
             start,
