@@ -129,7 +129,6 @@ class ColumnSeries extends Series {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Animate the column heights one by one from zero.
@@ -960,7 +959,6 @@ class ColumnSeries extends Series {
         Series.prototype.remove.apply(series, arguments as any);
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 
