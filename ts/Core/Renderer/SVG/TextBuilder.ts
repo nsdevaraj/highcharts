@@ -32,15 +32,14 @@ const {
     SVG_NS,
     win
 } = H;
-import U from '../../Utilities.js';
-const {
+import {
     attr,
     extend,
     fireEvent,
     isString,
     objectEach,
     pick
-} = U;
+} from '../../../Shared/Utilities.js';
 
 // Function used to test string length including an ellipsis
 const stringWithEllipsis = (text: string, currentIndex: number): string =>
@@ -63,7 +62,6 @@ class TextBuilder {
     /**
      * Constructs a new TextBuilder instance.
      * @internal
-     * @param svgElement The SVG element to build text for.
      */
     public constructor(svgElement: SVGElement) {
         const textStyles = svgElement.styles;

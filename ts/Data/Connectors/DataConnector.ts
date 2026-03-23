@@ -41,14 +41,8 @@ import DataModifier from '../Modifiers/DataModifier.js';
 import DataTable, {
     type ColumnCollection as DataTableColumnCollection
 } from '../DataTable.js';
-import U from '../../Core/Utilities.js';
 import { DeepPartial } from '../../Shared/Types';
-const {
-    addEvent,
-    fireEvent,
-    merge,
-    pick
-} = U;
+import { addEvent, fireEvent, merge, pick } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -298,10 +292,10 @@ abstract class DataConnector implements DataEventEmitter<Event> {
     /**
      * Updates the connector with new options.
      *
-     * @param newOptions
+     * @param {object} newOptions
      * The new options to be applied to the connector.
      *
-     * @param reload
+     * @param {boolean} [reload=true]
      * Whether to reload the connector after applying the new options.
      */
     public async update(
@@ -441,10 +435,10 @@ abstract class DataConnector implements DataEventEmitter<Event> {
     /**
      * Registers a callback for a specific connector event.
      *
-     * @param type
+     * @param {string} type
      * Event type.
      *
-     * @param callback
+     * @param {Function} callback
      * Function to register for the connector callback.
      *
      * @return {Function}

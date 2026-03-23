@@ -53,8 +53,9 @@ const {
     initDataLabels,
     initDataLabelsDefer
 } = D;
-import U from '../../Core/Utilities.js';
-const {
+import SVGElement from '../../Core/Renderer/SVG/SVGElement.js';
+import TextPath from '../../Extensions/TextPath.js';
+import {
     addEvent,
     clamp,
     defined,
@@ -64,9 +65,7 @@ const {
     isNumber,
     merge,
     pick
-} = U;
-import SVGElement from '../../Core/Renderer/SVG/SVGElement.js';
-import TextPath from '../../Extensions/TextPath.js';
+} from '../../Shared/Utilities.js';
 TextPath.compose(SVGElement);
 
 /* *
@@ -149,7 +148,6 @@ class PackedBubbleSeries extends BubbleSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Create a single array of all points from all series
@@ -696,7 +694,6 @@ class PackedBubbleSeries extends BubbleSeries {
     /**
      * Mouse up action, finalizing drag&drop.
      * @private
-     * @param {Highcharts.Point} point The point that event occurred.
      */
     public onMouseUp(
         dnPoint: DragNodesPoint
@@ -1220,7 +1217,6 @@ class PackedBubbleSeries extends BubbleSeries {
         fireEvent(this, 'afterTranslate');
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

@@ -15,11 +15,7 @@
 
 import SynthPatch from './SynthPatch.js';
 import InstrumentPresets from './InstrumentPresets.js';
-import U from '../../Core/Utilities.js';
-const {
-    defined,
-    extend
-} = U;
+import { defined, extend } from '../../Shared/Utilities.js';
 
 interface SonificationInstrumentCapabilitiesOptions {
     filters?: boolean;
@@ -72,17 +68,29 @@ namespace SonificationInstrument {
  *        Configuration for the instrument.
  */
 class SonificationInstrument {
+    /** @internal */
     readonly midiTrackName?: string;
+    /** @internal */
     readonly midiInstrument: number;
+    /** @internal */
     private static rampTime = SynthPatch.stopRampTime / 4;
+    /** @internal */
     private masterVolNode: GainNode;
+    /** @internal */
     private volumeNode: GainNode;
+    /** @internal */
     private synthPatch: SynthPatch;
+    /** @internal */
     private panNode?: StereoPannerNode;
+    /** @internal */
     private lowpassNode?: BiquadFilterNode;
+    /** @internal */
     private highpassNode?: BiquadFilterNode;
+    /** @internal */
     private tremoloOsc?: OscillatorNode;
+    /** @internal */
     private tremoloDepth?: GainNode;
+    /** @internal */
     private curParams: SonificationInstrument.ScheduledEventOptions = {};
 
     constructor(

@@ -35,16 +35,9 @@ const {
     scatter: ScatterSeries
 } = SeriesRegistry.seriesTypes;
 import SVGRenderer from '../../Core/Renderer/SVG/SVGRenderer.js';
-import U from '../../Core/Utilities.js';
-const {
-    extend,
-    fireEvent,
-    isNumber,
-    merge
-} = U;
-
 import '../../Core/Defaults.js';
 import '../Scatter/ScatterSeries.js';
+import { extend, fireEvent, isNumber, merge } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -93,7 +86,6 @@ class MapPointSeries extends ScatterSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     public drawDataLabels(): void {
         super.drawDataLabels();
@@ -210,7 +202,6 @@ class MapPointSeries extends ScatterSeries {
         fireEvent(this, 'afterTranslate');
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

@@ -44,8 +44,7 @@ const {
     composed,
     noop
 } = H;
-import U from '../Utilities.js';
-const {
+import {
     addEvent,
     correctFloat,
     defined,
@@ -58,7 +57,7 @@ const {
     relativeLength,
     splat,
     wrap
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -419,7 +418,6 @@ namespace RadialAxis {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * In case of auto connect, add one closestPointRange to the max value
@@ -1059,9 +1057,6 @@ namespace RadialAxis {
     /**
      * Modify radial axis.
      * @internal
-     *
-     * @param {Highcharts.Axis} radialAxis
-     * Radial axis to modify.
      */
     function modify(axis: RadialAxis.AxisComposition): void {
         axis.beforeSetTickPositions = beforeSetTickPositions;
@@ -1684,7 +1679,6 @@ namespace RadialAxis {
         return ret;
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

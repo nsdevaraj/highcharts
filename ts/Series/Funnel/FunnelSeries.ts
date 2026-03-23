@@ -41,8 +41,7 @@ const {
     column: ColumnSeries,
     pie: PieSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
     correctFloat,
     extend,
@@ -53,7 +52,7 @@ const {
     pushUnique,
     relativeLength,
     splat
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -148,7 +147,6 @@ class FunnelSeries extends PieSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * @private
@@ -668,7 +666,6 @@ class FunnelSeries extends PieSeries {
         points.sort((a, b): number => ((a.plotY as any) - (b.plotY as any)));
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

@@ -39,17 +39,16 @@ const {
 } = SeriesRegistry;
 import SVGRenderer from '../../Core/Renderer/SVG/SVGRenderer.js';
 const { prototype: { symbols } } = SVGRenderer;
-import U from '../../Core/Utilities.js';
-const {
+
+import IU from '../InterpolationUtilities.js';
+import {
     addEvent,
     extend,
     fireEvent,
     isNumber,
     merge,
     pick
-} = U;
-
-import IU from '../InterpolationUtilities.js';
+} from '../../Shared/Utilities.js';
 const {
     colorFromPoint,
     getContext
@@ -342,6 +341,11 @@ class HeatmapSeries extends ScatterSeries {
         if (options.marker && isNumber(options.borderRadius)) {
             options.marker.r = options.borderRadius;
         }
+
+        const canvas = this.canvas = document.createElement('canvas');
+        if (canvas) {
+            this.context = canvas?.getContext('webgpu') as any;
+        }
     }
 
     /**
@@ -525,7 +529,6 @@ class HeatmapSeries extends ScatterSeries {
         fireEvent(series, 'afterTranslate');
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

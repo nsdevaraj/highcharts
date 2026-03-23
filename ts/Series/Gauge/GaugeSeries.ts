@@ -40,16 +40,15 @@ const {
         column: ColumnSeries
     }
 } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
+import {
     clamp,
-    isNumber,
+    defined,
     extend,
+    isNumber,
     merge,
     pick,
-    pInt,
-    defined
-} = U;
+    pInt
+} from '../../Shared/Utilities.js';
 
 
 /* *
@@ -423,7 +422,6 @@ class GaugeSeries extends Series {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Calculate paths etc
@@ -631,7 +629,6 @@ class GaugeSeries extends Series {
         return !!this.points.length; // != 0
     }
 
-    /* eslint-enable valid-jsdoc */
 }
 
 /* *

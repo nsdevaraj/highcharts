@@ -25,14 +25,13 @@ import H from '../Globals.js';
 const {
     win
 } = H;
-import U from '../Utilities.js';
-const {
+import {
+    defined,
     isNumber,
     isString,
     merge,
-    pInt,
-    defined
-} = U;
+    pInt
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -51,7 +50,6 @@ const isStringColor = (color: ColorType): color is ColorString =>
  *
  * */
 
-/* eslint-disable valid-jsdoc */
 
 /**
  * Handle color operations. Some object methods are chainable.
