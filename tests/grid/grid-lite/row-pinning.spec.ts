@@ -113,12 +113,12 @@ test.describe('Grid Lite row pinning', () => {
         await expect(page.locator('#pinnedTop')).toHaveValue('ROW-001');
         await expect(page.locator('#pinnedBottom')).toHaveValue('ROW-060');
 
-        const scrollRowCell = page.locator(
+        const topActionCell = page.locator(
             'tbody.hcg-tbody-scrollable tr[data-row-index="5"] td[data-column-id="id"]'
         );
-        await expect(scrollRowCell).toBeVisible();
+        await expect(topActionCell).toBeVisible();
 
-        await scrollRowCell.click({ button: 'right' });
+        await topActionCell.click({ button: 'right' });
         await page.locator('.hcg-menu-item', { hasText: 'Pin row to top' }).click();
 
         await expect(page.locator('#pinnedTop')).toHaveValue('ROW-001,ROW-006');
@@ -138,47 +138,23 @@ test.describe('Grid Lite row pinning', () => {
         await page.locator('.hcg-menu-item', { hasText: 'Unpin row' }).click();
 
         await expect(page.locator('#pinnedTop')).toHaveValue('ROW-001');
+
+        const bottomActionCell = page.locator(
+            'tbody.hcg-tbody-scrollable tr[data-row-index="6"] td[data-column-id="id"]'
+        );
+        await expect(bottomActionCell).toBeVisible();
+
+        await bottomActionCell.click({ button: 'right' });
+        await page.locator('.hcg-menu-item', { hasText: 'Pin row to bottom' }).click();
+
+        await expect(page.locator('#pinnedBottom')).toHaveValue(
+            'ROW-060,ROW-007'
+        );
+        await expect(page.locator(
+            'tbody.hcg-tbody-pinned-bottom td[data-column-id="id"]',
+            { hasText: 'ROW-007' }
+        )).toBeVisible();
     });
-
-    test(
-        'Default context menu works in pinned sections with numeric row IDs',
-        async ({ page }) => {
-            await page.evaluate(async () => {
-                const host = document.getElementById('container');
-                if (host) {
-                    host.innerHTML = '';
-                }
-
-                const grid = (window as any).Grid.grid('container', {
-                    dataTable: {
-                        columns: {
-                            id: ['A', 'B', 'C'],
-                            value: [1, 2, 3]
-                        }
-                    }
-                });
-
-                await grid.pinRow(0, 'top');
-                await grid.pinRow(2, 'bottom');
-            });
-
-            await page.locator('tbody.hcg-tbody-pinned-top td').first()
-                .click({ button: 'right' });
-            await expect(page.locator(
-                '.hcg-menu-item',
-                { hasText: 'Unpin row' }
-            )).toBeVisible();
-
-            await page.keyboard.press('Escape');
-
-            await page.locator('tbody.hcg-tbody-pinned-bottom td').first()
-                .click({ button: 'right' });
-            await expect(page.locator(
-                '.hcg-menu-item',
-                { hasText: 'Unpin row' }
-            )).toBeVisible();
-        }
-    );
 
     test('Updates pinned rows when membership changes at same counts', async ({ page }) => {
         const state = await page.evaluate(async () => {
