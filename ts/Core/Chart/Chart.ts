@@ -299,6 +299,8 @@ class Chart {
         options: Partial<Options>,
         callback?: Chart.CallbackFunction
     ): Chart;
+
+    /* eslint-disable jsdoc/check-param-names */
     /**
      * Factory function for basic charts.
      *
@@ -337,6 +339,7 @@ class Chart {
     ): Chart {
         return new Chart(a as any, b as any, c);
     }
+    /* eslint-enable jsdoc/check-param-names */
 
     /* *
      *
@@ -3496,7 +3499,7 @@ class Chart {
      * @param {string} coll
      * An axis type.
      *
-     * @param {...Array<*>} arguments
+     * @param {...Array<*>} options
      * All arguments for the constructor.
      *
      * @return {Highcharts.Axis}
