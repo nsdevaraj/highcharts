@@ -22,6 +22,7 @@
  * */
 
 import type Grid from '../../Core/Grid';
+import type Table from '../../Core/Table/Table';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
 
@@ -36,17 +37,27 @@ import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
  *
  * */
 
+type TreeToggleClickListener = (event: MouseEvent) => void;
+
+const treeToggleAttribute = 'data-hcg-tree-toggle';
+const treeToggleSelector = '[' + treeToggleAttribute + ']';
+const treeToggleListeners = new WeakMap<Table, TreeToggleClickListener>();
+
 /**
  * Composes Grid Pro with TreeView projection infrastructure.
  *
  * @param GridClass
  * Grid class to extend.
  *
+ * @param TableClass
+ * Table class to extend.
+ *
  * @param TableCellClass
  * TableCell class to extend.
  */
 export function compose(
     GridClass: typeof Grid,
+    TableClass: typeof Table,
     TableCellClass: typeof TableCell
 ): void {
     if (!pushUnique(Globals.composed, 'TreeView')) {
@@ -55,6 +66,8 @@ export function compose(
 
     addEvent(GridClass, 'beforeLoad', onBeforeLoad);
     addEvent(GridClass, 'beforeDestroy', onBeforeDestroy);
+    addEvent(TableClass, 'beforeInit', onTableBeforeInit);
+    addEvent(TableClass, 'afterDestroy', onTableAfterDestroy);
     addEvent(TableCellClass, 'afterRender', onAfterCellRender);
 }
 
@@ -83,6 +96,58 @@ function onBeforeDestroy(this: Grid, e: { onlyDOM?: boolean }): void {
 
     this.treeView?.destroy();
     delete this.treeView;
+}
+
+/**
+ * Adds a delegated click listener for tree toggle buttons.
+ */
+function onTableBeforeInit(this: Table): void {
+    const listener = (event: MouseEvent): void => {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        const toggleButton = event.target.closest(treeToggleSelector);
+        if (!toggleButton || !this.tbodyElement.contains(toggleButton)) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const cell = this.getCellFromElement(
+            toggleButton
+        ) as TableCell | undefined;
+        if (!cell) {
+            return;
+        }
+
+        const controller = cell.row.viewport.grid.treeView;
+        const projectionState = controller?.getProjectionState();
+        const rowId = cell.row.id ?? projectionState?.rowIds[cell.row.index];
+
+        if (rowId === void 0) {
+            return;
+        }
+
+        void controller?.toggleRow(rowId);
+    };
+
+    this.tbodyElement.addEventListener('click', listener);
+    treeToggleListeners.set(this, listener);
+}
+
+/**
+ * Removes the delegated click listener for tree toggle buttons.
+ */
+function onTableAfterDestroy(this: Table): void {
+    const listener = treeToggleListeners.get(this);
+    if (!listener) {
+        return;
+    }
+
+    this.tbodyElement.removeEventListener('click', listener);
+    treeToggleListeners.delete(this);
 }
 
 /**
@@ -156,12 +221,7 @@ function onAfterCellRender(this: TableCell): void {
             'aria-expanded',
             rowState.isExpanded ? 'true' : 'false'
         );
-
-        toggleButton.addEventListener('click', (event): void => {
-            event.preventDefault();
-            event.stopPropagation();
-            void controller?.toggleRow(rowId);
-        });
+        toggleButton.setAttribute(treeToggleAttribute, '');
 
         toggleContainer.appendChild(toggleButton);
     }
