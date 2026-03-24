@@ -4,7 +4,7 @@
 
 .hcg-tree-cell-wrapper {
     --hcg-tree-indent-size: 16px;
-    --hcg-tree-toggle-gap: 3px;
+    --hcg-tree-toggle-gap: 5px;
     --hcg-tree-toggle-slot-size: 20px;
     --hcg-tree-toggle-hit-area-size: 22px;
     --hcg-tree-toggle-icon-size: 11px;
