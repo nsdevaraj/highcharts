@@ -68,7 +68,7 @@ export function compose(
  */
 function initResizeObserver(this: Grid): void {
     destroyResizeObserver.call(this);
-    if (!this.contentWrapper) {
+    if (!this.container || !this.contentWrapper) {
         return;
     }
 
