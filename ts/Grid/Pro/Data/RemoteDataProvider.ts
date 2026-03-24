@@ -536,7 +536,7 @@ export class RemoteDataProvider extends DataProvider {
         return column[localIndex];
     }
 
-    public override getOriginalRowObjectByRowId(
+    public override getRowObjectById(
         rowId: RowId
     ): Promise<RowObjectType | undefined> {
         const row = this.pinnedRowCache.get(rowId);

@@ -1270,7 +1270,7 @@ class Table {
         for (let i = 0; i < rowIds.length; ++i) {
             const rowId = rowIds[i];
             const rowData = await this.grid.dataProvider
-                ?.getOriginalRowObjectByRowId(rowId);
+                ?.getRowObjectById(rowId);
             if (!rowData) {
                 missingPinnedRowIds.push(rowId);
                 continue;

@@ -428,7 +428,7 @@ export class LocalDataProvider extends DataProvider {
      * @return
      * The original row object in raw data scope.
      */
-    public override getOriginalRowObjectByRowId(
+    public override getRowObjectById(
         rowId: RowId
     ): Promise<RowObjectType | undefined> {
         const originalIndex = this.resolveOriginalRowIndex(rowId);

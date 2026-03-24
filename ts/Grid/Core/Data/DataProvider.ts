@@ -153,7 +153,7 @@ export abstract class DataProvider {
      * @param rowId
      * Row identifier.
      */
-    public getOriginalRowObjectByRowId(
+    public getRowObjectById(
         rowId: RowId
     ): Promise<RowObjectType | undefined> {
         void rowId;

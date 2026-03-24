@@ -916,26 +916,6 @@ export interface LangOptions extends LangOptionsCore {
      */
     pagination?: PaginationLangOptions;
 
-    /**
-     * `Pin row to top` translation.
-     *
-     * @default 'Pin row to top'
-     */
-    pinRowTop?: string;
-
-    /**
-     * `Pin row to bottom` translation.
-     *
-     * @default 'Pin row to bottom'
-     */
-    pinRowBottom?: string;
-
-    /**
-     * `Unpin row` translation.
-     *
-     * @default 'Unpin row'
-     */
-    unpinRow?: string;
 }
 
 
