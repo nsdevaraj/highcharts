@@ -22,6 +22,7 @@
  * */
 
 import type Grid from '../../Core/Grid';
+import type { RowId } from '../../Core/Data/DataProvider';
 import type Table from '../../Core/Table/Table';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
@@ -39,10 +40,24 @@ import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
  * */
 
 type TreeToggleClickListener = (event: MouseEvent) => void;
+type TreeToggleDblClickListener = (event: MouseEvent) => void;
+type TreeToggleMouseDownListener = (event: MouseEvent) => void;
+type TreeToggleKeyDownListener = (event: KeyboardEvent) => void;
+type TreeToggleContext = {
+    cell: TableCell;
+    controller: TreeProjectionController;
+    rowId: RowId;
+};
+type TreeToggleListeners = {
+    click: TreeToggleClickListener;
+    dblClick: TreeToggleDblClickListener;
+    mouseDown: TreeToggleMouseDownListener;
+    keyDown: TreeToggleKeyDownListener;
+};
 
 const treeToggleAttribute = 'data-hcg-tree-toggle';
 const treeToggleSelector = '[' + treeToggleAttribute + ']';
-const treeToggleListeners = new WeakMap<Table, TreeToggleClickListener>();
+const treeToggleListeners = new WeakMap<Table, TreeToggleListeners>();
 
 /**
  * Composes Grid Pro with TreeView projection infrastructure.
@@ -100,10 +115,112 @@ function onBeforeDestroy(this: Grid, e: { onlyDOM?: boolean }): void {
 }
 
 /**
- * Adds a delegated click listener for tree toggle buttons.
+ * Returns tree-toggle context for an element within a tree cell.
+ *
+ * @param table
+ * Table viewport handling the tree cell.
+ *
+ * @param element
+ * Element within the tree cell or toggle button.
+ */
+function getTreeToggleContext(
+    table: Table,
+    element: Element
+): TreeToggleContext | undefined {
+    const cell = table.getCellFromElement(element) as TableCell | undefined;
+    if (!cell) {
+        return;
+    }
+
+    const controller = cell.row.viewport.grid.treeView;
+    const options = controller?.getOptions();
+    const projectionState = controller?.getProjectionState();
+    const treeColumn = (
+        options?.treeColumn ||
+        cell.row.viewport.columns[0]?.id
+    );
+
+    if (!controller || !projectionState || !treeColumn) {
+        return;
+    }
+
+    if (cell.column.id !== treeColumn) {
+        return;
+    }
+
+    const rowId = cell.row.id ?? projectionState?.rowIds[cell.row.index];
+    const rowState = rowId !== void 0 ?
+        projectionState.rowsById.get(rowId) :
+        void 0;
+
+    if (rowId === void 0 || !rowState?.hasChildren) {
+        return;
+    }
+
+    return { cell, controller, rowId };
+}
+
+/**
+ * Returns whether the event target is a focusable tree column cell with a
+ * toggleable row.
+ *
+ * @param table
+ * Table viewport handling the keydown event.
+ *
+ * @param event
+ * Keyboard event originating from a table cell.
+ */
+function getTreeToggleContextFromKeyboardEvent(
+    table: Table,
+    event: KeyboardEvent
+): TreeToggleContext | undefined {
+    if (!(event.target instanceof HTMLTableCellElement)) {
+        return;
+    }
+
+    return getTreeToggleContext(table, event.target);
+}
+
+/**
+ * Restores focus to the tree cell after a redraw caused by toggle.
+ *
+ * @param context
+ * Tree-toggle context captured before the redraw.
+ */
+function restoreTreeCellFocus(
+    context: TreeToggleContext
+): void {
+    const columnIndex = context.cell.column.index;
+    const restoredCell = context.cell.row.viewport
+        .getRow(context.rowId)
+        ?.cells[columnIndex];
+
+    restoredCell?.htmlElement.focus({
+        preventScroll: true
+    });
+}
+
+/**
+ * Toggles tree row and restores focus when redraw replaces the DOM cell.
+ *
+ * @param context
+ * Tree-toggle context captured from the current DOM cell.
+ */
+async function toggleTreeRow(
+    context: TreeToggleContext
+): Promise<void> {
+    const changed = await context.controller.toggleRow(context.rowId);
+
+    if (changed) {
+        restoreTreeCellFocus(context);
+    }
+}
+
+/**
+ * Adds delegated listeners for tree toggle buttons and keyboard shortcuts.
  */
 function onTableBeforeInit(this: Table): void {
-    const listener = (event: MouseEvent): void => {
+    const clickListener = (event: MouseEvent): void => {
         if (!(event.target instanceof Element)) {
             return;
         }
@@ -116,38 +233,99 @@ function onTableBeforeInit(this: Table): void {
         event.preventDefault();
         event.stopImmediatePropagation();
 
-        const cell = this.getCellFromElement(
-            toggleButton
-        ) as TableCell | undefined;
-        if (!cell) {
+        const context = getTreeToggleContext(this, toggleButton);
+        if (!context) {
             return;
         }
 
-        const controller = cell.row.viewport.grid.treeView;
-        const projectionState = controller?.getProjectionState();
-        const rowId = cell.row.id ?? projectionState?.rowIds[cell.row.index];
-
-        if (rowId === void 0) {
-            return;
-        }
-
-        void controller?.toggleRow(rowId);
+        void toggleTreeRow(context);
     };
 
-    this.tbodyElement.addEventListener('click', listener);
-    treeToggleListeners.set(this, listener);
+    const dblClickListener = (event: MouseEvent): void => {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        if (event.target.closest(treeToggleSelector)) {
+            return;
+        }
+
+        const context = getTreeToggleContext(this, event.target);
+        if (!context) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        context.cell.htmlElement.focus();
+
+        void toggleTreeRow(context);
+    };
+
+    const mouseDownListener = (event: MouseEvent): void => {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        const toggleButton = event.target.closest(treeToggleSelector);
+        if (!toggleButton || !this.tbodyElement.contains(toggleButton)) {
+            return;
+        }
+
+        const context = getTreeToggleContext(this, toggleButton);
+        if (!context) {
+            return;
+        }
+
+        event.preventDefault();
+        context.cell.htmlElement.focus();
+    };
+
+    const keyDownListener = (event: KeyboardEvent): void => {
+        if (
+            event.key !== 'Enter' &&
+            event.key !== ' ' &&
+            event.key !== 'Spacebar'
+        ) {
+            return;
+        }
+
+        const context = getTreeToggleContextFromKeyboardEvent(this, event);
+        if (!context) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        void toggleTreeRow(context);
+    };
+
+    this.tbodyElement.addEventListener('click', clickListener);
+    this.tbodyElement.addEventListener('dblclick', dblClickListener);
+    this.tbodyElement.addEventListener('mousedown', mouseDownListener);
+    this.tbodyElement.addEventListener('keydown', keyDownListener);
+    treeToggleListeners.set(this, {
+        click: clickListener,
+        dblClick: dblClickListener,
+        mouseDown: mouseDownListener,
+        keyDown: keyDownListener
+    });
 }
 
 /**
  * Removes the delegated click listener for tree toggle buttons.
  */
 function onTableAfterDestroy(this: Table): void {
-    const listener = treeToggleListeners.get(this);
-    if (!listener) {
+    const listeners = treeToggleListeners.get(this);
+    if (!listeners) {
         return;
     }
 
-    this.tbodyElement.removeEventListener('click', listener);
+    this.tbodyElement.removeEventListener('click', listeners.click);
+    this.tbodyElement.removeEventListener('dblclick', listeners.dblClick);
+    this.tbodyElement.removeEventListener('mousedown', listeners.mouseDown);
+    this.tbodyElement.removeEventListener('keydown', listeners.keyDown);
     treeToggleListeners.delete(this);
 }
 
@@ -221,6 +399,7 @@ function onAfterCellRender(this: TableCell): void {
             'aria-expanded',
             rowState.isExpanded ? 'true' : 'false'
         );
+        toggleButton.setAttribute('tabindex', '-1');
         toggleButton.setAttribute(treeToggleAttribute, '');
 
         const toggleIcon = createGridIcon(
