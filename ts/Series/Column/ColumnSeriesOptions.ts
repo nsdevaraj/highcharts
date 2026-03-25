@@ -432,8 +432,6 @@ export interface ColumnSeriesOptions extends SeriesOptions {
      *
      * @product highcharts highstock gantt
      *
-     * @product highcharts highstock
-     *
      * @apioption series.column.states.hover
      */
 
@@ -446,8 +444,6 @@ export interface ColumnSeriesOptions extends SeriesOptions {
      * @excluding halo, lineWidth, lineWidthPlus, marker
      *
      * @product highcharts highstock gantt
-     *
-     * @product highcharts highstock
      *
      * @apioption series.column.states.select
      */
