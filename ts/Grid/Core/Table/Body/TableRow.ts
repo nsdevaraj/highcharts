@@ -31,6 +31,7 @@ import Row from '../Row.js';
 import Table from '../Table.js';
 import TableCell from './TableCell.js';
 import Globals from '../../Globals.js';
+import { classNames as rowPinningClassNames } from '../../RowPinning/RowPinningGlobals.js';
 import { fireEvent } from '../../../../Shared/Utilities.js';
 
 
@@ -294,9 +295,9 @@ class TableRow extends Row {
         }
 
         el.classList.remove(
-            Globals.getClassName('rowPinned'),
-            Globals.getClassName('rowPinnedTop'),
-            Globals.getClassName('rowPinnedBottom')
+            rowPinningClassNames.rowPinned,
+            rowPinningClassNames.rowPinnedTop,
+            rowPinningClassNames.rowPinnedBottom
         );
 
         if (!this.pinnedSection) {
@@ -305,7 +306,7 @@ class TableRow extends Row {
         }
 
         if (this.pinnedSection === 'top') {
-            el.classList.add(Globals.getClassName('rowPinned'));
+            el.classList.add(rowPinningClassNames.rowPinned);
             el.setAttribute(
                 'aria-roledescription',
                 rowPinningDescriptions?.pinnedTop ||
@@ -315,7 +316,7 @@ class TableRow extends Row {
         }
 
         if (this.pinnedSection === 'bottom') {
-            el.classList.add(Globals.getClassName('rowPinned'));
+            el.classList.add(rowPinningClassNames.rowPinned);
             el.setAttribute(
                 'aria-roledescription',
                 rowPinningDescriptions?.pinnedBottom ||
@@ -331,8 +332,8 @@ class TableRow extends Row {
 
         const pinnedRows = vp.grid.getPinnedRows?.();
         if (pinnedRows?.topIds.includes(this.id)) {
-            el.classList.add(Globals.getClassName('rowPinned'));
-            el.classList.add(Globals.getClassName('rowPinnedTop'));
+            el.classList.add(rowPinningClassNames.rowPinned);
+            el.classList.add(rowPinningClassNames.rowPinnedTop);
             el.setAttribute(
                 'aria-roledescription',
                 rowPinningDescriptions?.alsoPinnedTop ||
@@ -342,8 +343,8 @@ class TableRow extends Row {
         }
 
         if (pinnedRows?.bottomIds.includes(this.id)) {
-            el.classList.add(Globals.getClassName('rowPinned'));
-            el.classList.add(Globals.getClassName('rowPinnedBottom'));
+            el.classList.add(rowPinningClassNames.rowPinned);
+            el.classList.add(rowPinningClassNames.rowPinnedBottom);
             el.setAttribute(
                 'aria-roledescription',
                 rowPinningDescriptions?.alsoPinnedBottom ||

@@ -44,6 +44,7 @@ import CellContextMenuBuiltInActions from './Body/CellContextMenuBuiltInActions.
 import {
     getGridRowPinningOptions
 } from '../RowPinning/RowPinningController.js';
+import { classNames as rowPinningClassNames } from '../RowPinning/RowPinningGlobals.js';
 
 const { makeHTMLElement } = GridUtils;
 
@@ -217,18 +218,18 @@ class Table {
         }
         this.pinnedTopTbodyElement = makeHTMLElement(
             'tbody',
-            { className: Globals.getClassName('pinnedTopTbodyElement') }
+            { className: rowPinningClassNames.pinnedTopTbodyElement }
         );
         this.pinnedTopTbodyElement.setAttribute(
             'aria-label', 'Pinned top rows'
         );
         this.tbodyElement = makeHTMLElement('tbody', {}, tableElement);
         this.tbodyElement.classList.add(
-            Globals.getClassName('scrollableTbodyElement')
+            rowPinningClassNames.scrollableTbodyElement
         );
         this.pinnedBottomTbodyElement = makeHTMLElement(
             'tbody',
-            { className: Globals.getClassName('pinnedBottomTbodyElement') }
+            { className: rowPinningClassNames.pinnedBottomTbodyElement }
         );
         this.pinnedBottomTbodyElement.setAttribute(
             'aria-label', 'Pinned bottom rows'
@@ -1148,7 +1149,7 @@ class Table {
 
         for (const section of pinnedSections) {
             section.tbody.classList.toggle(
-                Globals.getClassName('pinnedTbodyElementActive'),
+                rowPinningClassNames.pinnedTbodyElementActive,
                 section.rowIds.length > 0
             );
         }
