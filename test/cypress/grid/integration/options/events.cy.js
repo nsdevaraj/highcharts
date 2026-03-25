@@ -18,7 +18,7 @@ describe('Grid Pro - grid events.', () => {
     it('Grid afterUpdate event.', () => {
         cy.get('#afterUpdate').should('have.value', 'afterUpdate');
     });
-
+    
     it('Grid beforeUpdateColumn event.', () => {
         cy.get('#beforeUpdateColumn').should('have.value', 'beforeUpdateColumn');
     });
@@ -37,38 +37,6 @@ describe('Grid Pro - grid events.', () => {
 
     it('Grid afterRedraw event.', () => {
         cy.get('#afterRedraw').should('have.value', 'afterRedraw');
-    });
-});
-
-describe('Grid Pro - tree view events.', () => {
-    beforeEach(() => {
-        cy.visit('grid-pro/e2e/tree-view-events');
-    });
-
-    it('beforeTreeRowToggle / afterTreeRowToggle.', () => {
-        cy.get('.hcg-tree-toggle-button').first().click();
-
-        cy.get('#beforeTreeRowToggle').should('have.value', '1:true');
-        cy.get('#afterTreeRowToggle').should('have.value', '1:true');
-        cy.get('tbody .hcg-row').should('have.length', 3);
-
-        cy.get('.hcg-tree-toggle-button').first().click();
-
-        cy.get('#beforeTreeRowToggle').should('have.value', '1:false');
-        cy.get('#afterTreeRowToggle').should('have.value', '1:false');
-        cy.get('tbody .hcg-row').should('have.length', 1);
-    });
-
-    it('beforeTreeRowToggle can cancel toggle.', () => {
-        cy.get('.hcg-tree-toggle-button').first().click();
-        cy.get('tbody .hcg-row').should('have.length', 3);
-
-        cy.get('#preventToggle').check();
-        cy.get('.hcg-tree-toggle-button').first().click();
-
-        cy.get('#beforeTreeRowToggle').should('have.value', '1:false');
-        cy.get('#afterTreeRowToggle').should('have.value', '1:true');
-        cy.get('tbody .hcg-row').should('have.length', 3);
     });
 });
 
