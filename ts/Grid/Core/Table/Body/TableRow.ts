@@ -31,7 +31,7 @@ import Row from '../Row.js';
 import Table from '../Table.js';
 import TableCell from './TableCell.js';
 import Globals from '../../Globals.js';
-import { classNames as rowPinningClassNames } from '../../RowPinning/RowPinningGlobals.js';
+import { classNames as rowPinningClassNames } from '../../RowPinning/RowPinningComposition.js';
 import { fireEvent } from '../../../../Shared/Utilities.js';
 
 

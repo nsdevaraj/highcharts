@@ -55,6 +55,19 @@ export const defaultOptions: DeepPartial<Options> = {
     }
 };
 
+/**
+ * The class names used by the row pinning functionality.
+ */
+export const classNames = {
+    scrollableTbodyElement: Globals.classNamePrefix + 'tbody-scrollable',
+    pinnedTopTbodyElement: Globals.classNamePrefix + 'tbody-pinned-top',
+    pinnedBottomTbodyElement: Globals.classNamePrefix + 'tbody-pinned-bottom',
+    pinnedTbodyElementActive: Globals.classNamePrefix + 'tbody-pinned-active',
+    rowPinned: Globals.classNamePrefix + 'row-pinned',
+    rowPinnedTop: Globals.classNamePrefix + 'row-pinned-top',
+    rowPinnedBottom: Globals.classNamePrefix + 'row-pinned-bottom'
+} as const;
+
 /* *
  *
  *  Composition

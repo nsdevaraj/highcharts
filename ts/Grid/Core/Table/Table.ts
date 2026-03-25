@@ -44,7 +44,7 @@ import CellContextMenuBuiltInActions from './Body/CellContextMenuBuiltInActions.
 import {
     getGridRowPinningOptions
 } from '../RowPinning/RowPinningController.js';
-import { classNames as rowPinningClassNames } from '../RowPinning/RowPinningGlobals.js';
+import { classNames as rowPinningClassNames } from '../RowPinning/RowPinningComposition.js';
 
 const { makeHTMLElement } = GridUtils;
 
