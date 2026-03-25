@@ -127,16 +127,6 @@ export class RemoteDataProvider extends DataProvider {
     private requestEpoch = 0;
 
     /**
-     * Best-effort cache for pinned rows available client-side.
-     */
-    private pinnedRowCache: Map<RowId, RowObjectType> = new Map();
-
-    /**
-     * Warn-once tracking for pinned row cache misses.
-     */
-    private warnedPinnedCacheMisses: Set<RowId> = new Set();
-
-    /**
      * Abort controllers for in-flight requests (latest-only policy).
      */
     private pendingControllers: Set<AbortController> = new Set();
@@ -173,11 +163,6 @@ export class RemoteDataProvider extends DataProvider {
             controller.abort();
         }
         this.pendingControllers.clear();
-    }
-
-    private resetPinnedRowCache(): void {
-        this.pinnedRowCache.clear();
-        this.warnedPinnedCacheMisses.clear();
     }
 
     private async getChunkForRowIndex(rowIndex: number): Promise<DataChunk> {
@@ -536,50 +521,26 @@ export class RemoteDataProvider extends DataProvider {
         return column[localIndex];
     }
 
-    public override getRowObjectById(
+    /**
+     * Returns a row object by row ID from cached remote chunks.
+     *
+     * @param rowId
+     * Row identifier.
+     */
+    public override getCachedRowObjectById(
         rowId: RowId
-    ): Promise<RowObjectType | undefined> {
-        const row = this.pinnedRowCache.get(rowId);
+    ): RowObjectType | undefined {
+        const info = this.rowIdToChunkInfo?.get(rowId);
 
-        if (!row && !this.warnedPinnedCacheMisses.has(rowId)) {
-            this.warnedPinnedCacheMisses.add(rowId);
-            // eslint-disable-next-line no-console
-            console.warn(
-                'Grid RemoteDataProvider: pinned row cache miss for rowId ' +
-                `"${String(rowId)}".`
-            );
+        if (!info) {
+            return void 0;
         }
 
-        return Promise.resolve(row);
-    }
+        const rowIndex = this.querying.pagination.enabled ?
+            info.localIndex :
+            info.chunkIndex * this.maxChunkSize + info.localIndex;
 
-    public override primePinnedRows(rowIds: RowId[]): Promise<void> {
-        for (const rowId of rowIds) {
-            if (this.pinnedRowCache.has(rowId)) {
-                continue;
-            }
-
-            const info = this.rowIdToChunkInfo?.get(rowId);
-            if (!info) {
-                continue;
-            }
-
-            const rowIndex = this.querying.pagination.enabled ?
-                info.localIndex :
-                info.chunkIndex * this.maxChunkSize + info.localIndex;
-            const row = this.getRowObjectFromCache(rowIndex);
-
-            if (row) {
-                this.pinnedRowCache.set(rowId, row);
-            }
-        }
-
-        return Promise.resolve();
-    }
-
-    public override clearPinnedRowCache(rowId: RowId): void {
-        this.pinnedRowCache.delete(rowId);
-        this.warnedPinnedCacheMisses.delete(rowId);
+        return this.getRowObjectFromCache(rowIndex);
     }
 
     public override async setValue(
@@ -602,11 +563,6 @@ export class RemoteDataProvider extends DataProvider {
                 rowId,
                 value
             );
-
-            const pinnedRow = this.pinnedRowCache.get(rowId);
-            if (pinnedRow) {
-                pinnedRow[columnId] = value;
-            }
 
             this.lastQueryFingerprint = null;
 
@@ -695,7 +651,6 @@ export class RemoteDataProvider extends DataProvider {
         this.columnIds = null;
         this.prePaginationRowCount = null;
         this.rowCount = null;
-        this.warnedPinnedCacheMisses.clear();
 
         // When pagination is enabled, update the total items count
         // for the pagination controller (used to calculate total pages).
@@ -713,7 +668,6 @@ export class RemoteDataProvider extends DataProvider {
         this.columnIds = null;
         this.prePaginationRowCount = null;
         this.rowCount = null;
-        this.resetPinnedRowCache();
         this.lastQueryFingerprint = null;
         this.requestEpoch++;
     }

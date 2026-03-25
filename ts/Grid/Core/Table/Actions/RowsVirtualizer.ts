@@ -370,7 +370,7 @@ class RowsVirtualizer {
             return;
         }
 
-        await grid.dataProvider?.primePinnedRows(pinnedIds);
+        await grid.rowPinning.ensurePinnedRowsAvailable(pinnedIds);
         const renderResult = await this.viewport.renderPinnedRows(true);
         await grid.rowPinning.handlePinnedRenderResult(renderResult, 'query');
     }

@@ -420,24 +420,39 @@ export class LocalDataProvider extends DataProvider {
     }
 
     /**
-     * Returns the original row object for a given row ID.
+     * Returns the original row object for a row ID from resident local data.
      *
      * @param rowId
-     * The row ID to get the original row object for.
+     * Row identifier.
      *
      * @return
      * The original row object in raw data scope.
      */
-    public override getRowObjectById(
+    public override getCachedRowObjectById(
         rowId: RowId
-    ): Promise<RowObjectType | undefined> {
+    ): RowObjectType | undefined {
         const originalIndex = this.resolveOriginalRowIndex(rowId);
 
         if (originalIndex === void 0) {
-            return Promise.resolve(void 0);
+            return void 0;
         }
 
-        return Promise.resolve(this.dataTable?.getRowObject(originalIndex));
+        return this.dataTable?.getRowObject(originalIndex);
+    }
+
+    /**
+     * Resolves a row object by row ID from resident local data.
+     *
+     * @param rowId
+     * Row identifier.
+     *
+     * @return
+     * The original row object in raw data scope.
+     */
+    public override fetchRowObjectById(
+        rowId: RowId
+    ): Promise<RowObjectType | undefined> {
+        return Promise.resolve(this.getCachedRowObjectById(rowId));
     }
 
     /**

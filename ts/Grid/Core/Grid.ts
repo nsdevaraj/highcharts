@@ -204,6 +204,52 @@ function didPinnedRowsChange(
 }
 
 /**
+ * Returns whether column options change sorting or filtering semantics.
+ *
+ * @param options
+ * Column-level options to inspect.
+ */
+function hasColumnQueryOptionChanges(
+    options?: DeepPartial<IndividualColumnOptions> | NoIdColumnOptions | null
+): boolean {
+    if (!options) {
+        return false;
+    }
+
+    return !!(
+        options.sorting && (
+            Object.prototype.hasOwnProperty.call(options.sorting, 'compare') ||
+            Object.prototype.hasOwnProperty.call(options.sorting, 'order')
+        )
+    ) || !!(
+        options.filtering && (
+            Object.prototype.hasOwnProperty.call(
+                options.filtering,
+                'condition'
+            ) ||
+            Object.prototype.hasOwnProperty.call(options.filtering, 'value')
+        )
+    );
+}
+
+/**
+ * Returns whether grid update options change sorting or filtering semantics.
+ *
+ * @param options
+ * Grid update options to inspect.
+ */
+function hasGridQueryOptionChanges(options: Omit<Options, 'id'>): boolean {
+    if (hasColumnQueryOptionChanges(options.columnDefaults || null)) {
+        return true;
+    }
+
+    const columns = options.columns;
+    return Array.isArray(columns) && columns.some((columnOptions): boolean =>
+        hasColumnQueryOptionChanges(columnOptions || null)
+    );
+}
+
+/**
  * Create a row pinning event payload using controller-owned preview logic.
  *
  * @param controller
@@ -273,7 +319,7 @@ function createRowPinningChangeEvent(
  * Event payload passed to before/after row pinning hooks.
  *
  * @param applyChange
- * Callback that mutates pinning state and provider cache hooks.
+ * Callback that mutates pinning state and controller-managed pinned data.
  *
  * @param announcementAction
  * Announcement action for accessibility.
@@ -692,8 +738,7 @@ export class Grid {
             this,
             eventPayload,
             async (): Promise<void> => {
-                this.rowPinning?.pinRow(rowId, position, index);
-                await this.dataProvider?.primePinnedRows([rowId]);
+                await this.rowPinning?.pinRow(rowId, position, index);
             },
             'pin',
             position
@@ -739,10 +784,8 @@ export class Grid {
             async (): Promise<void> => {
                 if (isPinned) {
                     this.rowPinning?.unpinRow(rowId);
-                    this.dataProvider?.clearPinnedRowCache(rowId);
                 } else {
-                    this.rowPinning?.pinRow(rowId, position);
-                    await this.dataProvider?.primePinnedRows([rowId]);
+                    await this.rowPinning?.pinRow(rowId, position);
                 }
             },
             isPinned ? 'unpin' : 'pin',
@@ -775,7 +818,6 @@ export class Grid {
             eventPayload,
             (): void => {
                 this.rowPinning?.unpinRow(rowId);
-                this.dataProvider?.clearPinnedRowCache(rowId);
             },
             'unpin'
         );
@@ -1095,6 +1137,7 @@ export class Grid {
         });
 
         const { viewport } = this;
+        const requestedQueryOptionChanges = hasGridQueryOptionChanges(options);
         const diff = this.loadUserOptions(options, oneToOne);
         const flags = this.dirtyFlags;
         const renderingDiff = diff.rendering as ({
@@ -1205,6 +1248,10 @@ export class Grid {
             });
         };
 
+        if (requestedQueryOptionChanges) {
+            this.rowPinning?.invalidatePinnedRowObjects();
+        }
+
         if (redraw) {
             return this.redraw().then(finish);
         }
@@ -1276,7 +1323,6 @@ export class Grid {
 
         if ('sorting' in columnDiff) {
             const sortingDiff = columnDiff.sorting ?? {};
-
             if (
                 'compare' in sortingDiff ||
                 'order' in sortingDiff
@@ -1297,7 +1343,6 @@ export class Grid {
 
         if ('filtering' in columnDiff) {
             const filteringDiff = columnDiff.filtering ?? {};
-
             if (
                 'condition' in filteringDiff ||
                 'value' in filteringDiff
@@ -1451,6 +1496,9 @@ export class Grid {
         });
 
         const vp = this.viewport;
+        const requestedQueryOptionChanges = hasColumnQueryOptionChanges(
+            options
+        );
         const diffs = this.setColumnOptions([{
             id: columnId,
             ...options
@@ -1459,6 +1507,10 @@ export class Grid {
 
         if (diff && vp) {
             this.loadColumnOptionDiffs(vp, columnId, diff);
+        }
+
+        if (requestedQueryOptionChanges) {
+            this.rowPinning?.invalidatePinnedRowObjects();
         }
 
         if (redraw) {
@@ -1541,6 +1593,7 @@ export class Grid {
         }
 
         sortingController.setSorting(normalized);
+        this.rowPinning?.invalidatePinnedRowObjects();
         await viewport.updateRows();
 
         const currentSortings = sortingController.currentSortings || [];

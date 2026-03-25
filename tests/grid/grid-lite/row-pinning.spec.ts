@@ -1015,6 +1015,57 @@ test.describe('Grid Lite row pinning', () => {
         expect(state.scrollableRows).toBe(0);
     });
 
+    test('local missing pinned ids clear previously cached pinned row objects', async ({ page }) => {
+        const state = await page.evaluate(async () => {
+            const grid = (window as any).grid;
+            const getPinnedTopIds = (): string[] => Array.from(
+                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                    'td[data-column-id="id"]'
+                )
+            ).map((el: Element) => (el.textContent || '').trim());
+
+            const before = {
+                pinning: grid.getPinnedRows(),
+                pinnedTop: getPinnedTopIds()
+            };
+
+            await grid.update({
+                dataTable: {
+                    columns: {
+                        id: [],
+                        product: [],
+                        group: [],
+                        stock: []
+                    }
+                },
+                rendering: {
+                    rows: {
+                        pinning: {
+                            idColumn: 'id',
+                            topIds: ['ROW-001'],
+                            bottomIds: []
+                        }
+                    }
+                }
+            });
+
+            return {
+                before,
+                after: {
+                    pinning: grid.getPinnedRows(),
+                    pinnedTop: getPinnedTopIds(),
+                    topRows: grid.viewport.pinnedTopRows.length
+                }
+            };
+        });
+
+        expect(state.before.pinning.topIds).toEqual(['ROW-001']);
+        expect(state.before.pinnedTop).toEqual(['ROW-001']);
+        expect(state.after.pinning.topIds).toEqual([]);
+        expect(state.after.pinnedTop).toEqual([]);
+        expect(state.after.topRows).toBe(0);
+    });
+
     test('getPinnedRows returns empty effective state for missing ids after recompute', async ({ page }) => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;

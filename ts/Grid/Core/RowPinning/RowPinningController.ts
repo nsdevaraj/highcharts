@@ -24,7 +24,12 @@
 import type Grid from '../../Core/Grid';
 import type Options from '../../Core/Options';
 import type { RowId as DataProviderRowId } from '../Data/DataProvider';
+import type {
+    RowObject as RowObjectType,
+    CellType as DataTableCellType
+} from '../../../Data/DataTable';
 
+import { DataProvider } from '../Data/DataProvider.js';
 import { erase, isNumber, isString } from '../../../Shared/Utilities.js';
 
 /* *
@@ -101,6 +106,8 @@ class RowPinningController {
 
     private explicitUnpinned: Set<RowId> = new Set();
 
+    private pinnedRowObjects: Map<RowId, RowObjectType> = new Map();
+
     private optionsDirty = true;
 
     constructor(grid: Grid) {
@@ -116,9 +123,30 @@ class RowPinningController {
         this.bottomRowIds.length = 0;
         this.resolvedTopRowIds.length = 0;
         this.resolvedBottomRowIds.length = 0;
+        this.pinnedRowObjects.clear();
 
         if (clearExplicitUnpinned) {
             this.explicitUnpinned.clear();
+        }
+    }
+
+    /**
+     * Prunes cached pinned row objects for rows that are no longer pinned.
+     *
+     * @param state
+     * Optional pinned state snapshot.
+     */
+    private syncPinnedRowObjects(state?: RowPinningState): void {
+        const pinned = state || this.getPinnedRows();
+        const activeIds = new Set<RowId>([
+            ...pinned.topIds,
+            ...pinned.bottomIds
+        ]);
+
+        for (const rowId of this.pinnedRowObjects.keys()) {
+            if (!activeIds.has(rowId)) {
+                this.pinnedRowObjects.delete(rowId);
+            }
         }
     }
 
@@ -165,6 +193,7 @@ class RowPinningController {
         this.bottomRowIds = normalized.bottomIds;
         this.resolvedTopRowIds.length = 0;
         this.resolvedBottomRowIds.length = 0;
+        this.syncPinnedRowObjects();
     }
 
     public markOptionsDirty(): void {
@@ -193,11 +222,11 @@ class RowPinningController {
         return this.getPinningOptions()?.enabled !== false;
     }
 
-    public pinRow(
+    public async pinRow(
         rowId: RowId,
         position: RowPinningPosition = 'top',
         index?: number
-    ): void {
+    ): Promise<void> {
         this.loadOptions();
         if (!this.isOptionEnabled()) {
             return;
@@ -214,6 +243,7 @@ class RowPinningController {
 
         this.topRowIds = next.topIds;
         this.bottomRowIds = next.bottomIds;
+        await this.ensurePinnedRowsAvailable([rowId]);
     }
 
     public unpinRow(rowId: RowId): void {
@@ -230,6 +260,7 @@ class RowPinningController {
         this.topRowIds = next.topIds;
         this.bottomRowIds = next.bottomIds;
         this.explicitUnpinned.add(rowId);
+        this.pinnedRowObjects.delete(rowId);
     }
 
     public previewPinnedRowsChange(
@@ -273,6 +304,7 @@ class RowPinningController {
 
         this.resolvedTopRowIds = normalized.topIds;
         this.resolvedBottomRowIds = normalized.bottomIds;
+        this.syncPinnedRowObjects();
     }
 
     public pruneMissingExplicitIds(rowIds: RowId[]): void {
@@ -287,6 +319,7 @@ class RowPinningController {
         this.bottomRowIds = this.bottomRowIds.filter((rowId): boolean =>
             !missing.has(rowId)
         );
+        this.syncPinnedRowObjects();
     }
 
     public getPinnedRows(): { topIds: RowId[]; bottomIds: RowId[] } {
@@ -325,6 +358,90 @@ class RowPinningController {
     }
 
     /**
+     * Returns the cached row object for a pinned row.
+     *
+     * @param rowId
+     * Row identifier.
+     */
+    public getPinnedRowObject(rowId: RowId): RowObjectType | undefined {
+        return this.pinnedRowObjects.get(rowId);
+    }
+
+    /**
+     * Synchronizes pinned row objects with provider data.
+     *
+     * @param rowIds
+     * Row identifiers to resolve.
+     */
+    public async ensurePinnedRowsAvailable(rowIds: RowId[]): Promise<void> {
+        if (!rowIds.length) {
+            return;
+        }
+
+        const dataProvider = this.grid.dataProvider;
+        if (!dataProvider) {
+            return;
+        }
+
+        for (const rowId of RowPinningController.uniqueRowIds(rowIds)) {
+            const cachedRow = dataProvider.getCachedRowObjectById(rowId);
+
+            if (cachedRow) {
+                this.pinnedRowObjects.set(rowId, cachedRow);
+                continue;
+            }
+
+            if (
+                dataProvider.fetchRowObjectById !==
+                DataProvider.prototype.fetchRowObjectById
+            ) {
+                const fetchedRow = await dataProvider.fetchRowObjectById(rowId);
+
+                if (fetchedRow) {
+                    this.pinnedRowObjects.set(rowId, fetchedRow);
+                } else {
+                    this.pinnedRowObjects.delete(rowId);
+                }
+            } else {
+                continue;
+            }
+        }
+
+        this.syncPinnedRowObjects();
+    }
+
+    /**
+     * Applies a committed cell edit to the pinned row cache.
+     *
+     * @param rowId
+     * Edited row identifier.
+     *
+     * @param columnId
+     * Edited column identifier.
+     *
+     * @param value
+     * Persisted cell value.
+     */
+    public updatePinnedRowValue(
+        rowId: RowId,
+        columnId: string,
+        value: DataTableCellType
+    ): void {
+        const row = this.pinnedRowObjects.get(rowId);
+
+        if (row) {
+            row[columnId] = value;
+        }
+    }
+
+    /**
+     * Clears all cached pinned row objects.
+     */
+    public invalidatePinnedRowObjects(): void {
+        this.pinnedRowObjects.clear();
+    }
+
+    /**
      * Recompute resolve()-based pinned IDs from materialized provider rows.
      */
     public async recomputeResolvedFromMaterializedRows(): Promise<void> {
@@ -334,8 +451,18 @@ class RowPinningController {
 
         const resolve = this.getPinningOptions()?.resolve;
         const dataProvider = this.grid.dataProvider;
-        if (!resolve || !dataProvider) {
+        if (!dataProvider) {
             this.setResolvedIds([], []);
+            return;
+        }
+
+        if (!resolve) {
+            this.setResolvedIds([], []);
+            const pinned = this.getPinnedRows();
+            await this.ensurePinnedRowsAvailable([
+                ...pinned.topIds,
+                ...pinned.bottomIds
+            ]);
             return;
         }
 
@@ -378,7 +505,7 @@ class RowPinningController {
 
         this.setResolvedIds(topResolved, bottomResolved);
         const pinned = this.getPinnedRows();
-        await dataProvider.primePinnedRows([
+        await this.ensurePinnedRowsAvailable([
             ...pinned.topIds,
             ...pinned.bottomIds
         ]);
@@ -407,7 +534,7 @@ class RowPinningController {
         const isRemote = this.grid.options?.data?.providerType === 'remote';
         if (isRemote) {
             if (source === 'query') {
-                await this.grid.dataProvider?.primePinnedRows(
+                await this.ensurePinnedRowsAvailable(
                     result.missingPinnedRowIds
                 );
             }

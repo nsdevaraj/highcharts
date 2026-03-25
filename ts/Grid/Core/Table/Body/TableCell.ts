@@ -261,6 +261,11 @@ class TableCell extends Cell {
             this.column.id,
             rowId
         );
+        vp.grid.rowPinning?.updatePinnedRowValue(
+            rowId,
+            this.column.id,
+            this.value
+        );
 
         if (vp.grid.querying.willNotModify()) {
             await this.syncRenderedMirrorCells(rowId);

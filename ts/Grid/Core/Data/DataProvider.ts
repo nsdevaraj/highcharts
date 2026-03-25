@@ -147,38 +147,29 @@ export abstract class DataProvider {
     public abstract destroy(): void;
 
     /**
-     * Returns a row object from the original (unmodified) data source by row
-     * ID. Used by pinned-row rendering.
+     * Returns a row object by row ID from currently available provider data.
      *
      * @param rowId
      * Row identifier.
      */
-    public getRowObjectById(
+    public getCachedRowObjectById(
+        rowId: RowId
+    ): RowObjectType | undefined {
+        void rowId;
+        return void 0;
+    }
+
+    /**
+     * Resolves a row object by row ID using a definitive lookup when supported.
+     *
+     * @param rowId
+     * Row identifier.
+     */
+    public fetchRowObjectById(
         rowId: RowId
     ): Promise<RowObjectType | undefined> {
         void rowId;
         return Promise.resolve(void 0);
-    }
-
-    /**
-     * Primes provider-side pinned row caches (best-effort).
-     *
-     * @param rowIds
-     * Row identifiers to prime.
-     */
-    public primePinnedRows(rowIds: RowId[]): Promise<void> {
-        void rowIds;
-        return Promise.resolve();
-    }
-
-    /**
-     * Clears a single pinned row cache entry.
-     *
-     * @param rowId
-     * Row identifier to clear from cache.
-     */
-    public clearPinnedRowCache(rowId: RowId): void {
-        void rowId;
     }
 
     /**
