@@ -188,6 +188,15 @@ class ColumnsResizer {
             return;
         }
 
+        /*
+         * In iOS, a touchmove event with e.touches[0].pageX === 0 can fire
+         * while holding the finger in place. Ignore it to avoid collapsing the
+         * column to its minimum width.
+         */
+        if ('touches' in e && e.touches[0]?.pageX === 0) {
+            return;
+        }
+
         const pageX = ColumnsResizer.getPageX(e);
 
         if (pageX === void 0) {

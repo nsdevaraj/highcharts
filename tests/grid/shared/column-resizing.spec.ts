@@ -146,11 +146,11 @@ test.describe('Column distribution strategies', () => {
         expect(width).toBeLessThan(100);
     });
 
-    test('Resize should work with touch events', async ({ page }) => {
+    test('Resize should work with touch events and ignore zero-pageX moves', async ({ page }) => {
         const initialWidth = await page.locator('.hcg-header-cell').first()
             .evaluate((el: HTMLElement) => el.offsetWidth);
 
-        await page.evaluate(() => {
+        const widthAfterHeldMove = await page.evaluate(() => {
             const cell = document.querySelector('.hcg-header-cell');
             const handle = cell?.querySelector('.hcg-column-resizer');
 
@@ -204,6 +204,10 @@ test.describe('Column distribution strategies', () => {
                 pageX: rect.left + window.scrollX + rect.width / 2,
                 pageY: rect.top + window.scrollY + rect.height / 2
             };
+            const heldPosition = {
+                ...startPosition,
+                pageX: 0
+            };
             const movePosition = {
                 ...startPosition,
                 clientX: startPosition.clientX - 30,
@@ -211,16 +215,20 @@ test.describe('Column distribution strategies', () => {
             };
 
             dispatchTouch(handle, handle, 'touchstart', startPosition);
+            dispatchTouch(document, handle, 'touchmove', heldPosition);
+            const widthAfterHeldMove = cell.offsetWidth;
             dispatchTouch(document, handle, 'touchmove', movePosition);
             dispatchTouch(document, handle, 'touchend', movePosition);
+
+            return widthAfterHeldMove;
         });
+
+        expect(widthAfterHeldMove).toBe(initialWidth);
 
         await page.waitForFunction(
             (startWidth) => {
                 const cell = document.querySelector('.hcg-header-cell');
-
-                return !!cell &&
-                    (cell as HTMLElement).offsetWidth < startWidth;
+                return !!cell && (cell as HTMLElement).offsetWidth < startWidth;
             },
             initialWidth,
             { timeout: 5000 }
