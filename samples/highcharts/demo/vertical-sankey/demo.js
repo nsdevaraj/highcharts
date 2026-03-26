@@ -99,7 +99,7 @@ Highcharts.chart('container', {
         }, {
             id: 'Other power (non-steam)',
             column: 4,
-            offsetHorizontal: '700%',
+            offsetHorizontal: '900%',
             color: 'rgba(108, 221, 202, 0.8)'
         }, {
             id: 'To direct water services',
@@ -128,7 +128,7 @@ Highcharts.chart('container', {
             }
         }, {
             id: 'Electric water-related applications',
-            offsetHorizontal: '-250%',
+            offsetHorizontal: '-330%',
             color: 'rgba(255, 141, 100, 0.8)',
             dataLabels: {
                 rotation: -90,
@@ -138,18 +138,18 @@ Highcharts.chart('container', {
             }
         }, {
             id: 'Electric water heating',
-            offsetHorizontal: '-1100%',
+            offsetHorizontal: '-1600%',
             color: 'rgba(250, 183, 118, 0.8)'
         }, {
             id: 'Other',
-            offsetHorizontal: '-480%',
+            offsetHorizontal: '-700%',
             color: 'rgba(149, 155, 236, 0.8)',
             dataLabels: {
                 rotation: -90
             }
         }, {
             id: 'Direct water services',
-            offsetHorizontal: '-80%',
+            offsetHorizontal: '-680%',
             color: 'rgba(76, 175, 254, 0.8)',
             dataLabels: {
                 style: {
