@@ -96,7 +96,7 @@ const SunburstSeriesDefaults: SunburstSeriesOptions = {
     /**
      * Can set a `color` on all points which lies on the same level.
      *
-     * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type      {Highcharts.ColorType}
      * @apioption plotOptions.sunburst.levels.color
      */
 

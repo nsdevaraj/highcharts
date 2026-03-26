@@ -167,7 +167,7 @@ const SankeySeriesDefaults: PlotOptionsOf<SankeySeries> = {
     /**
      * Can set `color` on all nodes which lay on the same level.
      *
-     * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type      {Highcharts.ColorType}
      * @apioption plotOptions.sankey.levels.color
      */
 
@@ -444,7 +444,7 @@ const SankeySeriesDefaults: PlotOptionsOf<SankeySeries> = {
 /**
  * The color of the auto generated node.
  *
- * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type      {Highcharts.ColorType}
  * @product   highcharts
  * @apioption series.sankey.nodes.color
  */
@@ -616,7 +616,7 @@ const SankeySeriesDefaults: PlotOptionsOf<SankeySeries> = {
  * the points, so when setting a specific link color, consider setting the
  * `fillOpacity` to 1.
  *
- * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type      {Highcharts.ColorType}
  * @product   highcharts
  * @apioption series.sankey.data.color
  */

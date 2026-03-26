@@ -37,7 +37,7 @@ export interface SankeyPointOptions extends ColumnPointOptions, NodesComposition
      * applies to the points, so when setting a specific link color, consider
      * setting the `fillOpacity` to 1.
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @product highcharts
      */

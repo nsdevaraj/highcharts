@@ -2066,7 +2066,7 @@ export class Exporting {
              * @internal
              * @function filterStyles
              *
-             * @param {string | number | Highcharts.GradientColor | Highcharts.PatternObject | undefined} val
+             * @param {string|number|Highcharts.GradientColorObject|Highcharts.PatternObject|undefined} val
              * Style value.
              * @param {string} prop
              * Style property name.

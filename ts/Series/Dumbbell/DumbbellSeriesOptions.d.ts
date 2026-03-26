@@ -96,7 +96,7 @@ interface DumbbellSeriesOptions extends AreaRangeSeriesOptions {
      * priority over the series color. To avoid this, set `lowColor` to
      * `undefined`.
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @since 8.0.0
      *

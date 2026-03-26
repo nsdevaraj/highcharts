@@ -901,7 +901,11 @@ class TreemapSeries extends ScatterSeries {
                         2 * (options.padding || padding || 0);
                     style.width = `${dataLabelWidth}px`;
                     style.lineClamp ??= Math.floor(height / 16);
-                    style.visibility = 'inherit';
+                    // Only set this in traversal mode, with zooming data labels
+                    // should not inherit group visibility (#24220).
+                    if (this.options.allowTraversingTree) {
+                        style.visibility = 'inherit';
+                    }
 
                     // Make the label box itself fill the width. Reset when
                     // no longer header (#23100).

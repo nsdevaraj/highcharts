@@ -1736,14 +1736,6 @@ class Chart {
                                 baseline :
                                 offset + baseline
                         },
-                        {
-                            align: key === 'title' ?
-                                // Title defaults to center for short titles,
-                                // left for word-wrapped titles
-                                (uncappedScale < minScale ? 'left' : 'center') :
-                                // Subtitle defaults to the title.align
-                                this.title?.alignValue
-                        },
                         descOptions
                     ),
                     width = (descOptions.width || (
@@ -1755,6 +1747,14 @@ class Chart {
                                 alignTo.width
                         ) / scale
                     )) + 'px';
+
+                // Handle auto alignment
+                alignAttr.align ??= key === 'title' ?
+                    // Title defaults to center for short titles,
+                    // left for word-wrapped titles
+                    (uncappedScale < minScale ? 'left' : 'center') :
+                    // Subtitle defaults to the title.align
+                    this.title?.alignValue;
 
                 // No animation when switching alignment
                 if (desc.alignValue !== alignAttr.align) {

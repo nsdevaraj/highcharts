@@ -58,7 +58,7 @@ const MapLineSeriesDefaults: MapLineSeriesOptions = {
     /**
      * Fill color for the map line shapes
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      */
     fillColor: 'none',
 

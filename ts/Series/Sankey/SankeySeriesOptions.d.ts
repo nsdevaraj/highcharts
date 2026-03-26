@@ -58,7 +58,7 @@ export interface SankeySeriesLevelOptions {
     /**
      * Can set `color` on all nodes which lay on the same level.
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @apioption plotOptions.sankey.levels.color
      */
@@ -105,7 +105,7 @@ export interface SankeySeriesNodeOptions {
     /**
      * The color of the auto generated node.
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @product highcharts
      */

@@ -54,7 +54,7 @@ const ErrorBarSeriesDefaults: ErrorBarSeriesOptions = {
      * @sample {highcharts} highcharts/plotoptions/error-bar-styling/
      *         Error bar styling
      *
-     * @type    {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type    {Highcharts.ColorType}
      * @default #000000
      * @since   3.0
      * @product highcharts

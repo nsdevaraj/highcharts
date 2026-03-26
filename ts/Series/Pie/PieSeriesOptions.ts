@@ -106,7 +106,7 @@ export interface PieSeriesOptions extends LineSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/pie-bordercolor-black/
      *         Black border
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @default #ffffff
      *
@@ -132,7 +132,7 @@ export interface PieSeriesOptions extends LineSeriesOptions {
      * The width of the border surrounding each slice.
      *
      * When setting the border width to 0, there may be small gaps between
-     * the slices due to SVG antialiasing artefacts. To work around this,
+     * the slices due to SVG antialiasing artifacts. To work around this,
      * keep the border width at 0.5 or 1, but set the `borderColor` to
      * `null` instead.
      *
@@ -185,7 +185,7 @@ export interface PieSeriesOptions extends LineSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/pie-emptyseries/
      *         Empty pie series
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @default ${palette.neutralColor20}
      */
@@ -201,7 +201,7 @@ export interface PieSeriesOptions extends LineSeriesOptions {
      * @sample {highcharts} highcharts/demo/pie-monochrome/
      *         Set default colors for all pies
      *
-     * @type {Array<Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject>}
+     * @type {Array<Highcharts.ColorType>}
      *
      * @since 3.0
      *
@@ -309,7 +309,7 @@ export interface PieSeriesOptions extends LineSeriesOptions {
      * @sample {highcharts} highcharts/plotoptions/pie-emptyseries/
      *         Empty pie series
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      */
     fillColor?: ColorType;
 

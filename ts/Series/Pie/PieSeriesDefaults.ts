@@ -17,9 +17,8 @@
  *
  * */
 
-import type PieSeries from './PieSeries';
-import type { PlotOptionsOf } from '../../Core/Series/SeriesOptions';
 import type Point from '../../Core/Series/Point';
+import type { PieSeriesOptions } from './PieSeriesOptions';
 
 import { Palette } from '../../Core/Color/Palettes.js';
 
@@ -46,10 +45,8 @@ import { Palette } from '../../Core/Color/Palettes.js';
  *               zoneAxis, zones, dataSorting, boostBlending
  * @product      highcharts highmaps
  * @optionparent plotOptions.pie
- *
- * @private
  */
-const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
+const PieSeriesDefaults: PieSeriesOptions = {
 
     /**
      * The corner radius of the border surrounding each slice. A number
@@ -118,8 +115,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @type    {Array<(number|string|null),(number|string|null)>}
      * @default [null, null]
      * @product highcharts highmaps
-     *
-     * @private
      */
     center: [null, null],
 
@@ -138,22 +133,20 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @sample {highcharts} highcharts/plotoptions/pie-emptyseries/
      *         Empty pie series
      *
-     * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type      {Highcharts.ColorType}
      * @default   ${palette.neutralColor20}
      * @apioption plotOptions.pie.color
      */
 
     /**
      * @product highcharts
-     *
-     * @private
      */
     clip: false,
 
     /**
      * @ignore-option
      *
-     * @private
+     * @internal
      */
     colorByPoint: true, // Always true for pies
 
@@ -164,7 +157,7 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @sample {highcharts} highcharts/demo/pie-monochrome/
      *         Set default colors for all pies
      *
-     * @type      {Array<Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject>}
+     * @type      {Array<Highcharts.ColorType>}
      * @since     3.0
      * @product   highcharts highmaps
      * @apioption plotOptions.pie.colors
@@ -174,7 +167,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @declare   Highcharts.SeriesPieDataLabelsOptionsObject
      * @extends   plotOptions.series.dataLabels
      * @excluding align, allowOverlap, inside, staggerLines, step
-     * @private
      */
     dataLabels: {
 
@@ -211,7 +203,7 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
          * @sample {highcharts} highcharts/css/pie-point/
          *         Styled connectors
          *
-         * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type      {Highcharts.ColorType}
          * @since     2.1
          * @product   highcharts highmaps
          * @apioption plotOptions.pie.dataLabels.connectorColor
@@ -384,8 +376,7 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @sample {highcharts} highcharts/plotoptions/pie-emptyseries/
      *         Empty pie series
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
-     * @private
+     * @type {Highcharts.ColorType}
      */
     fillColor: void 0,
 
@@ -411,7 +402,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @product   highcharts
      * @since 10.1.0
      * @apioption plotOptions.pie.thickness
-     * @private
      */
 
     /**
@@ -427,15 +417,12 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      *
      * @since   2.3.0
      * @product highcharts highmaps
-     *
-     * @private
      */
     ignoreHiddenPoint: true,
 
     /**
-     * @default   true
-     * @extends   plotOptions.series.inactiveOtherPoints
-     * @private
+     * @default true
+     * @extends plotOptions.series.inactiveOtherPoints
      */
     inactiveOtherPoints: true,
 
@@ -466,14 +453,14 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
     /**
      * @ignore-option
      *
-     * @private
+     * @internal
      */
     legendType: 'point',
 
     /**
      * @ignore-option
      *
-     * @private
+     * @internal
      */
     marker: null as any, // Point options are specified in the base options
 
@@ -504,8 +491,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      *
      * @type    {number|string|null}
      * @product highcharts highmaps
-     *
-     * @private
      */
     size: null as any,
 
@@ -517,8 +502,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      *         One series in the legend, one hidden
      *
      * @product highcharts highmaps
-     *
-     * @private
      */
     showInLegend: false,
 
@@ -530,8 +513,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      *         20px offset
      *
      * @product highcharts highmaps
-     *
-     * @private
      */
     slicedOffset: 10,
 
@@ -559,8 +540,6 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * will be hidden when moving the mouse between series.
      *
      * @product highcharts highmaps
-     *
-     * @private
      */
     stickyTracking: false,
 
@@ -580,11 +559,9 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * @sample {highcharts} highcharts/plotoptions/pie-bordercolor-black/
      *         Black border
      *
-     * @type    {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
-     * @default #ffffff
+     * @type    {Highcharts.ColorType}
+     * @default ${palette.backgroundColor}
      * @product highcharts highmaps
-     *
-     * @private
      */
     borderColor: Palette.backgroundColor,
 
@@ -592,7 +569,7 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      * The width of the border surrounding each slice.
      *
      * When setting the border width to 0, there may be small gaps between
-     * the slices due to SVG antialiasing artefacts. To work around this,
+     * the slices due to SVG antialiasing artifacts. To work around this,
      * keep the border width at 0.5 or 1, but set the `borderColor` to
      * `null` instead.
      *
@@ -603,14 +580,12 @@ const PieSeriesDefaults: PlotOptionsOf<PieSeries> = {
      *         3px border
      *
      * @product highcharts highmaps
-     *
-     * @private
      */
     borderWidth: 1,
 
     /**
      * @ignore-option
-     * @private
+     * @internal
      */
     lineWidth: void 0, // #12222
 

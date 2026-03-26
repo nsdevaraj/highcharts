@@ -85,7 +85,7 @@ const DumbbellSeriesDefaults: DumbbellSeriesOptions = {
      * priority over the series color. To avoid this, set `lowColor` to
      * `undefined`.
      *
-     * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type      {Highcharts.ColorType}
      * @since 8.0.0
      * @product   highcharts highstock
      */
@@ -204,7 +204,7 @@ const DumbbellSeriesDefaults: DumbbellSeriesOptions = {
  * priority over the series color. To avoid this, set `lowColor` to
  * `undefined`.
  *
- * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type      {Highcharts.ColorType}
  * @since     8.0.0
  * @product   highcharts highstock
  * @apioption  series.dumbbell.lowColor
@@ -259,7 +259,7 @@ const DumbbellSeriesDefaults: DumbbellSeriesOptions = {
  * priority over the series color. To avoid this, set `lowColor` to
  * `undefined`.
  *
- * @type        {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type        {Highcharts.ColorType}
  * @since       8.0.0
  * @default     ${palette.neutralColor80}
  * @product     highcharts highstock

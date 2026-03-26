@@ -315,7 +315,7 @@ export interface HeatmapPointOptions extends ScatterPointOptions {
      * explicitly, as we use the color to denote the `value`. Options for this
      * are set in the [colorAxis](#colorAxis) configuration.
      *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+     * @type {Highcharts.ColorType}
      *
      * @product highcharts highmaps
      *

@@ -134,7 +134,7 @@ class SupertrendIndicator extends SMAIndicator {
          * @sample {highstock} stock/indicators/supertrend/
          *         Example with risingTrendColor
          *
-         * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type {Highcharts.ColorType}
          */
         risingTrendColor: Palette.positiveColor,
         /**
@@ -143,7 +143,7 @@ class SupertrendIndicator extends SMAIndicator {
          * @sample {highstock} stock/indicators/supertrend/
          *         Example with fallingTrendColor
          *
-         * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type {Highcharts.ColorType}
          */
         fallingTrendColor: Palette.negativeColor,
         /**

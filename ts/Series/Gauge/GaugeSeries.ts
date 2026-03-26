@@ -169,7 +169,7 @@ class GaugeSeries extends Series {
                  * @sample {highcharts} highcharts/plotoptions/gauge-dial/
                  *         Dial options demonstrated
                  *
-                 * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+                 * @type      {Highcharts.ColorType}
                  * @default   #000000
                  * @since     2.3.0
                  * @product   highcharts
@@ -215,7 +215,7 @@ class GaugeSeries extends Series {
                  * @sample {highcharts} highcharts/plotoptions/gauge-dial/
                  *         Dial options demonstrated
                  *
-                 * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+                 * @type      {Highcharts.ColorType}
                  * @default   #cccccc
                  * @since     2.3.0
                  * @product   highcharts
@@ -364,7 +364,7 @@ class GaugeSeries extends Series {
                  * @sample {highcharts} highcharts/plotoptions/gauge-pivot/
                  *         Pivot options demonstrated
                  *
-                 * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+                 * @type      {Highcharts.ColorType}
                  * @default   #cccccc
                  * @since     2.3.0
                  * @product   highcharts
@@ -378,7 +378,7 @@ class GaugeSeries extends Series {
                  * @sample {highcharts} highcharts/plotoptions/gauge-pivot/
                  *         Pivot options demonstrated
                  *
-                 * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+                 * @type      {Highcharts.ColorType}
                  * @default   #000000
                  * @since     2.3.0
                  * @product   highcharts

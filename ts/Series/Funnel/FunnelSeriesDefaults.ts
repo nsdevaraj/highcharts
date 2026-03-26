@@ -153,7 +153,7 @@ const FunnelSeriesDefaults: FunnelSeriesOptions = {
             /**
              * A specific color for the selected point.
              *
-             * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+             * @type {Highcharts.ColorType}
              */
             color: Palette.neutralColor20,
 

@@ -793,7 +793,7 @@ export default SankeySeries;
  * The color of the auto generated node.
  *
  * @name Highcharts.SankeyNodeObject#color
- * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type {Highcharts.ColorType}
  *//**
  * The color index of the auto generated node, especially for use in styled
  * mode.

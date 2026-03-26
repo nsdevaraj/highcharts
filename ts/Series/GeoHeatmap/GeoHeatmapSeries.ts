@@ -171,7 +171,7 @@ class GeoHeatmapSeries extends MapSeries {
              * point. Unless options are set in the [colorAxis](#colorAxis), the
              * default value is pulled from the [options.colors](#colors) array.
              *
-             * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+             * @type      {Highcharts.ColorType}
              * @product   highmaps
              * @apioption plotOptions.geoheatmap.color
              */
@@ -819,7 +819,7 @@ export default GeoHeatmapSeries;
  * Individual color for the point. By default the color is either used
  * to denote the value, or pulled from the global `colors` array.
  *
- * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type      {Highcharts.ColorType}
  * @product   highmaps
  * @apioption series.geoheatmap.data.color
  */
