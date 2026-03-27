@@ -77,7 +77,7 @@ export abstract class DataProvider {
      * */
 
     /**
-     * Optional asynchronous initialization hook.
+     * Initializes the data provider.
      */
     public init(): Promise<void> {
         return Promise.resolve();
@@ -149,6 +149,9 @@ export abstract class DataProvider {
     /**
      * Returns a row object by row ID from currently available provider data.
      *
+     * Providers can override this to expose generic row lookup over their own
+     * resident cache without coupling to any specific Grid feature.
+     *
      * @param rowId
      * Row identifier.
      */
@@ -157,19 +160,6 @@ export abstract class DataProvider {
     ): RowObjectType | undefined {
         void rowId;
         return void 0;
-    }
-
-    /**
-     * Resolves a row object by row ID using a definitive lookup when supported.
-     *
-     * @param rowId
-     * Row identifier.
-     */
-    public fetchRowObjectById(
-        rowId: RowId
-    ): Promise<RowObjectType | undefined> {
-        void rowId;
-        return Promise.resolve(void 0);
     }
 
     /**

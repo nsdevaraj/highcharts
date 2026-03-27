@@ -22,21 +22,28 @@
  * */
 
 import type Grid from '../../Core/Grid';
+import type Table from '../../Core/Table/Table';
+import type Column from '../../Core/Table/Column';
 import type { DeepPartial } from '../../../Shared/Types';
 import type Options from '../../Core/Options';
-import type { RowObject as DataTableRowObject } from '../../../Data/DataTable';
-import type { GridEvent } from '../../Core/GridUtils';
-import type { RowId } from '../Data/DataProvider';
 
 import { defaultOptions as gridDefaultOptions } from '../../Core/Defaults.js';
-import { formatText } from '../../Core/GridUtils.js';
 import Globals from '../../Core/Globals.js';
 import RowPinningController, {
-    getGridRowPinningOptions
+    hasConfiguredGridRowPinningOptions,
+    type RowId as GridRowId,
+    type RowPinningChangeAction,
+    type RowPinningChangeEvent,
+    type RowPinningChangeEventCallback,
+    type RowPinningEvents,
+    type RowPinningOptions,
+    type RowPinningPosition,
+    type RowPinningSectionOptions
 } from './RowPinningController.js';
+import RowPinningView, { classNames } from './RowPinningView.js';
+import { registerBuiltInAction } from '../Table/Body/CellContextMenuBuiltInActions.js';
 import {
     addEvent,
-    fireEvent,
     merge,
     pushUnique
 } from '../../../Shared/Utilities.js';
@@ -45,6 +52,31 @@ import {
  * Default options for row pinning.
  */
 export const defaultOptions: DeepPartial<Options> = {
+    accessibility: {
+        announcements: {
+            rowPinning: true
+        }
+    },
+    lang: {
+        pinRowTop: 'Pin row to top',
+        pinRowBottom: 'Pin row to bottom',
+        unpinRow: 'Unpin row',
+        accessibility: {
+            rowPinning: {
+                announcements: {
+                    pinned: 'Row {rowId} pinned to {position}.',
+                    unpinned: 'Row {rowId} unpinned.'
+                },
+                descriptions: {
+                    pinnedTop: 'Pinned row in top section.',
+                    pinnedBottom: 'Pinned row in bottom section.',
+                    alsoPinnedTop: 'This row is also pinned to top section.',
+                    alsoPinnedBottom:
+                        'This row is also pinned to bottom section.'
+                }
+            }
+        }
+    },
     rendering: {
         rows: {
             pinning: {
@@ -59,585 +91,300 @@ export const defaultOptions: DeepPartial<Options> = {
     }
 };
 
-/**
- * The class names used by the row pinning functionality.
- */
-export const classNames = {
-    scrollableTbodyElement: Globals.classNamePrefix + 'tbody-scrollable',
-    pinnedTopTbodyElement: Globals.classNamePrefix + 'tbody-pinned-top',
-    pinnedBottomTbodyElement: Globals.classNamePrefix + 'tbody-pinned-bottom',
-    pinnedTbodyElementActive: Globals.classNamePrefix + 'tbody-pinned-active',
-    rowPinned: Globals.classNamePrefix + 'row-pinned',
-    rowPinnedTop: Globals.classNamePrefix + 'row-pinned-top',
-    rowPinnedBottom: Globals.classNamePrefix + 'row-pinned-bottom'
-} as const;
+export { classNames };
 
-/* *
- *
- *  Composition
- *
- * */
+const defaultPinnedRowsState = {
+    topIds: [],
+    bottomIds: []
+};
 
 /**
- * Compose row pinning APIs into Grid.
+ * Compose row pinning APIs into Grid Pro.
  *
  * @param GridClass
- * Grid class constructor.
+ * Grid class to compose into.
+ *
+ * @param TableClass
+ * Table class to compose into.
+ *
+ * @param ColumnClass
+ * Column class to compose into.
  */
 export function compose(
-    GridClass: typeof Grid
+    GridClass: typeof Grid,
+    TableClass: typeof Table,
+    ColumnClass: typeof Column
 ): void {
+    void ColumnClass;
+
     if (!pushUnique(Globals.composed, 'RowPinning')) {
         return;
     }
 
     merge(true, gridDefaultOptions, defaultOptions);
-
-    GridClass.prototype.pinRow = pinRow;
-    GridClass.prototype.toggleRow = toggleRow;
-    GridClass.prototype.unpinRow = unpinRow;
-    GridClass.prototype.getPinnedRows = getPinnedRows;
+    registerBuiltInActions();
 
     addEvent(GridClass, 'beforeLoad', initRowPinning);
+    addEvent(GridClass, 'beforeUpdate', onBeforeGridUpdate);
+    addEvent(TableClass, 'beforeInit', initRowPinningView);
 }
 
 /**
- * Initialize row pinning controller before grid options are loaded.
+ * Registers row pinning built-in context menu actions.
+ */
+function registerBuiltInActions(): void {
+    registerBuiltInAction(
+        'pinRowTop',
+        {
+            getLabel: (cell): string =>
+                cell.row.viewport.grid.options?.lang?.pinRowTop || '',
+            icon: 'pin',
+            isDisabled: (cell, rowId): boolean =>
+                isRowPinningActionDisabled('pinRowTop', cell, rowId),
+            onClick: (cell, rowId): void => {
+                void cell.row.viewport.grid.rowPinning?.pin(rowId, 'top');
+            }
+        },
+        true
+    );
+
+    registerBuiltInAction(
+        'pinRowBottom',
+        {
+            getLabel: (cell): string =>
+                cell.row.viewport.grid.options?.lang?.pinRowBottom || '',
+            icon: 'pin',
+            isDisabled: (cell, rowId): boolean =>
+                isRowPinningActionDisabled('pinRowBottom', cell, rowId),
+            onClick: (cell, rowId): void => {
+                void cell.row.viewport.grid.rowPinning?.pin(rowId, 'bottom');
+            }
+        },
+        true
+    );
+
+    registerBuiltInAction(
+        'unpinRow',
+        {
+            getLabel: (cell): string =>
+                cell.row.viewport.grid.options?.lang?.unpinRow || '',
+            icon: 'unpin',
+            isDisabled: (cell, rowId): boolean =>
+                isRowPinningActionDisabled('unpinRow', cell, rowId),
+            onClick: (cell, rowId): void => {
+                void cell.row.viewport.grid.rowPinning?.unpin(rowId);
+            }
+        },
+        true
+    );
+}
+
+/**
+ * Initializes row pinning state for a grid instance.
  */
 function initRowPinning(this: Grid): void {
+    syncPinningIdColumnOption(this.userOptions);
+    syncPinningIdColumnOption(this.options);
+
     this.rowPinning = new RowPinningController(this);
     this.rowPinning.loadOptions();
 }
 
 /**
- * Announce a row pinning change to screen readers.
- *
- * @param grid
- * Grid instance.
- *
- * @param action
- * Whether the row was pinned or unpinned.
- *
- * @param rowId
- * The row ID that changed.
- *
- * @param position
- * Pin position (only relevant when action is 'pin').
+ * Creates the row pinning view helper for a table instance.
  */
-function announceRowPinningChange(
-    grid: Grid,
-    action: 'pin'|'unpin',
-    rowId: GridRowId,
-    position?: RowPinningPosition
+function initRowPinningView(this: Table): void {
+    this.rowPinningView = new RowPinningView(this);
+}
+
+/**
+ * Syncs row pinning state before a grid update is applied.
+ *
+ * @param e
+ * Pending update payload.
+ *
+ * @param e.options
+ * Pending update options.
+ *
+ * @param e.scope
+ * Update scope.
+ */
+function onBeforeGridUpdate(
+    this: Grid,
+    e: {
+        options?: Omit<Options, 'id'> | Record<string, unknown>;
+        scope?: 'grid'|'column';
+    }
 ): void {
-    if (!grid.options?.accessibility?.announcements?.rowPinning) {
+    const updateOptions = e.options;
+
+    if (!updateOptions || typeof updateOptions !== 'object') {
         return;
     }
 
-    const lang = grid.options?.lang?.accessibility?.rowPinning?.announcements;
-    let msg: string | undefined;
+    syncPinningIdColumnOption(updateOptions as Partial<Options>);
 
-    if (action === 'pin' && position) {
-        msg = formatText(lang?.pinned || '', {
-            rowId: String(rowId),
-            position
-        });
-    } else {
-        msg = formatText(lang?.unpinned || '', {
-            rowId: String(rowId)
-        });
+    if (
+        hasOwnPath(
+            updateOptions,
+            ['rendering', 'rows', 'pinning']
+        )
+    ) {
+        this.rowPinning?.markOptionsDirty();
     }
 
-    if (msg) {
-        grid.accessibility?.announce(msg, true);
+    if (
+        this.rowPinning &&
+        hasDataSourceOptionChanges(updateOptions as Partial<Options>)
+    ) {
+        this.rowPinning.invalidatePinnedRowObjects();
     }
 }
 
 /**
- * Calls configured row pinning event callbacks from `pinning.events`.
+ * Returns whether a row pinning built-in action should be disabled.
  *
- * @param grid
- * Grid instance.
+ * @param actionId
+ * Built-in action identifier.
  *
- * @param eventName
- * Row pinning event callback name.
+ * @param cell
+ * Context menu cell context.
  *
- * @param eventPayload
- * Event payload object.
+ * @param cell.row
+ * Row context.
+ *
+ * @param cell.row.id
+ * Current row identifier.
+ *
+ * @param cell.row.viewport
+ * Viewport context.
+ *
+ * @param cell.row.viewport.grid
+ * Owning grid instance.
+ *
+ * @param rowId
+ * Current row identifier.
  */
-function callRowPinningEventCallback(
-    grid: Grid,
-    eventName: 'beforeRowPin'|'afterRowPin',
-    eventPayload: RowPinningChangeEvent
-): void {
-    const callback = getGridRowPinningOptions(grid)?.events?.[eventName] as
-        (RowPinningChangeEventCallback | undefined);
+function isRowPinningActionDisabled(
+    actionId: 'pinRowTop'|'pinRowBottom'|'unpinRow',
+    cell: {
+        row: {
+            id?: GridRowId;
+            viewport: {
+                grid: Grid;
+            };
+        };
+    },
+    rowId: GridRowId | undefined
+): boolean {
+    const { grid } = cell.row.viewport;
 
-    const callbackEvent = {
-        target: grid,
-        ...eventPayload
-    } as (GridEvent<Grid> & RowPinningChangeEvent);
+    if (
+        rowId === void 0 ||
+        !hasConfiguredGridRowPinningOptions(grid) ||
+        grid.rowPinning?.isOptionEnabled() !== true
+    ) {
+        return true;
+    }
 
-    callback?.call(grid, callbackEvent);
+    const pinned = grid.rowPinning?.getPinnedRows() ||
+        defaultPinnedRowsState;
+    const inTop = pinned.topIds.includes(rowId);
+    const inBottom = pinned.bottomIds.includes(rowId);
+
+    if (actionId === 'pinRowTop') {
+        return inTop;
+    }
+
+    if (actionId === 'pinRowBottom') {
+        return inBottom;
+    }
+
+    return !inTop && !inBottom;
 }
 
 /**
- * Compare row id arrays by value and order.
+ * Returns whether an object defines every segment in a nested path.
  *
- * @param a
- * First row id list.
+ * @param obj
+ * Object to inspect.
  *
- * @param b
- * Second row id list.
+ * @param path
+ * Property path to verify.
  */
-function sameIds(a: GridRowId[], b: GridRowId[]): boolean {
-    if (a.length !== b.length) {
-        return false;
-    }
+function hasOwnPath(
+    obj: object,
+    path: string[]
+): boolean {
+    let cursor: unknown = obj;
 
-    for (let i = 0, iEnd = a.length; i < iEnd; ++i) {
-        if (a[i] !== b[i]) {
+    for (const segment of path) {
+        if (
+            !cursor ||
+            typeof cursor !== 'object' ||
+            !Object.prototype.hasOwnProperty.call(cursor, segment)
+        ) {
             return false;
         }
+
+        cursor = (cursor as Record<string, unknown>)[segment];
     }
 
     return true;
 }
 
 /**
- * Returns whether the pinned row ordering changed.
+ * Mirrors `rendering.rows.pinning.idColumn` into `data.idColumn`.
  *
- * @param previous
- * Previous pinned row state.
- *
- * @param previous.topIds
- * Previous top-pinned row IDs.
- *
- * @param previous.bottomIds
- * Previous bottom-pinned row IDs.
- *
- * @param next
- * Next pinned row state.
- *
- * @param next.topIds
- * Next top-pinned row IDs.
- *
- * @param next.bottomIds
- * Next bottom-pinned row IDs.
+ * @param options
+ * Options object to normalize.
  */
-function didPinnedRowsChange(
-    previous: { topIds: GridRowId[]; bottomIds: GridRowId[] },
-    next: { topIds: GridRowId[]; bottomIds: GridRowId[] }
-): boolean {
+function syncPinningIdColumnOption(
+    options?: Partial<Options> | Record<string, unknown>
+): void {
+    if (!options || typeof options !== 'object') {
+        return;
+    }
+
+    const rendering = (options as Partial<Options>).rendering;
+    const idColumn = rendering?.rows?.pinning?.idColumn;
+
+    if (!idColumn) {
+        return;
+    }
+
+    if (!(options as Partial<Options>).data) {
+        (options as Partial<Options>).data = {};
+    }
+
+    if ((options as Partial<Options>).data?.idColumn === void 0) {
+        (options as Partial<Options>).data!.idColumn = idColumn;
+    }
+}
+
+/**
+ * Returns whether an update includes a data source change.
+ *
+ * @param options
+ * Update options to inspect.
+ */
+function hasDataSourceOptionChanges(options: Partial<Options>): boolean {
     return (
-        !sameIds(previous.topIds, next.topIds) ||
-        !sameIds(previous.bottomIds, next.bottomIds)
+        Object.prototype.hasOwnProperty.call(options, 'data') ||
+        Object.prototype.hasOwnProperty.call(options, 'dataTable')
     );
 }
 
-/**
- * Create a row pinning event payload using controller-owned preview logic.
- *
- * @param controller
- * Row pinning controller.
- *
- * @param previous
- * Previous pinned state snapshot.
- *
- * @param previous.topIds
- * Previous top-pinned row IDs.
- *
- * @param previous.bottomIds
- * Previous bottom-pinned row IDs.
- *
- * @param action
- * Runtime row pinning action exposed by the event payload.
- *
- * @param rowId
- * Row identifier to pin or unpin.
- *
- * @param nextAction
- * Internal pinning transition to preview.
- *
- * @param position
- * Target pinning position for pin actions.
- *
- * @param index
- * Optional insertion index in target collection.
- */
-function createRowPinningChangeEvent(
-    controller: RowPinningController,
-    previous: { topIds: GridRowId[]; bottomIds: GridRowId[] },
-    action: RowPinningChangeAction,
-    rowId: GridRowId,
-    nextAction: 'pin'|'unpin',
-    position?: RowPinningPosition,
-    index?: number
-): RowPinningChangeEvent {
-    const next = controller.previewPinnedRowsChange(
-        previous,
-        nextAction,
-        rowId,
-        position,
-        index
-    );
-
-    return {
-        rowId,
-        action,
-        position,
-        index,
-        changed: didPinnedRowsChange(previous, next),
-        previousTopIds: previous.topIds.slice(),
-        previousBottomIds: previous.bottomIds.slice(),
-        topIds: next.topIds.slice(),
-        bottomIds: next.bottomIds.slice()
-    };
-}
-
-/**
- * Execute shared runtime pinning sequence.
- *
- * @param grid
- * Grid instance.
- *
- * @param eventPayload
- * Event payload passed to before/after row pinning hooks.
- *
- * @param applyChange
- * Callback that mutates pinning state and controller-managed pinned data.
- *
- * @param announcementAction
- * Announcement action for accessibility.
- *
- * @param announcementPosition
- * Optional pinning position used by pin announcements.
- */
-async function runRuntimePinningChange(
-    grid: Grid,
-    eventPayload: RowPinningChangeEvent,
-    applyChange: () => Promise<void> | void,
-    announcementAction: 'pin'|'unpin',
-    announcementPosition?: RowPinningPosition
-): Promise<void> {
-    fireEvent(grid, 'beforeRowPin', eventPayload);
-    callRowPinningEventCallback(grid, 'beforeRowPin', eventPayload);
-
-    await applyChange();
-
-    if (grid.viewport && grid.querying.pagination.enabled) {
-        await grid.viewport.rowsVirtualizer.refreshRows();
-    }
-
-    const renderResult = grid.viewport ?
-        await grid.viewport.renderPinnedRows(true) :
-        { missingPinnedRowIds: [] };
-
-    await grid.rowPinning?.handlePinnedRenderResult(renderResult, 'runtime');
-    grid.viewport?.reflow();
-    if (
-        announcementAction === 'pin' &&
-        eventPayload.changed &&
-        eventPayload.position
-    ) {
-        grid.viewport?.revealPinnedRowInSection(
-            eventPayload.rowId,
-            eventPayload.position
-        );
-    }
-
-    fireEvent(grid, 'afterRowPin', eventPayload);
-    callRowPinningEventCallback(grid, 'afterRowPin', eventPayload);
-    if (eventPayload.changed) {
-        announceRowPinningChange(
-            grid,
-            announcementAction,
-            eventPayload.rowId,
-            announcementPosition
-        );
-    }
-}
-
-/**
- * Pin a row to top or bottom.
- *
- * @param rowId
- * Row identifier to pin.
- *
- * @param position
- * Pin target section.
- *
- * @param index
- * Optional insert index for pinned order.
- */
-async function pinRow(
-    this: Grid,
-    rowId: GridRowId,
-    position: RowPinningPosition = 'top',
-    index?: number
-): Promise<void> {
-    if (!this.rowPinning?.isOptionEnabled()) {
-        return;
-    }
-
-    const previous = this.rowPinning.getPinnedRows();
-    const eventPayload = createRowPinningChangeEvent(
-        this.rowPinning,
-        previous,
-        'pin',
-        rowId,
-        'pin',
-        position,
-        index
-    );
-
-    await runRuntimePinningChange(
-        this,
-        eventPayload,
-        async (): Promise<void> => {
-            await this.rowPinning?.pinRow(rowId, position, index);
-        },
-        'pin',
-        position
-    );
-}
-
-/**
- * Toggle row pinning. If already pinned, unpin it; otherwise pin to selected
- * position (defaults to top).
- *
- * @param rowId
- * Row identifier to toggle.
- *
- * @param position
- * Pin target section when toggling into pinned state.
- */
-async function toggleRow(
-    this: Grid,
-    rowId: GridRowId,
-    position: RowPinningPosition = 'top'
-): Promise<void> {
-    if (!this.rowPinning?.isOptionEnabled()) {
-        return;
-    }
-
-    const previous = this.rowPinning.getPinnedRows();
-    const isPinned = (
-        previous.topIds.includes(rowId) ||
-        previous.bottomIds.includes(rowId)
-    );
-    const nextAction = isPinned ? 'unpin' : 'pin';
-    const eventPayload = createRowPinningChangeEvent(
-        this.rowPinning,
-        previous,
-        'toggle',
-        rowId,
-        nextAction,
-        isPinned ? void 0 : position
-    );
-
-    await runRuntimePinningChange(
-        this,
-        eventPayload,
-        async (): Promise<void> => {
-            if (isPinned) {
-                this.rowPinning?.unpinRow(rowId);
-            } else {
-                await this.rowPinning?.pinRow(rowId, position);
-            }
-        },
-        isPinned ? 'unpin' : 'pin',
-        isPinned ? void 0 : position
-    );
-}
-
-/**
- * Remove row pinning for a row.
- *
- * @param rowId
- * Row identifier to unpin.
- */
-async function unpinRow(this: Grid, rowId: GridRowId): Promise<void> {
-    if (!this.rowPinning?.isOptionEnabled()) {
-        return;
-    }
-
-    const previous = this.rowPinning.getPinnedRows();
-    const eventPayload = createRowPinningChangeEvent(
-        this.rowPinning,
-        previous,
-        'unpin',
-        rowId,
-        'unpin'
-    );
-
-    await runRuntimePinningChange(
-        this,
-        eventPayload,
-        (): void => {
-            this.rowPinning?.unpinRow(rowId);
-        },
-        'unpin'
-    );
-}
-
-/**
- * Return currently pinned row IDs.
- */
-function getPinnedRows(this: Grid): {
-    topIds: GridRowId[];
-    bottomIds: GridRowId[];
-} {
-    return this.rowPinning?.getPinnedRows() || {
-        topIds: [],
-        bottomIds: []
-    };
-}
-
-/* *
- *
- *  Declarations
- *
- * */
-
-export type RowPinningPosition = 'top'|'bottom';
-export type GridRowId = RowId;
-export type RowPinningChangeAction = 'pin'|'unpin'|'toggle';
-
-export interface RowPinningChangeEvent {
-    rowId: GridRowId;
-    action: RowPinningChangeAction;
-    position?: RowPinningPosition;
-    index?: number;
-    changed: boolean;
-    previousTopIds: GridRowId[];
-    previousBottomIds: GridRowId[];
-    topIds: GridRowId[];
-    bottomIds: GridRowId[];
-}
-
-export type RowPinningChangeEventCallback = (
-    this: Grid,
-    e: GridEvent<Grid> & RowPinningChangeEvent
-) => void;
-
-export interface RowPinningEvents {
-    /**
-     * Callback function to be called before runtime row pinning state changes
-     * are redrawn (Grid Pro).
-     */
-    beforeRowPin?: RowPinningChangeEventCallback;
-
-    /**
-     * Callback function to be called after runtime row pinning state changes
-     * are redrawn (Grid Pro).
-     */
-    afterRowPin?: RowPinningChangeEventCallback;
-}
-
-declare module '../../Core/Options' {
-    interface LangOptions {
-        /**
-         * `Pin row to top` translation.
-         *
-         * @default 'Pin row to top'
-         */
-        pinRowTop?: string;
-
-        /**
-         * `Pin row to bottom` translation.
-         *
-         * @default 'Pin row to bottom'
-         */
-        pinRowBottom?: string;
-
-        /**
-         * `Unpin row` translation.
-         *
-         * @default 'Unpin row'
-         */
-        unpinRow?: string;
-    }
-
-    interface RowsSettings {
-        /**
-         * Row pinning options.
-         */
-        pinning?: RowPinningOptions;
-    }
-}
-
-declare module '../../Core/Grid' {
-    export default interface Grid {
-        /**
-         * Row pinning controller.
-         * @internal
-         */
-        rowPinning?: RowPinningController;
-
-        /**
-         * Pin a row to top or bottom.
-         */
-        pinRow(
-            rowId: GridRowId,
-            position?: RowPinningPosition,
-            index?: number
-        ): Promise<void>;
-
-        /**
-         * Toggle row pinning.
-         */
-        toggleRow(
-            rowId: GridRowId,
-            position?: RowPinningPosition
-        ): Promise<void>;
-
-        /**
-         * Remove row pinning for a row.
-         */
-        unpinRow(rowId: GridRowId): Promise<void>;
-
-        /**
-         * Return currently pinned row IDs.
-         */
-        getPinnedRows(): {
-            topIds: GridRowId[];
-            bottomIds: GridRowId[];
-        };
-    }
-}
-
-export interface RowPinningOptions {
-    /**
-     * Enable/disable row pinning behavior.
-     */
-    enabled?: boolean;
-
-    /**
-     * Column used as stable row identity for row pinning.
-     */
-    idColumn?: string;
-    topIds?: GridRowId[];
-    bottomIds?: GridRowId[];
-    top?: RowPinningSectionOptions;
-    bottom?: RowPinningSectionOptions;
-    events?: RowPinningEvents;
-    resolve?: (row: DataTableRowObject) => ('top'|'bottom'|null|undefined);
-}
-
-export interface RowPinningSectionOptions {
-    /**
-     * Maximum height for this pinned tbody. Enables vertical scrolling in the
-     * pinned section when content exceeds this height.
-     */
-    maxHeight?: number|string;
-}
-
-/* *
- *
- *  Default Export
- *
- * */
+export type {
+    GridRowId,
+    RowPinningChangeAction,
+    RowPinningChangeEvent,
+    RowPinningChangeEventCallback,
+    RowPinningEvents,
+    RowPinningOptions,
+    RowPinningPosition,
+    RowPinningSectionOptions
+};
 
 export default {
     compose

@@ -361,7 +361,7 @@ test.describe('Pagination', () => {
     });
 
     test('Pinning on last page keeps grid height stable', async ({ page }) => {
-        await page.goto('/grid-lite/demo/pagination', {
+        await page.goto('/grid-pro/basic/overview', {
             waitUntil: 'networkidle'
         });
 
@@ -373,7 +373,36 @@ test.describe('Pagination', () => {
 
         const state = await page.evaluate(async () => {
             const grid = (window as any).Grid.grids[0];
+            const rows = Array.from({ length: 254 }, (_, i) => ({
+                ID: i + 1,
+                Name: `Row ${i + 1}`
+            }));
             const host = document.getElementById('container');
+
+            if (host) {
+                host.style.height = '520px';
+            }
+
+            await grid.update({
+                dataTable: {
+                    columns: {
+                        ID: rows.map((row) => row.ID),
+                        Name: rows.map((row) => row.Name)
+                    }
+                },
+                pagination: {
+                    enabled: true,
+                    pageSize: 10,
+                    page: 1
+                },
+                rendering: {
+                    rows: {
+                        pinning: {
+                            idColumn: 'ID'
+                        }
+                    }
+                }
+            });
             const getHeight = (element: HTMLElement | null): number =>
                 Math.round(element?.getBoundingClientRect().height || 0);
 
@@ -389,7 +418,7 @@ test.describe('Pagination', () => {
                 tableHeight: getHeight(grid.viewport.tableElement)
             };
 
-            await grid.pinRow(250, 'top');
+            await grid.rowPinning.pin(250, 'top');
 
             return {
                 beforePin,
@@ -407,15 +436,24 @@ test.describe('Pagination', () => {
     });
 
     test('Pinned rows are counted in pagination page size', async ({ page }) => {
+        await page.goto('/grid-pro/basic/overview', {
+            waitUntil: 'networkidle'
+        });
+
         const state = await page.evaluate(async () => {
-            const grid = (window as any).grid;
-            const getScrollableIds = (): string[] => Array.from(
-                document.querySelectorAll(
-                    'tbody.hcg-tbody-scrollable td[data-column-id="ID"]'
-                )
-            ).map((el): string => (el.textContent || '').trim());
+            const grid = (window as any).Grid.grids[0];
+            const rows = Array.from({ length: 30 }, (_, i) => ({
+                ID: i,
+                Name: `Row ${i}`
+            }));
 
             await grid.update({
+                dataTable: {
+                    columns: {
+                        ID: rows.map((row) => row.ID),
+                        Name: rows.map((row) => row.Name)
+                    }
+                },
                 pagination: {
                     enabled: true,
                     pageSize: 10,
@@ -423,10 +461,19 @@ test.describe('Pagination', () => {
                 },
                 rendering: {
                     rows: {
-                        virtualization: false
+                        virtualization: false,
+                        pinning: {
+                            idColumn: 'ID'
+                        }
                     }
                 }
             });
+
+            const getScrollableIds = (): string[] => Array.from(
+                document.querySelectorAll(
+                    'tbody.hcg-tbody-scrollable td[data-column-id="ID"]'
+                )
+            ).map((el): string => (el.textContent || '').trim());
 
             const beforePin = {
                 top: grid.viewport.pinnedTopRows.length,
@@ -434,7 +481,7 @@ test.describe('Pagination', () => {
                 bottom: grid.viewport.pinnedBottomRows.length
             };
 
-            await grid.pinRow(0, 'top');
+            await grid.rowPinning.pin(0, 'top');
 
             const afterTopPin = {
                 top: grid.viewport.pinnedTopRows.length,
@@ -443,7 +490,7 @@ test.describe('Pagination', () => {
                 scrollableIds: getScrollableIds()
             };
 
-            await grid.pinRow(1, 'bottom');
+            await grid.rowPinning.pin(1, 'bottom');
 
             const afterBottomPin = {
                 top: grid.viewport.pinnedTopRows.length,

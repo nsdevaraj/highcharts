@@ -26,7 +26,6 @@ import type { CellType as DataTableCellType } from '../../../../Data/DataTable';
 import type CSSObject from '../../../../Core/Renderer/CSSObject';
 import type Column from '../Column';
 import type TableRow from './TableRow';
-import type { RowId } from '../../Data/DataProvider';
 
 import Globals from '../../Globals.js';
 import Cell from '../Cell.js';
@@ -55,12 +54,12 @@ class TableCell extends Cell {
     /**
      * The row of the cell.
      */
-    public readonly row: TableRow;
+    public declare readonly row: TableRow;
 
     /**
      * The column of the cell.
      */
-    public override column: Column;
+    public declare column: Column;
 
     /**
      * The cell's content.
@@ -248,15 +247,13 @@ class TableCell extends Cell {
         }
 
         const vp = this.column.viewport;
-        const { dataProvider } = vp.grid;
-
         const rowId = this.row.id;
-        if (!dataProvider || rowId === void 0) {
+        if (!vp.grid.dataProvider || rowId === void 0) {
             return false;
         }
 
         this.row.data[this.column.id] = this.value;
-        await dataProvider.setValue(
+        await vp.grid.dataProvider.setValue(
             this.value,
             this.column.id,
             rowId
@@ -268,7 +265,12 @@ class TableCell extends Cell {
         );
 
         if (vp.grid.querying.willNotModify()) {
-            await this.syncRenderedMirrorCells(rowId);
+            await vp.rowPinningView?.syncRenderedMirrors(
+                rowId,
+                this.column.id,
+                this.value,
+                this.row
+            );
             return false;
         }
 
@@ -285,52 +287,6 @@ class TableCell extends Cell {
             this.column.id,
             this.row.index
         );
-    }
-
-    private async getRenderedMirrorRows(rowId: RowId): Promise<TableRow[]> {
-        const vp = this.column.viewport;
-        const renderedRows = new Set<TableRow>();
-        const mainRowIndex = await vp.grid.dataProvider?.getRowIndex(rowId);
-
-        const topRow = vp.getRenderedPinnedRowById(rowId, 'top');
-        if (topRow) {
-            renderedRows.add(topRow);
-        }
-
-        const bottomRow = vp.getRenderedPinnedRowById(rowId, 'bottom');
-        if (bottomRow) {
-            renderedRows.add(bottomRow);
-        }
-
-        if (typeof mainRowIndex === 'number') {
-            const scrollRow = vp.getRenderedRowByIndex(mainRowIndex);
-            if (scrollRow) {
-                renderedRows.add(scrollRow);
-            }
-        }
-
-        return Array.from(renderedRows);
-    }
-
-    private async syncRenderedMirrorCells(rowId: RowId): Promise<void> {
-        const mirrorRows = await this.getRenderedMirrorRows(rowId);
-
-        for (const row of mirrorRows) {
-            if (row === this.row) {
-                continue;
-            }
-
-            row.data[this.column.id] = this.value;
-
-            const cell = row.cells.find((tableCell): boolean =>
-                tableCell instanceof TableCell &&
-                tableCell.column.id === this.column.id
-            ) as (TableCell | undefined);
-
-            if (cell) {
-                await cell.setValue(this.value);
-            }
-        }
     }
 
     /**

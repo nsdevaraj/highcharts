@@ -30,13 +30,7 @@ import type {
 } from '../../Options';
 import type { GridIconName } from '../../UI/SvgIcons';
 
-import { defaultLangOptions } from '../../Defaults.js';
 import {
-    hasConfiguredGridRowPinningOptions,
-    getGridRowPinningOptions
-} from '../../RowPinning/RowPinningController.js';
-import {
-    defined,
     isArray,
     isNumber,
     isObject,
@@ -51,53 +45,13 @@ import {
 
 const warnedUnknownActionIds = new Set<string>();
 
-export const defaultBuiltInCellContextMenuActions: CellContextMenuActionId[] = [
-    'pinRowTop',
-    'pinRowBottom',
-    'unpinRow'
-];
+export const defaultBuiltInCellContextMenuActions: CellContextMenuActionId[] =
+    [];
 
-const builtInActionDefinitions: Record<
+const builtInActionDefinitions: Partial<Record<
     CellContextMenuActionId,
     BuiltInActionDefinition
-> = {
-    pinRowTop: {
-        getLabel: (cell: TableCell): string =>
-            cell.row.viewport.grid.options?.lang?.pinRowTop ||
-            defaultLangOptions.pinRowTop ||
-            '',
-        icon: 'pin',
-        isDisabled: (cell, rowId): boolean =>
-            isPinnedStateDisabled('pinRowTop', cell, rowId),
-        onClick: (cell, rowId): void => {
-            void cell.row.viewport.grid.pinRow(rowId, 'top');
-        }
-    },
-    pinRowBottom: {
-        getLabel: (cell: TableCell): string =>
-            cell.row.viewport.grid.options?.lang?.pinRowBottom ||
-            defaultLangOptions.pinRowBottom ||
-            '',
-        icon: 'pin',
-        isDisabled: (cell, rowId): boolean =>
-            isPinnedStateDisabled('pinRowBottom', cell, rowId),
-        onClick: (cell, rowId): void => {
-            void cell.row.viewport.grid.pinRow(rowId, 'bottom');
-        }
-    },
-    unpinRow: {
-        getLabel: (cell: TableCell): string =>
-            cell.row.viewport.grid.options?.lang?.unpinRow ||
-            defaultLangOptions.unpinRow ||
-            '',
-        icon: 'unpin',
-        isDisabled: (cell, rowId): boolean =>
-            isPinnedStateDisabled('unpinRow', cell, rowId),
-        onClick: (cell, rowId): void => {
-            void cell.row.viewport.grid.unpinRow(rowId);
-        }
-    }
-};
+>> = {};
 
 export interface ResolvedCellContextMenuActionItemOptions {
     label: string;
@@ -114,7 +68,7 @@ export type ResolvedCellContextMenuItemOptions =
     CellContextMenuDividerItemOptions |
     ResolvedCellContextMenuActionItemOptions;
 
-interface BuiltInActionDefinition {
+export interface BuiltInActionDefinition {
     getLabel: (cell: TableCell) => string;
     icon: GridIconName;
     isDisabled: (
@@ -122,6 +76,33 @@ interface BuiltInActionDefinition {
         rowId: string|number|undefined
     ) => boolean;
     onClick: (cell: TableCell, rowId: string|number) => void;
+}
+
+/**
+ * Registers one built-in context menu action.
+ *
+ * @param actionId
+ * Built-in action identifier.
+ *
+ * @param definition
+ * Action behavior definition.
+ *
+ * @param useByDefault
+ * Whether the action should be added to the default menu set.
+ */
+export function registerBuiltInAction(
+    actionId: CellContextMenuActionId,
+    definition: BuiltInActionDefinition,
+    useByDefault: boolean = false
+): void {
+    builtInActionDefinitions[actionId] = definition;
+
+    if (
+        useByDefault &&
+        !defaultBuiltInCellContextMenuActions.includes(actionId)
+    ) {
+        defaultBuiltInCellContextMenuActions.push(actionId);
+    }
 }
 
 /* *
@@ -228,47 +209,6 @@ function getCurrentRowId(cell: TableCell): (string|number|undefined) {
 }
 
 /**
- * Returns whether row pinning option is enabled.
- *
- * @param cell
- * Table cell for the context menu.
- *
- * @return
- * True when row pinning option is enabled.
- */
-function isPinningOptionEnabled(cell: TableCell): boolean {
-    const grid = cell.row.viewport.grid;
-    if (hasConfiguredGridRowPinningOptions(grid)) {
-        return getGridRowPinningOptions(grid)?.enabled !== false;
-    }
-
-    return !!grid.rowPinning?.isEnabled();
-}
-
-/**
- * Returns whether the context menu should be enabled for a cell.
- *
- * @param cell
- * Table cell for the context menu.
- *
- * @return
- * True when the context menu is effectively enabled.
- */
-function isContextMenuEnabled(cell: TableCell): boolean {
-    const options = cell.column?.options.cells?.contextMenu;
-
-    if (defined(options?.enabled)) {
-        return options.enabled;
-    }
-
-    if (options?.items !== void 0) {
-        return true;
-    }
-
-    return isPinningOptionEnabled(cell);
-}
-
-/**
  * Returns the built-in action definition for a given action ID.
  *
  * @param actionId
@@ -280,52 +220,14 @@ function isContextMenuEnabled(cell: TableCell): boolean {
 function getBuiltInActionDefinition(
     actionId: string
 ): BuiltInActionDefinition | undefined {
-    if (actionId in builtInActionDefinitions) {
-        return builtInActionDefinitions[actionId as CellContextMenuActionId];
+    const definition =
+        builtInActionDefinitions[actionId as CellContextMenuActionId];
+
+    if (definition) {
+        return definition;
     }
 
     warnUnknownBuiltInAction(actionId);
-}
-
-/**
- * Returns disabled state for a built-in action based on row pinning state.
- *
- * @param actionId
- * Built-in action id.
- *
- * @param cell
- * Table cell for the context menu.
- *
- * @param rowId
- * Current row id.
- *
- * @return
- * True when the action should be disabled.
- */
-function isPinnedStateDisabled(
-    actionId: CellContextMenuActionId,
-    cell: TableCell,
-    rowId: string|number|undefined
-): boolean {
-    if (rowId === void 0 || !isPinningOptionEnabled(cell)) {
-        return true;
-    }
-
-    const pinned = cell.row.viewport.grid.getPinnedRows?.() || {
-        topIds: [],
-        bottomIds: []
-    };
-    const inTop = pinned.topIds.includes(rowId);
-    const inBottom = pinned.bottomIds.includes(rowId);
-
-    if (actionId === 'pinRowTop') {
-        return inTop;
-    }
-    if (actionId === 'pinRowBottom') {
-        return inBottom;
-    }
-
-    return !inTop && !inBottom;
 }
 
 /**
@@ -470,12 +372,29 @@ function resolveCellContextMenuItemsAtLevel(
 export function resolveCellContextMenuItems(
     cell: TableCell
 ): ResolvedCellContextMenuItemOptions[] {
-    if (!isContextMenuEnabled(cell)) {
+    const options = cell.column?.options.cells?.contextMenu;
+
+    if (options?.enabled === false) {
         return [];
     }
 
-    const options = cell.column?.options.cells?.contextMenu;
-    return resolveCellContextMenuItemsAtLevel(cell, options?.items, true);
+    const items = resolveCellContextMenuItemsAtLevel(
+        cell,
+        options?.items,
+        true
+    );
+
+    if (
+        !items.length ||
+        options?.enabled === true ||
+        options?.items !== void 0
+    ) {
+        return items;
+    }
+
+    return items.some((item): boolean =>
+        !('separator' in item) && !item.disabled
+    ) ? items : [];
 }
 
 /* *
@@ -489,5 +408,6 @@ export function resolveCellContextMenuItems(
  */
 export default {
     defaultBuiltInCellContextMenuActions,
+    registerBuiltInAction,
     resolveCellContextMenuItems
 } as const;

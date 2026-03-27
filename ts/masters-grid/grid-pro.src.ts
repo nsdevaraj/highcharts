@@ -147,7 +147,7 @@ ExportingComposition.compose(G.Grid);
 ValidatorComposition.compose(G.Table);
 CellRenderersComposition.compose(G.Column);
 PaginationComposition.compose(G.Pagination);
-RowPinningComposition.compose(G.Grid);
+RowPinningComposition.compose(G.Grid, G.Table, G.Column);
 ResponsiveComposition.compose(G.Grid);
 
 

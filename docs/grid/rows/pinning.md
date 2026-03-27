@@ -94,18 +94,18 @@ already pinned explicitly.
 
 ## Runtime API
 
-Use runtime methods to update pinning dynamically:
+Use the scoped row pinning API to update pinning dynamically:
 
 ```js
-await grid.pinRow('row-001'); // defaults to top
-await grid.pinRow('row-010', 'top');
-await grid.pinRow('row-025', 'bottom');
-await grid.pinRow('row-050', 'top', 0); // insert at index 0 in top section
-await grid.toggleRow('row-025'); // defaults to top when currently unpinned
-await grid.toggleRow('row-030', 'bottom');
-await grid.unpinRow('row-010');
+await grid.rowPinning.pin('row-001'); // defaults to top
+await grid.rowPinning.pin('row-010', 'top');
+await grid.rowPinning.pin('row-025', 'bottom');
+await grid.rowPinning.pin('row-050', 'top', 0); // insert at index 0 in top section
+await grid.rowPinning.toggle('row-025'); // defaults to top when currently unpinned
+await grid.rowPinning.toggle('row-030', 'bottom');
+await grid.rowPinning.unpin('row-010');
 
-const pinned = grid.getPinnedRows();
+const pinned = grid.rowPinning.getPinnedRows();
 // { topIds: [...], bottomIds: [...] }
 ```
 
@@ -149,7 +149,7 @@ Event payload fields:
 - `rowId`: changed row id
 - `action`: `'pin' | 'unpin' | 'toggle'`
 - `position`: pin target when relevant (`'top'` for new toggle pins)
-- `index`: insertion index when provided to `pinRow`
+- `index`: insertion index when provided to `grid.rowPinning.pin(...)`
 - `changed`: whether pinned state actually changed
 - `previousTopIds` / `previousBottomIds`
 - `topIds` / `bottomIds`
@@ -188,7 +188,8 @@ You can make top/bottom pinned sections scroll independently by setting
 If `maxHeight` is not set, pinned sections do not use internal scrolling by
 default.
 
-When rows are pinned at runtime (`pinRow` or `toggleRow` that pins), Grid
+When rows are pinned at runtime (`grid.rowPinning.pin(...)` or
+`grid.rowPinning.toggle(...)` when it pins), Grid
 automatically scrolls the affected top/bottom pinned section just enough to keep
 the inserted row visible.
 

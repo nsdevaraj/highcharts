@@ -39,7 +39,6 @@ import { DataProvider } from '../../Core/Data/DataProvider.js';
 import DataProviderRegistry from '../../Core/Data/DataProviderRegistry.js';
 import { createQueryFingerprint } from './QuerySerializer.js';
 import { dataSourceFetch } from './DataSourceHelper.js';
-import { isArray } from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -482,6 +481,22 @@ export class RemoteDataProvider extends DataProvider {
         return this.getRowObjectFromCache(rowIndex);
     }
 
+    public override getCachedRowObjectById(
+        rowId: RowId
+    ): RowObjectType | undefined {
+        const info = this.rowIdToChunkInfo?.get(rowId);
+
+        if (!info) {
+            return void 0;
+        }
+
+        const rowIndex = this.querying.pagination.enabled ?
+            info.localIndex :
+            info.chunkIndex * this.maxChunkSize + info.localIndex;
+
+        return this.getRowObjectFromCache(rowIndex);
+    }
+
     public override async getPrePaginationRowCount(): Promise<number> {
         if (this.prePaginationRowCount !== null) {
             return this.prePaginationRowCount;
@@ -519,28 +534,6 @@ export class RemoteDataProvider extends DataProvider {
         }
 
         return column[localIndex];
-    }
-
-    /**
-     * Returns a row object by row ID from cached remote chunks.
-     *
-     * @param rowId
-     * Row identifier.
-     */
-    public override getCachedRowObjectById(
-        rowId: RowId
-    ): RowObjectType | undefined {
-        const info = this.rowIdToChunkInfo?.get(rowId);
-
-        if (!info) {
-            return void 0;
-        }
-
-        const rowIndex = this.querying.pagination.enabled ?
-            info.localIndex :
-            info.chunkIndex * this.maxChunkSize + info.localIndex;
-
-        return this.getRowObjectFromCache(rowIndex);
     }
 
     public override async setValue(
@@ -625,7 +618,7 @@ export class RemoteDataProvider extends DataProvider {
             return 'string';
         }
 
-        if (!isArray(column)) {
+        if (!Array.isArray(column)) {
             // Typed array
             return 'number';
         }

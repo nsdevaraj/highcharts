@@ -41,19 +41,6 @@ function test_grid() {
                 resizing: {
                     mode: 'distributed'
                 }
-            },
-            rows: {
-                pinning: {
-                    enabled: true,
-                    topIds: ['A'],
-                    bottomIds: ['C'],
-                    top: {
-                        maxHeight: 120
-                    },
-                    bottom: {
-                        maxHeight: '25%'
-                    }
-                }
             }
         },
         columnDefaults: {
@@ -61,26 +48,6 @@ function test_grid() {
                 contextMenu: {
                     enabled: true,
                     items: [
-                        'pinRowTop',
-                        {
-                            actionId: 'unpinRow',
-                            label: 'Unpin now',
-                            icon: 'unpin'
-                        },
-                        {
-                            label: 'Pinning',
-                            items: [
-                                {
-                                    actionId: 'pinRowBottom',
-                                    items: [{
-                                        label: 'Leaf action',
-                                        onClick: function () {
-                                            // noop
-                                        }
-                                    }]
-                                }
-                            ]
-                        },
                         {
                             label: 'Test',
                             onClick: function () {
@@ -106,11 +73,4 @@ function test_grid() {
             }]
         }]
     });
-
-    grid.pinRow('A');
-    grid.pinRow('A', 'top');
-    grid.toggleRow('A');
-    grid.toggleRow('A', 'bottom');
-    grid.unpinRow('A');
-    grid.getPinnedRows();
 }

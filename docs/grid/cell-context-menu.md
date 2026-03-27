@@ -36,11 +36,11 @@ The context menu is enabled/disabled per column using `contextMenu.enabled`.
 When `enabled` is omitted, Grid enables the context menu when:
 
 - `contextMenu.items` is provided (explicit opt-in), or
-- row pinning is explicitly configured via `rendering.rows.pinning` and not
-  disabled.
+- built-in actions are registered by a composed feature and at least one of
+  those actions is enabled for the clicked cell.
 
-If the context menu is enabled and `items` is omitted, Grid uses built-in row
-pinning actions by default: `pinRowTop`, `pinRowBottom`, `unpinRow`.
+In Grid Pro, row pinning registers built-in actions by default:
+`pinRowTop`, `pinRowBottom`, `unpinRow`.
 
 If `items` is empty, the browser's native context menu is kept.
 
@@ -62,7 +62,7 @@ Each item supports:
 - `disabled: true`: Disables the item
 - `onClick(cell)`: Callback invoked when the item is clicked
 
-Built-in actions can also be declared by ID:
+Grid Pro exposes these built-in row pinning action IDs:
 
 - `'pinRowTop'`
 - `'pinRowBottom'`
@@ -95,7 +95,7 @@ the native browser context menu.
 
 ## Localize built-in labels
 
-Built-in row pinning actions use these root language keys:
+Built-in row pinning actions use these root language keys in Grid Pro:
 
 - `lang.pinRowTop`
 - `lang.pinRowBottom`

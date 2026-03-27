@@ -102,7 +102,7 @@ test.describe('Pinned row cell editing', () => {
 
         // Unpin the row via API
         await page.evaluate(async () => {
-            await (window as any).testGrid.unpinRow('A');
+            await (window as any).testGrid.rowPinning.unpin('A');
         });
 
         // Verify no edit input remains anywhere
@@ -139,7 +139,7 @@ test.describe('Pinned row cell editing', () => {
 
         // Pin the row via API
         await page.evaluate(async () => {
-            await (window as any).testGrid.pinRow('B', 'top');
+            await (window as any).testGrid.rowPinning.pin('B', 'top');
         });
 
         // Verify no edit input remains
@@ -174,7 +174,7 @@ test.describe('Pinned row cell editing', () => {
 
         // Now unpin the row
         await page.evaluate(async () => {
-            await (window as any).testGrid.unpinRow('A');
+            await (window as any).testGrid.rowPinning.unpin('A');
         });
 
         // The edited value should persist in the scrollable area
