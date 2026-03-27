@@ -273,7 +273,7 @@
         transition: max-width 0.3s ease, opacity 0.3s ease;
     }
 
-    .hcg-header-cell-icons .hcg-icon.hcg-button-selected::after {
+    .hcg-header-cell-icons .hcg-icon.hcg-icon-selected::after {
         content: "";
         position: absolute;
         top: 2px;
@@ -285,7 +285,7 @@
     }
 
     :is(:hover, :focus-visible) .hcg-header-cell-icons,
-    .hcg-header-cell-icons:has(.hcg-button:focus-visible, .hcg-icon:focus-visible, .hcg-button.hcg-button-highlighted, .hcg-icon.hcg-button-highlighted, .hcg-button.hcg-button-selected, .hcg-icon.hcg-button-selected),
+    .hcg-header-cell-icons:has(.hcg-button:focus-visible, .hcg-icon:focus-visible, .hcg-button.hcg-button-selected, .hcg-icon.hcg-icon-highlighted, .hcg-icon.hcg-icon-selected),
     .hcg-header-cell-container.hcg-no-width .hcg-header-cell-icons {
         max-width: 100px;
         opacity: 1;

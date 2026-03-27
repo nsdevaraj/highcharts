@@ -85,7 +85,7 @@
         border-radius: var(--ig-icon-border-radius);
 
         &:hover:not(:disabled),
-        &.hcg-button-highlighted {
+        &.hcg-icon-highlighted {
             color: var(--ig-icon-hover-color);
             background: var(--ig-icon-hover-background);
             border-color: var(--ig-icon-hover-border-color);
