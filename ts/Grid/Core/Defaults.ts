@@ -33,6 +33,7 @@ import { merge } from '../../Shared/Utilities.js';
  */
 export const defaultLangOptions: DeepPartial<LangOptions> = {
     accessibility: {
+        columnMenu: 'Open menu for {column}.',
         sorting: {
             sortable: 'Sortable.',
             announcements: {

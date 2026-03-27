@@ -100,6 +100,14 @@ export interface LangAccessibilityOptions {
     filtering?: FilteringLangA11yOptions;
 
     /**
+     * Accessible label for the minimized column header menu button. Use
+     * `{column}` to insert the current column label.
+     *
+     * @default 'Open menu for {column}.'
+     */
+    columnMenu?: string;
+
+    /**
      * Language options for screen reader sections before and after the Grid.
      */
     screenReaderSection?: ScreenReaderSectionLangOptions;
