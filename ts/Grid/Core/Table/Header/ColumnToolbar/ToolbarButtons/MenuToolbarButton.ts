@@ -56,7 +56,6 @@ class MenuToolbarButton extends ToolbarButton {
         const column = this.toolbar?.column;
         const label = (
             column?.header?.headerContent?.textContent ||
-            column?.header?.value ||
             column?.id ||
             ''
         ).trim();
