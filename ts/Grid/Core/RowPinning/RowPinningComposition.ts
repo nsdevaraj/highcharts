@@ -195,6 +195,14 @@ function initRowPinning(this: Grid): void {
  */
 function initRowPinningView(this: Table): void {
     this.rowPinningView = new RowPinningView(this);
+    this.rowsVirtualizer.getEffectiveRowCount = async (
+        providerRowCount: number
+    ): Promise<number> => await this.rowPinningView?.getScrollableRowCount(
+        providerRowCount
+    ) ?? providerRowCount;
+    this.rowsVirtualizer.afterRenderRows = async (): Promise<void> => {
+        await this.rowPinningView?.syncPinnedRowsFromMaterializedRows();
+    };
 }
 
 /**
