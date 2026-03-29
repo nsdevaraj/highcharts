@@ -658,15 +658,27 @@ class Tick {
     }
 
     /**
-     * Get the offset height or width of the label
+     * Get the offset height or width of the label. For rotated labels on
+     * vertical axes, the returned value is a Math.min of the unrotated and
+     * rotated bounding box widths.
      *
      * @internal
      * @function Highcharts.Tick#getLabelSize
      */
     public getLabelSize(): number {
-        return this.label ?
-            this.label.getBBox()[this.axis.horiz ? 'height' : 'width'] :
-            0;
+        const { label, axis } = this;
+        // Short labels: the rotated box is often wider than non-rotated, so we
+        // use the non-rotated width.
+        // Long labels: the rotated box is often narrower, so we use the rotated
+        // width.
+        if (!axis.horiz && isNumber(label?.rotation) && label.rotation !== 0) {
+            const unrotated = label.getBBox(false, 0),
+                rotated = label.getRotatedBox(unrotated, label.rotation);
+
+            return Math.min(unrotated.width, rotated.width);
+        }
+
+        return label ? label.getBBox()[axis.horiz ? 'height' : 'width'] : 0;
     }
 
     /**
