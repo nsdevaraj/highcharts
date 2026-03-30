@@ -268,6 +268,7 @@ const ArcDiagramSeriesDefaults: ArcDiagramSeriesOptions = {
  *     }]
  *  ```
  *
+ * @basic
  * @type      {Array<*>}
  * @extends   series.sankey.data
  * @product   highcharts
