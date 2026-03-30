@@ -56,6 +56,7 @@ export abstract class DataProvider {
      */
     protected readonly options: DataProviderOptions;
 
+
     /* *
      *
      *  Constructor
@@ -77,7 +78,7 @@ export abstract class DataProvider {
      * */
 
     /**
-     * Optional asynchronous initialization hook.
+     * Initializes the data provider.
      */
     public init(): Promise<void> {
         return Promise.resolve();
@@ -145,32 +146,6 @@ export abstract class DataProvider {
      * Destroys the provider and releases resources.
      */
     public abstract destroy(): void;
-
-    /**
-     * Returns a row object by row ID from currently available provider data.
-     *
-     * @param rowId
-     * Row identifier.
-     */
-    public getCachedRowObjectById(
-        rowId: RowId
-    ): RowObjectType | undefined {
-        void rowId;
-        return void 0;
-    }
-
-    /**
-     * Resolves a row object by row ID using a definitive lookup when supported.
-     *
-     * @param rowId
-     * Row identifier.
-     */
-    public fetchRowObjectById(
-        rowId: RowId
-    ): Promise<RowObjectType | undefined> {
-        void rowId;
-        return Promise.resolve(void 0);
-    }
 
     /**
      * Returns the number of items before pagination has been applied.
@@ -244,6 +219,7 @@ export interface DataProviderOptions {
      */
     providerType?: string;
 }
+
 
 /* *
  *

@@ -297,7 +297,6 @@ class ColumnSorting {
         } else {
             sortingController.setSorting(order, this.column.id);
         }
-        viewport.grid.rowPinning?.invalidatePinnedRowObjects();
         await viewport.updateRows();
 
         for (const col of viewport.columns) {

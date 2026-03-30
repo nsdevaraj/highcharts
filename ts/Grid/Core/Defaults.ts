@@ -58,18 +58,6 @@ export const defaultLangOptions: DeepPartial<LangOptions> = {
                     '{rowsCount} results found.'
             }
         },
-        rowPinning: {
-            announcements: {
-                pinned: 'Row {rowId} pinned to {position}.',
-                unpinned: 'Row {rowId} unpinned.'
-            },
-            descriptions: {
-                pinnedTop: 'Pinned row in top section.',
-                pinnedBottom: 'Pinned row in bottom section.',
-                alsoPinnedTop: 'This row is also pinned to top section.',
-                alsoPinnedBottom: 'This row is also pinned to bottom section.'
-            }
-        },
         screenReaderSection: {
             beforeRegionLabel: '',
             afterRegionLabel: ''
@@ -80,9 +68,6 @@ export const defaultLangOptions: DeepPartial<LangOptions> = {
     filter: 'Filter',
     sortAscending: 'Sort ascending',
     sortDescending: 'Sort descending',
-    pinRowTop: 'Pin row to top',
-    pinRowBottom: 'Pin row to bottom',
-    unpinRow: 'Unpin row',
     column: 'Column',
     setFilter: 'Set filter',
     pagination: {
@@ -126,8 +111,7 @@ export const defaultOptions: DeepPartial<Options> = {
         highContrastMode: 'auto',
         announcements: {
             sorting: true,
-            filtering: true,
-            rowPinning: true
+            filtering: true
         },
         screenReaderSection: {
             beforeGridFormat:

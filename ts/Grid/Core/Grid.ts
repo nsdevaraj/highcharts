@@ -65,53 +65,6 @@ import {
 } from '../../Shared/Utilities.js';
 import { uniqueKey } from '../../Core/Utilities.js';
 
-/**
- * Returns whether column options change sorting or filtering semantics.
- *
- * @param options
- * Column-level options to inspect.
- */
-function hasColumnQueryOptionChanges(
-    options?: DeepPartial<IndividualColumnOptions> | NoIdColumnOptions | null
-): boolean {
-    if (!options) {
-        return false;
-    }
-
-    return !!(
-        options.sorting && (
-            Object.prototype.hasOwnProperty.call(options.sorting, 'compare') ||
-            Object.prototype.hasOwnProperty.call(options.sorting, 'order')
-        )
-    ) || !!(
-        options.filtering && (
-            Object.prototype.hasOwnProperty.call(
-                options.filtering,
-                'condition'
-            ) ||
-            Object.prototype.hasOwnProperty.call(options.filtering, 'value')
-        )
-    );
-}
-
-/**
- * Returns whether grid update options change sorting or filtering semantics.
- *
- * @param options
- * Grid update options to inspect.
- */
-function hasGridQueryOptionChanges(options: Omit<Options, 'id'>): boolean {
-    if (hasColumnQueryOptionChanges(options.columnDefaults || null)) {
-        return true;
-    }
-
-    const columns = options.columns;
-    return Array.isArray(columns) && columns.some((columnOptions): boolean =>
-        hasColumnQueryOptionChanges(columnOptions || null)
-    );
-}
-
-
 /* *
  *
  *  Class
@@ -737,20 +690,8 @@ export class Grid {
         });
 
         const { viewport } = this;
-        const requestedQueryOptionChanges = hasGridQueryOptionChanges(options);
         const diff = this.loadUserOptions(options, oneToOne);
         const flags = this.dirtyFlags;
-        const renderingDiff = diff.rendering as ({
-            rows?: Record<string, unknown>;
-        } | undefined);
-        const rowsDiff = renderingDiff?.rows;
-        if (
-            rowsDiff &&
-            Object.prototype.hasOwnProperty.call(rowsDiff, 'pinning')
-        ) {
-            this.rowPinning?.markOptionsDirty();
-        }
-
         if (viewport) {
             if (
                 !this.dataProvider ||
@@ -847,10 +788,6 @@ export class Grid {
                 oneToOne
             });
         };
-
-        if (requestedQueryOptionChanges) {
-            this.rowPinning?.invalidatePinnedRowObjects();
-        }
 
         if (redraw) {
             return this.redraw().then(finish);
@@ -1096,9 +1033,6 @@ export class Grid {
         });
 
         const vp = this.viewport;
-        const requestedQueryOptionChanges = hasColumnQueryOptionChanges(
-            options
-        );
         const diffs = this.setColumnOptions([{
             id: columnId,
             ...options
@@ -1107,10 +1041,6 @@ export class Grid {
 
         if (diff && vp) {
             this.loadColumnOptionDiffs(vp, columnId, diff);
-        }
-
-        if (requestedQueryOptionChanges) {
-            this.rowPinning?.invalidatePinnedRowObjects();
         }
 
         if (redraw) {
@@ -1193,7 +1123,6 @@ export class Grid {
         }
 
         sortingController.setSorting(normalized);
-        this.rowPinning?.invalidatePinnedRowObjects();
         await viewport.updateRows();
 
         const currentSortings = sortingController.currentSortings || [];

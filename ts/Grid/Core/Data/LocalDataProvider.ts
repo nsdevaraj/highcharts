@@ -41,13 +41,9 @@ import DataTable from '../../../Data/DataTable.js';
 import ChainModifier from '../../../Data/Modifiers/ChainModifier.js';
 import DataConnector from '../../../Data/Connectors/DataConnector.js';
 import DataProviderRegistry from './DataProviderRegistry.js';
-import {
-    getGridRowPinningOptions
-} from '../RowPinning/RowPinningController.js';
 import { uniqueKey } from '../../../Core/Utilities.js';
 import {
     defined,
-    isArray,
     isNumber,
     isString
 } from '../../../Shared/Utilities.js';
@@ -107,22 +103,6 @@ export class LocalDataProvider extends DataProvider {
     private prePaginationRowCount?: number;
 
     /**
-     * Pre-computed snapshot of row IDs and lookup indexes for the current
-     * presentation table. Row objects remain lazy to avoid rebuilding every
-     * row object on each query cycle.
-     */
-    private materializedRows: MaterializedRows = {
-        rowIds: [],
-        rowObjects: [],
-        rowIdToIndex: new Map()
-    };
-
-    /**
-     * Maps row ID to original row index in raw scope.
-     */
-    private rowIdToOriginalIndex: Map<RowId, number> = new Map();
-
-    /**
      * Unbind callbacks for DataTable events.
      */
     private dataTableEventDestructors: Function[] = [];
@@ -145,9 +125,6 @@ export class LocalDataProvider extends DataProvider {
      *
      * */
 
-    /**
-     * Initializes the local data provider and its backing table.
-     */
     public override async init(): Promise<void> {
         if (this.dataTable) {
             return;
@@ -180,12 +157,6 @@ export class LocalDataProvider extends DataProvider {
         this.dataTable = table;
         this.presentationTable = table.getModified();
         this.prePaginationRowCount = this.presentationTable?.rowCount ?? 0;
-        this.materializedRows = {
-            rowIds: [],
-            rowObjects: [],
-            rowIdToIndex: new Map()
-        };
-        this.rowIdToOriginalIndex.clear();
 
         for (const eventName of LocalDataProvider.tableChangeEventNames) {
             const fn = table.on(eventName, (e: DataEvent): void => {
@@ -289,12 +260,6 @@ export class LocalDataProvider extends DataProvider {
         }
     }
 
-    /**
-     * Returns the IDs of the columns in the current presentation table.
-     *
-     * @return
-     * Column IDs in presentation order.
-     */
     public override getColumnIds(): Promise<string[]> {
         return Promise.resolve(this.presentationTable?.getColumnIds() ?? []);
     }
@@ -303,38 +268,30 @@ export class LocalDataProvider extends DataProvider {
      * Returns the row ID for a given local row index. If not found, returns
      * `undefined`.
      *
-     * If a configured ID column is available, the row ID is the value from
-     * that column in the current row. Otherwise, the row ID is the original
-     * row index.
+     * If the `data.idColumn` option is set, the row ID is the value of the
+     * row in the column with the given ID. Otherwise, the row ID is the
+     * original row index.
      *
      * @param rowIndex
      * The local (presentation table) row index to get the row ID for.
-     *
-     * @return
-     * The row ID for the requested row.
      */
     public override async getRowId(
         rowIndex: number
     ): Promise<RowId | undefined> {
-        const cachedRowId = this.materializedRows.rowIds[rowIndex];
-        if (defined(cachedRowId)) {
-            return cachedRowId;
-        }
-
         const originalRowIndex =
             await this.getOriginalRowIndexFromLocal(rowIndex);
         if (!defined(originalRowIndex) || !this.dataTable) {
-            return;
+            return Promise.resolve(void 0);
         }
 
-        const idColId = this.getConfiguredIdColumn();
+        const idColId = this.options.idColumn;
         if (!idColId) {
-            return originalRowIndex;
+            return Promise.resolve(originalRowIndex);
         }
 
         const rawId = this.dataTable.getCell(idColId, originalRowIndex);
         if (isString(rawId) || isNumber(rawId)) {
-            return rawId;
+            return Promise.resolve(rawId);
         }
     }
 
@@ -342,32 +299,22 @@ export class LocalDataProvider extends DataProvider {
      * Returns the local (presentation table) row index for a given row ID. If
      * not found, returns `undefined`.
      *
-     * The lookup is resolved against the current materialized presentation
-     * rows, with fallback to original row index mapping when needed.
-     *
      * @param rowId
-     * The row ID to get the row index for.
-     *
-     * @return
-     * The local row index for the requested row.
+     * The row ID to get the row index for. If the `data.idColumn` option is
+     * set, the row ID is the value of the row in the column with the given ID.
+     * Otherwise, the row ID is the original row index.
      */
-    public override async getRowIndex(
+    public override getRowIndex(
         rowId: RowId
     ): Promise<number | undefined> {
-        const cachedRowIndex = this.materializedRows.rowIdToIndex.get(rowId);
-        if (defined(cachedRowIndex)) {
-            return cachedRowIndex;
-        }
-
         if (!this.originalRowIndexesMap && isNumber(rowId)) {
             return this.getLocalRowIndexFromOriginal(rowId);
         }
 
         const originalRowIndex = this.originalRowIndexesMap?.get(rowId);
         if (!defined(originalRowIndex)) {
-            return;
+            return Promise.resolve(void 0);
         }
-
         return this.getLocalRowIndexFromOriginal(originalRowIndex);
     }
 
@@ -376,9 +323,6 @@ export class LocalDataProvider extends DataProvider {
      *
      * @param localRowIndex
      * The local row index to get the original row index for.
-     *
-     * @return
-     * The original row index.
      */
     public getOriginalRowIndexFromLocal(
         localRowIndex: number
@@ -393,9 +337,6 @@ export class LocalDataProvider extends DataProvider {
      *
      * @param originalRowIndex
      * The original row index to get the local row index for.
-     *
-     * @return
-     * The local row index.
      */
     public getLocalRowIndexFromOriginal(
         originalRowIndex: number
@@ -405,101 +346,20 @@ export class LocalDataProvider extends DataProvider {
         );
     }
 
-    /**
-     * Returns the row object for a given local row index.
-     *
-     * @param rowIndex
-     * The local row index to get the row object for.
-     *
-     * @return
-     * The row object in presentation scope.
-     */
     public override getRowObject(
         rowIndex: number
     ): Promise<RowObjectType | undefined> {
-        const cachedRowObject = this.materializedRows.rowObjects[rowIndex];
-        if (cachedRowObject) {
-            return Promise.resolve(cachedRowObject);
-        }
-
-        const rowObject = this.presentationTable?.getRowObject(rowIndex);
-        if (!rowObject) {
-            return Promise.resolve(void 0);
-        }
-
-        this.materializedRows.rowObjects[rowIndex] = rowObject;
-
-        return Promise.resolve(rowObject);
+        return Promise.resolve(this.presentationTable?.getRowObject(rowIndex));
     }
 
-    /**
-     * Returns the original row object for a row ID from resident local data.
-     *
-     * @param rowId
-     * Row identifier.
-     *
-     * @return
-     * The original row object in raw data scope.
-     */
-    public override getCachedRowObjectById(
-        rowId: RowId
-    ): RowObjectType | undefined {
-        const originalIndex = this.resolveOriginalRowIndex(rowId);
-
-        if (originalIndex === void 0) {
-            return void 0;
-        }
-
-        return this.dataTable?.getRowObject(originalIndex);
-    }
-
-    /**
-     * Resolves a row object by row ID from resident local data.
-     *
-     * @param rowId
-     * Row identifier.
-     *
-     * @return
-     * The original row object in raw data scope.
-     */
-    public override fetchRowObjectById(
-        rowId: RowId
-    ): Promise<RowObjectType | undefined> {
-        return Promise.resolve(this.getCachedRowObjectById(rowId));
-    }
-
-    /**
-     * Returns the number of rows before pagination is applied.
-     *
-     * @return
-     * The row count before pagination.
-     */
     public override getPrePaginationRowCount(): Promise<number> {
         return Promise.resolve(this.prePaginationRowCount ?? 0);
     }
 
-    /**
-     * Returns the number of rows in the current presentation table.
-     *
-     * @return
-     * The presentation row count.
-     */
     public override getRowCount(): Promise<number> {
-        return Promise.resolve(this.materializedRows.rowIds.length);
+        return Promise.resolve(this.presentationTable?.getRowCount() ?? 0);
     }
 
-    /**
-     * Returns the value of a cell in the current presentation table.
-     *
-     * @param columnId
-     * The column ID.
-     *
-     * @param rowIndex
-     * The local row index.
-     *
-     * @return
-     * The cell value.
-     */
     public override getValue(
         columnId: string,
         rowIndex: number
@@ -509,22 +369,7 @@ export class LocalDataProvider extends DataProvider {
         );
     }
 
-    /**
-     * Sets the value of a cell identified by row ID and column ID.
-     *
-     * After updating the raw data table, refreshes the presentation snapshot
-     * immediately only when the normal querying flow will not do it.
-     *
-     * @param value
-     * The new cell value.
-     *
-     * @param columnId
-     * The column ID.
-     *
-     * @param rowId
-     * The row ID.
-     */
-    public override async setValue(
+    public override setValue(
         value: DataTableCellType,
         columnId: string,
         rowId: RowId
@@ -532,17 +377,16 @@ export class LocalDataProvider extends DataProvider {
         const originalIndex = this.resolveOriginalRowIndex(rowId);
 
         if (originalIndex === void 0) {
-            throw new Error('LocalDataProvider: unable to resolve rowId.');
+            // eslint-disable-next-line no-console
+            console.error('[setValue] Wrong row ID:', rowId);
+            return Promise.resolve();
         }
 
         this.dataTable?.setCell(columnId, originalIndex, value, {
             fromGrid: true
         });
 
-        if (this.querying.willNotModify()) {
-            await this.applyQuery();
-            this.querying.shouldBeUpdated = false;
-        }
+        return Promise.resolve();
     }
 
     /**
@@ -555,67 +399,35 @@ export class LocalDataProvider extends DataProvider {
             return;
         }
 
-        const rawTable = originalDataTable.getModified();
         const groupedModifiers = controller.getGroupedModifiers();
-        let groupedTable: DataTable;
+        let interTable: DataTable;
 
         // Grouped modifiers
         if (groupedModifiers.length > 0) {
             const chainModifier = new ChainModifier({}, ...groupedModifiers);
             const dataTableCopy = originalDataTable.clone();
             await chainModifier.modify(dataTableCopy.getModified());
-            groupedTable = dataTableCopy.getModified();
+            interTable = dataTableCopy.getModified();
         } else {
-            groupedTable = rawTable;
+            interTable = originalDataTable.getModified();
         }
 
-        this.prePaginationRowCount = groupedTable.rowCount;
-        this.originalRowIndexesMap = this.createOriginalRowIndexesMap();
-
-        let activeTable = groupedTable;
+        this.prePaginationRowCount = interTable.rowCount;
 
         // Pagination modifier
         const paginationModifier =
-            controller.pagination.createModifier(groupedTable.rowCount);
+            controller.pagination.createModifier(interTable.rowCount);
         if (paginationModifier) {
-            activeTable = groupedTable.clone();
-            await paginationModifier.modify(activeTable);
-            activeTable = activeTable.getModified();
+            interTable = interTable.clone();
+            await paginationModifier.modify(interTable);
+            interTable = interTable.getModified();
         }
 
-        this.materializedRows = this.createMaterializedRows(activeTable);
-
-        this.rowIdToOriginalIndex = this.createRowIdToOriginalIndexMap(
-            rawTable
-        );
-
-        this.presentationTable = activeTable;
-    }
-
-    private createMaterializedRows(table: DataTable): MaterializedRows {
-        const rowIds: RowId[] = [];
-
-        for (let i = 0, iEnd = table.getRowCount(); i < iEnd; ++i) {
-            rowIds.push(this.getRowIdFromTable(table, i));
-        }
-
-        return {
-            rowIds,
-            rowObjects: new Array<RowObjectType | undefined>(rowIds.length),
-            rowIdToIndex: createRowIdIndexMap(rowIds)
-        };
-    }
-
-    private createRowIdToOriginalIndexMap(table: DataTable): Map<RowId, number> {
-        const map = new Map<RowId, number>();
-        for (let i = 0, iEnd = table.getRowCount(); i < iEnd; ++i) {
-            map.set(this.getRowIdFromTable(table, i), i);
-        }
-        return map;
+        this.presentationTable = interTable;
     }
 
     private createOriginalRowIndexesMap(): Map<RowId, number> | undefined {
-        const idColId = this.getConfiguredIdColumn();
+        const idColId = this.options.idColumn;
         const table = this.dataTable;
         if (!idColId || !table) {
             return;
@@ -645,65 +457,20 @@ export class LocalDataProvider extends DataProvider {
     }
 
     private resolveOriginalRowIndex(rowId: RowId): number | undefined {
-        return this.rowIdToOriginalIndex.get(rowId) ??
-            this.originalRowIndexesMap?.get(rowId) ??
-            (
-                !this.getConfiguredIdColumn() && typeof rowId === 'number' ?
-                    rowId :
-                    void 0
-            );
-    }
-
-    private getConfiguredIdColumn(): string | undefined {
-        return this.options.idColumn ??
-            getGridRowPinningOptions(this.querying.grid)?.idColumn;
-    }
-
-    private getRowIdFromTable(
-        table: DataTable,
-        rowIndex: number
-    ): RowId {
-        const idColumn = this.getConfiguredIdColumn();
-
-        if (idColumn && table.hasColumns([idColumn])) {
-            const value = table.getCell(idColumn, rowIndex);
-            if (isString(value) || isNumber(value)) {
-                return value;
-            }
+        if (this.originalRowIndexesMap) {
+            return this.originalRowIndexesMap.get(rowId);
         }
 
-        const originalIndex = table.getOriginalRowIndex(rowIndex);
-        if (isNumber(originalIndex)) {
-            return originalIndex;
+        if (isNumber(rowId)) {
+            return rowId;
         }
-
-        return rowIndex;
     }
 
-    /**
-     * Destroys the data provider and clears its cached state.
-     */
     public override destroy(): void {
         this.clearDataTableEvents();
         this.clearConnector();
-        this.materializedRows = {
-            rowIds: [],
-            rowObjects: [],
-            rowIdToIndex: new Map()
-        };
-        this.rowIdToOriginalIndex.clear();
-        this.originalRowIndexesMap = void 0;
     }
 
-    /**
-     * Returns the inferred data type for a given column.
-     *
-     * @param columnId
-     * The column ID to inspect.
-     *
-     * @return
-     * The inferred column data type.
-     */
     public override getColumnDataType(
         columnId: string
     ): Promise<ColumnDataType> {
@@ -712,7 +479,7 @@ export class LocalDataProvider extends DataProvider {
             return Promise.resolve('string');
         }
 
-        if (!isArray(column)) {
+        if (!Array.isArray(column)) {
             // Typed array
             return Promise.resolve('number');
         }
@@ -751,31 +518,6 @@ export class LocalDataProvider extends DataProvider {
     ): connector is DataConnectorType {
         return 'getTable' in connector;
     }
-}
-
-/**
- * Pre-computed snapshot of presentation row IDs plus a lazy row-object cache.
- * ID and index lookups stay O(1), while row objects are materialized only
- * when callers actually request them.
- */
-interface MaterializedRows {
-    rowIds: RowId[];
-    rowObjects: Array<RowObjectType | undefined>;
-    rowIdToIndex: Map<RowId, number>;
-}
-
-/**
- * Create fast lookup map for row IDs.
- *
- * @param rowIds
- * Row IDs to index.
- */
-function createRowIdIndexMap(rowIds: RowId[]): Map<RowId, number> {
-    const map = new Map<RowId, number>();
-    for (let i = 0, iEnd = rowIds.length; i < iEnd; ++i) {
-        map.set(rowIds[i], i);
-    }
-    return map;
 }
 
 export type GridDataConnectorTypeOptions =

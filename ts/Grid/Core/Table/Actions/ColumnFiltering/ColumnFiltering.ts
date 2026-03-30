@@ -310,7 +310,6 @@ class ColumnFiltering {
         filteringController.addColumnFilterCondition(columnId, condition);
         this.disableInputIfNeeded();
 
-        viewport.grid.rowPinning?.invalidatePinnedRowObjects();
         await querying.proceed();
         await viewport.updateRows();
 

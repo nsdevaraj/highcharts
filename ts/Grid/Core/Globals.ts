@@ -44,6 +44,7 @@ export const rawClassNames = {
     descriptionElement: 'description',
     theadElement: 'thead',
     tbodyElement: 'tbody',
+    scrollableTbody: 'tbody-scrollable',
     rowElement: 'row',
     rowEven: 'row-even',
     rowOdd: 'row-odd',

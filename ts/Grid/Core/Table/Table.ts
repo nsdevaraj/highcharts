@@ -22,29 +22,27 @@
  *
  * */
 
-import TableRow from './Body/TableRow.js';
 import type DataTable from '../../../Data/DataTable';
+import type DataProvider from '../Data/DataProvider';
+import type TableCell from './Body/TableCell';
 import type { RowId } from '../Data/DataProvider';
+import type RowPinningView from '../RowPinning/RowPinningView';
 
 import GridUtils from '../GridUtils.js';
 import ColumnResizing from './ColumnResizing/ColumnResizing.js';
 import ColumnResizingMode from './ColumnResizing/ResizingMode.js';
 import Column from './Column.js';
+import TableRow from './Body/TableRow.js';
 import TableHeader from './Header/TableHeader.js';
 import Grid from '../Grid.js';
 import RowsVirtualizer from './Actions/RowsVirtualizer.js';
 import ColumnsResizer from './Actions/ColumnsResizer.js';
 import Globals from '../Globals.js';
-import type TableCell from './Body/TableCell';
 
 import Cell from './Cell.js';
 import { defined, fireEvent, getStyle } from '../../../Shared/Utilities.js';
 import CellContextMenu from './Body/CellContextMenu.js';
 import CellContextMenuBuiltInActions from './Body/CellContextMenuBuiltInActions.js';
-import {
-    getGridRowPinningOptions
-} from '../RowPinning/RowPinningController.js';
-import { classNames as rowPinningClassNames } from '../RowPinning/RowPinningComposition.js';
 
 const { makeHTMLElement } = GridUtils;
 
@@ -86,16 +84,6 @@ class Table {
     public readonly tbodyElement: HTMLElement;
 
     /**
-     * The HTML element containing top pinned rows.
-     */
-    public readonly pinnedTopTbodyElement: HTMLElement;
-
-    /**
-     * The HTML element containing bottom pinned rows.
-     */
-    public readonly pinnedBottomTbodyElement: HTMLElement;
-
-    /**
      * The head of the table.
      */
     public header?: TableHeader;
@@ -113,19 +101,31 @@ class Table {
     /**
      * The rendered top pinned rows.
      */
-    public pinnedTopRows: TableRow[] = [];
+    public get pinnedTopRows(): TableRow[] {
+        return this.rowPinningView?.getRows('top') || [];
+    }
 
     /**
      * The rendered bottom pinned rows.
      */
-    public pinnedBottomRows: TableRow[] = [];
+    public get pinnedBottomRows(): TableRow[] {
+        return this.rowPinningView?.getRows('bottom') || [];
+    }
 
     /**
-     * Fast lookup maps for rendered pinned rows.
+     * The HTML element containing top pinned rows.
      */
-    public pinnedTopRowById: Map<RowId, TableRow> = new Map();
+    public get pinnedTopTbodyElement(): HTMLElement {
+        return this.rowPinningView?.pinnedTopTbodyElement || this.tbodyElement;
+    }
 
-    public pinnedBottomRowById: Map<RowId, TableRow> = new Map();
+    /**
+     * The HTML element containing bottom pinned rows.
+     */
+    public get pinnedBottomTbodyElement(): HTMLElement {
+        return this.rowPinningView?.pinnedBottomTbodyElement ||
+            this.tbodyElement;
+    }
 
     /**
      * The resize observer for the table container.
@@ -180,9 +180,9 @@ class Table {
     private cellContextMenu?: CellContextMenu;
 
     /**
-     * Whether pinned scrollbar compensation is queued for next frame.
+     * Row pinning viewport helper, available only in Grid Pro.
      */
-    private pinnedScrollbarCompensationQueued = false;
+    public rowPinningView?: RowPinningView;
 
     /**
      * Whether the table body min-height was set by the grid.
@@ -216,24 +216,9 @@ class Table {
         if (grid.options?.rendering?.header?.enabled) {
             this.theadElement = makeHTMLElement('thead', {}, tableElement);
         }
-        this.pinnedTopTbodyElement = makeHTMLElement(
-            'tbody',
-            { className: rowPinningClassNames.pinnedTopTbodyElement }
-        );
-        this.pinnedTopTbodyElement.setAttribute(
-            'aria-label', 'Pinned top rows'
-        );
-        this.tbodyElement = makeHTMLElement('tbody', {}, tableElement);
-        this.tbodyElement.classList.add(
-            rowPinningClassNames.scrollableTbodyElement
-        );
-        this.pinnedBottomTbodyElement = makeHTMLElement(
-            'tbody',
-            { className: rowPinningClassNames.pinnedBottomTbodyElement }
-        );
-        this.pinnedBottomTbodyElement.setAttribute(
-            'aria-label', 'Pinned bottom rows'
-        );
+        this.tbodyElement = makeHTMLElement('tbody', {
+            className: Globals.getClassName('scrollableTbody')
+        }, tableElement);
 
         this.rowsVirtualizer = new RowsVirtualizer(this);
 
@@ -245,8 +230,14 @@ class Table {
 
         this.tbodyElement.addEventListener('scroll', this.onScroll);
         this.addBodyEventListeners(this.tbodyElement);
-        this.addBodyEventListeners(this.pinnedTopTbodyElement);
-        this.addBodyEventListeners(this.pinnedBottomTbodyElement);
+        if (this.rowPinningView) {
+            this.addBodyEventListeners(
+                this.rowPinningView.pinnedTopTbodyElement
+            );
+            this.addBodyEventListeners(
+                this.rowPinningView.pinnedBottomTbodyElement
+            );
+        }
     }
 
     /* *
@@ -262,10 +253,13 @@ class Table {
      * @deprecated Use `grid.dataProvider` instead.
      */
     public get dataTable(): DataTable | undefined {
-        const dp = this.grid.dataProvider;
-        if (dp && 'getDataTable' in dp) {
-            return dp.getDataTable(true);
-        }
+        const dp = this.grid.dataProvider as (
+            DataProvider & {
+                getDataTable?(presentation?: boolean): DataTable | undefined;
+            }
+        ) | undefined;
+
+        return dp?.getDataTable?.(true);
     }
 
     /**
@@ -365,11 +359,7 @@ class Table {
             return;
         }
 
-        const pinned = this.grid.rowPinning?.getPinnedRows();
-        const pinnedRowsCount = (
-            (pinned?.topIds.length || 0) +
-            (pinned?.bottomIds.length || 0)
-        );
+        const pinnedRowsCount = this.rowPinningView?.getPinnedRowsCount() || 0;
         const minScrollableRows = Math.max(
             0,
             minVisibleRows - pinnedRowsCount
@@ -429,12 +419,11 @@ class Table {
      */
     public async updateRows(): Promise<void> {
         const vp = this;
-        const { dataProvider: dp } = vp.grid;
-        if (!dp) {
+        if (!vp.grid.dataProvider) {
             return;
         }
         const oldPinningMaxHeightSignature =
-            this.getPinnedBodyMaxHeightSignature();
+            this.rowPinningView?.getPinnedBodyMaxHeightSignature();
         const focusCursor = vp.focusCursor;
 
         try {
@@ -466,13 +455,13 @@ class Table {
             }
             const pinningMaxHeightChanged = (
                 oldPinningMaxHeightSignature !==
-                this.getPinnedBodyMaxHeightSignature()
+                this.rowPinningView?.getPinnedBodyMaxHeightSignature()
             );
             if (pinningMaxHeightChanged) {
                 shouldRerender = true;
             }
 
-            const newRowCount = await dp.getRowCount();
+            const newRowCount = await vp.grid.dataProvider.getRowCount();
             if (shouldRerender) {
                 // Rerender all rows
                 await vp.rowsVirtualizer.rerender();
@@ -495,7 +484,9 @@ class Table {
             vp.reflow();
 
             if (focusCursor?.section === 'scroll') {
-                const newRowIndex = await dp.getRowIndex(focusCursor.rowId);
+                const newRowIndex = await vp.grid.dataProvider?.getRowIndex(
+                    focusCursor.rowId
+                );
                 if (newRowIndex !== void 0) {
                     vp.scrollToRow(newRowIndex);
                     setTimeout((): void => {
@@ -537,12 +528,7 @@ class Table {
             this.rowsVirtualizer.applyMeasuredRowHeight(measuredRowHeight);
         }
         this.setTbodyMinHeight();
-        for (const row of this.pinnedTopRows.concat(this.pinnedBottomRows)) {
-            row.reflow();
-        }
-        this.applyPinnedBodyMaxHeights();
-        this.applyPinnedScrollbarCompensation();
-        this.syncPinnedHorizontalScroll(this.tbodyElement.scrollLeft);
+        this.rowPinningView?.reflow();
 
         // Reflow the pagination
         this.grid.pagination?.reflow();
@@ -581,7 +567,7 @@ class Table {
             void this.rowsVirtualizer.scroll();
         }
 
-        this.syncPinnedHorizontalScroll(this.tbodyElement.scrollLeft);
+        this.rowPinningView?.syncHorizontalScroll(this.tbodyElement.scrollLeft);
 
         this.header?.scrollHorizontally(this.tbodyElement.scrollLeft);
     };
@@ -843,23 +829,17 @@ class Table {
         }
 
         let row: TableRow | undefined;
+        const pinnedSection = this.rowPinningView?.getSectionForBody(tbody);
 
-        if (tbody === this.pinnedTopTbodyElement) {
+        if (pinnedSection) {
             const rowId = tr.getAttribute('data-row-id');
+
             if (rowId !== null) {
-                row = this.getRenderedPinnedRowById(rowId, 'top');
-                if (!row && /^-?\d+(\.\d+)?$/.test(rowId)) {
-                    row = this.getRenderedPinnedRowById(Number(rowId), 'top');
-                }
-            }
-        } else if (tbody === this.pinnedBottomTbodyElement) {
-            const rowId = tr.getAttribute('data-row-id');
-            if (rowId !== null) {
-                row = this.getRenderedPinnedRowById(rowId, 'bottom');
+                row = this.getRenderedPinnedRowById(rowId, pinnedSection);
                 if (!row && /^-?\d+(\.\d+)?$/.test(rowId)) {
                     row = this.getRenderedPinnedRowById(
                         Number(rowId),
-                        'bottom'
+                        pinnedSection
                     );
                 }
             }
@@ -888,8 +868,14 @@ class Table {
     public destroy(): void {
         this.tbodyElement.removeEventListener('scroll', this.onScroll);
         this.removeBodyEventListeners(this.tbodyElement);
-        this.removeBodyEventListeners(this.pinnedTopTbodyElement);
-        this.removeBodyEventListeners(this.pinnedBottomTbodyElement);
+        if (this.rowPinningView) {
+            this.removeBodyEventListeners(
+                this.rowPinningView.pinnedTopTbodyElement
+            );
+            this.removeBodyEventListeners(
+                this.rowPinningView.pinnedBottomTbodyElement
+            );
+        }
         this.resizeObserver.disconnect();
         this.columnsResizer?.removeEventListeners();
         this.header?.destroy();
@@ -899,12 +885,7 @@ class Table {
         for (let i = 0, iEnd = this.rows.length; i < iEnd; ++i) {
             this.rows[i]?.destroy();
         }
-        for (let i = 0, iEnd = this.pinnedTopRows.length; i < iEnd; ++i) {
-            this.pinnedTopRows[i].destroy();
-        }
-        for (let i = 0, iEnd = this.pinnedBottomRows.length; i < iEnd; ++i) {
-            this.pinnedBottomRows[i].destroy();
-        }
+        this.rowPinningView?.destroy();
 
         fireEvent(this, 'afterDestroy');
     }
@@ -937,7 +918,7 @@ class Table {
     ): void {
         this.tbodyElement.scrollTop = meta.scrollTop;
         this.tbodyElement.scrollLeft = meta.scrollLeft;
-        this.syncPinnedHorizontalScroll(meta.scrollLeft);
+        this.rowPinningView?.syncHorizontalScroll(meta.scrollLeft);
 
         if (meta.focusCursor) {
             const { section, rowId, columnIndex } = meta.focusCursor;
@@ -1007,9 +988,9 @@ class Table {
      */
     public getRenderedRows(): TableRow[] {
         return [
-            ...this.pinnedTopRows,
+            ...(this.rowPinningView?.getRows('top') || []),
             ...this.rows,
-            ...this.pinnedBottomRows
+            ...(this.rowPinningView?.getRows('bottom') || [])
         ];
     }
 
@@ -1029,9 +1010,7 @@ class Table {
         rowId: RowId,
         section: 'top'|'bottom'
     ): TableRow | undefined {
-        return section === 'top' ?
-            this.pinnedTopRowById.get(rowId) :
-            this.pinnedBottomRowById.get(rowId);
+        return this.rowPinningView?.getRenderedPinnedRowById(rowId, section);
     }
 
     /**
@@ -1049,29 +1028,7 @@ class Table {
         rowId: RowId,
         section: 'top'|'bottom'
     ): void {
-        const tbody = section === 'top' ?
-            this.pinnedTopTbodyElement :
-            this.pinnedBottomTbodyElement;
-        const row = this.getRenderedPinnedRowById(rowId, section);
-        const rowElement = row?.htmlElement;
-
-        if (!rowElement || !tbody.isConnected || tbody.clientHeight <= 0) {
-            return;
-        }
-
-        const viewportTop = tbody.scrollTop;
-        const viewportBottom = viewportTop + tbody.clientHeight;
-        const rowTop = rowElement.offsetTop;
-        const rowBottom = rowTop + rowElement.offsetHeight;
-
-        if (rowTop < viewportTop) {
-            tbody.scrollTop = Math.max(0, rowTop);
-            return;
-        }
-
-        if (rowBottom > viewportBottom) {
-            tbody.scrollTop = Math.max(0, rowBottom - tbody.clientHeight);
-        }
+        this.rowPinningView?.revealRowInSection(rowId, section);
     }
 
     /**
@@ -1086,12 +1043,7 @@ class Table {
     public async refreshPinnedRowsFromQueryCycle(
         deferLayout: boolean = false
     ): Promise<void> {
-        await this.grid.rowPinning?.recomputeResolvedFromMaterializedRows();
-        const renderResult = await this.renderPinnedRows(deferLayout);
-        await this.grid.rowPinning?.handlePinnedRenderResult(
-            renderResult,
-            'query'
-        );
+        await this.rowPinningView?.refreshFromQueryCycle(deferLayout);
     }
 
     /**
@@ -1106,224 +1058,9 @@ class Table {
     public async renderPinnedRows(
         deferLayout: boolean = false
     ): Promise<{ missingPinnedRowIds: RowId[] }> {
-        // Cancel any active cell editing before destroying/moving rows to
-        // prevent orphaned inputs and stale cell references.
-        if (this.cellEditing?.editedCell) {
-            this.cellEditing.stopEditing(false);
-        }
-
-        const pinnedRows = this.grid.rowPinning?.getPinnedRows() || {
-            topIds: [],
-            bottomIds: []
+        return await this.rowPinningView?.render(deferLayout) || {
+            missingPinnedRowIds: []
         };
-        const hasPinning = pinnedRows.topIds.length > 0 ||
-            pinnedRows.bottomIds.length > 0;
-        const pinnedSections = this.getPinnedSections(pinnedRows);
-        this.ensurePinnedBodiesRendered(hasPinning);
-
-        if (!hasPinning) {
-            this.clearPinnedRows();
-            this.tbodyElement.style.display = '';
-            if (!deferLayout) {
-                this.setTbodyMinHeight();
-                this.applyPinnedBodyMaxHeights();
-            }
-            this.updateScrollableRowAttributes();
-            await this.syncAriaRowIndexes();
-            return { missingPinnedRowIds: [] };
-        }
-
-        const missingPinnedRowIds: RowId[] = [];
-        for (const section of pinnedSections) {
-            missingPinnedRowIds.push(...await this.syncPinnedRowsByIds(
-                section.rows,
-                section.tbody,
-                section.rowIds,
-                section.position
-            ));
-        }
-
-        this.rebuildPinnedRowLookupMaps();
-        this.updateScrollableRowAttributes();
-        await this.syncAriaRowIndexes();
-
-        for (const section of pinnedSections) {
-            section.tbody.classList.toggle(
-                rowPinningClassNames.pinnedTbodyElementActive,
-                section.rowIds.length > 0
-            );
-        }
-        this.tbodyElement.style.display = '';
-        if (!deferLayout) {
-            this.setTbodyMinHeight();
-            this.applyPinnedBodyMaxHeights();
-            this.syncPinnedHorizontalScroll(this.tbodyElement.scrollLeft);
-            this.applyPinnedScrollbarCompensation();
-        }
-        return {
-            missingPinnedRowIds
-        };
-    }
-
-    /**
-     * Reads pinned tbody max-height options from row pinning config.
-     *
-     * @param position
-     * The pinned section position.
-     */
-    private getPinnedBodyMaxHeight(
-        position: 'top'|'bottom'
-    ): number|string|undefined {
-        const pinningOptions = getGridRowPinningOptions(this.grid);
-        return position === 'top' ?
-            pinningOptions?.top?.maxHeight :
-            pinningOptions?.bottom?.maxHeight;
-    }
-
-    /**
-     * Converts max-height option values to a CSS length.
-     *
-     * @param value
-     * The max-height option value.
-     */
-    private normalizeMaxHeight(
-        value?: number|string
-    ): string {
-        if (typeof value === 'number' && value >= 0) {
-            return value + 'px';
-        }
-        if (typeof value !== 'string') {
-            return '';
-        }
-
-        const trimmed = value.trim();
-        const percentMatch = trimmed.match(/^(\d+(\.\d+)?)%$/);
-        if (percentMatch) {
-            const percent = parseFloat(percentMatch[1]);
-            const tableHeight = this.tableElement.clientHeight ||
-                this.tbodyElement.clientHeight;
-            const pxHeight = Math.max(
-                0, Math.round(tableHeight * percent / 100)
-            );
-            return pxHeight + 'px';
-        }
-
-        if (/^\d+(\.\d+)?px$/.test(trimmed)) {
-            return trimmed;
-        }
-
-        return '';
-    }
-
-    /**
-     * Returns a normalized signature used to detect max-height option changes.
-     */
-    private getPinnedBodyMaxHeightSignature(): string {
-        return [
-            this.normalizeMaxHeight(this.getPinnedBodyMaxHeight('top')),
-            this.normalizeMaxHeight(this.getPinnedBodyMaxHeight('bottom'))
-        ].join('|');
-    }
-
-    /**
-     * Applies optional max-height scrolling behavior to pinned tbodies.
-     */
-    private applyPinnedBodyMaxHeights(): void {
-        const apply = (tbody: HTMLElement, value?: number|string): void => {
-            const maxHeight = this.normalizeMaxHeight(value);
-
-            tbody.style.maxHeight = maxHeight;
-            tbody.style.overflowY = maxHeight ? 'auto' : '';
-            tbody.style.overflowX = maxHeight ? 'hidden' : '';
-        };
-
-        for (const section of this.getPinnedSections()) {
-            apply(section.tbody, this.getPinnedBodyMaxHeight(section.position));
-        }
-    }
-
-    private syncPinnedHorizontalScroll(scrollLeft: number): void {
-        if (!this.pinnedTopTbodyElement.isConnected) {
-            return;
-        }
-
-        const offset = -scrollLeft;
-        const transform = offset ? `translateX(${offset}px)` : '';
-
-        for (const section of this.getPinnedSections()) {
-            section.tbody.scrollLeft = scrollLeft;
-
-            for (let i = 0, iEnd = section.rows.length; i < iEnd; ++i) {
-                section.rows[i].htmlElement.style.transform = transform;
-            }
-        }
-    }
-
-    private async syncPinnedRowsByIds(
-        targetRows: TableRow[],
-        tbody: HTMLElement,
-        rowIds: RowId[],
-        section: 'top'|'bottom'
-    ): Promise<RowId[]> {
-        const missingPinnedRowIds: RowId[] = [];
-        const nextRows: TableRow[] = [];
-
-        for (let i = 0; i < rowIds.length; ++i) {
-            const rowId = rowIds[i];
-            const rowData = this.grid.rowPinning?.getPinnedRowObject(rowId);
-            if (!rowData) {
-                missingPinnedRowIds.push(rowId);
-                continue;
-            }
-
-            const nextIndex = nextRows.length;
-            let row = targetRows[nextIndex];
-
-            if (!row) {
-                row = new TableRow(this, nextIndex);
-                await row.syncPinned(rowId, section, rowData, nextIndex, false);
-                await row.init();
-                await row.render();
-                tbody.appendChild(row.htmlElement);
-            } else {
-                await row.syncPinned(rowId, section, rowData, nextIndex, false);
-                if (!row.htmlElement.isConnected) {
-                    tbody.appendChild(row.htmlElement);
-                }
-            }
-
-            row.reflow();
-            nextRows.push(row);
-        }
-
-        for (let i = nextRows.length; i < targetRows.length; ++i) {
-            targetRows[i].destroy();
-        }
-
-        targetRows.length = 0;
-        for (const row of nextRows) {
-            targetRows.push(row);
-        }
-
-        return missingPinnedRowIds;
-    }
-
-    private rebuildPinnedRowLookupMaps(): void {
-        for (const section of this.getPinnedSections()) {
-            section.rowById.clear();
-
-            for (const row of section.rows) {
-                if (row.id !== void 0) {
-                    section.rowById.set(row.id, row);
-                }
-            }
-        }
-    }
-
-    private updateScrollableRowAttributes(): void {
-        for (let i = 0, iEnd = this.rows.length; i < iEnd; ++i) {
-            this.rows[i].updateRowAttributes();
-        }
     }
 
     public async syncAriaRowIndexes(): Promise<void> {
@@ -1344,128 +1081,13 @@ class Table {
                 'aria-rowcount',
                 (
                     baseRowCount +
-                    this.pinnedTopRows.length +
-                    this.pinnedBottomRows.length +
+                    (this.rowPinningView?.getPinnedRowsCount() || 0) +
                     headerRowsCount
                 ) + ''
             );
         }
     }
 
-    /**
-     * Keeps pinned sections aligned with the scrollable tbody content width by
-     * compensating for the vertical scrollbar gutter.
-     */
-    private applyPinnedScrollbarCompensation(): void {
-        const scrollableBody = this.tbodyElement;
-        const mainGutterWidth = Math.max(
-            0,
-            scrollableBody.offsetWidth - scrollableBody.clientWidth
-        );
-        const applyToPinnedBody = (pinnedBody: HTMLElement): void => {
-            if (!pinnedBody.isConnected) {
-                pinnedBody.style.width = '';
-                return;
-            }
-            const pinnedGutterWidth = Math.max(
-                0,
-                pinnedBody.offsetWidth - pinnedBody.clientWidth
-            );
-            const compensation = Math.max(
-                0,
-                mainGutterWidth - pinnedGutterWidth
-            );
-
-            pinnedBody.style.width = compensation > 0 ?
-                `calc(100% - ${compensation}px)` :
-                '';
-        };
-
-        for (const section of this.getPinnedSections()) {
-            applyToPinnedBody(section.tbody);
-        }
-
-        if (!this.pinnedScrollbarCompensationQueued) {
-            this.pinnedScrollbarCompensationQueued = true;
-            requestAnimationFrame((): void => {
-                this.pinnedScrollbarCompensationQueued = false;
-                for (const section of this.getPinnedSections()) {
-                    applyToPinnedBody(section.tbody);
-                }
-            });
-        }
-    }
-
-    /**
-     * Ensure pinned tbody elements are attached only when row pinning is
-     * active, keeping a single tbody in the default non-pinning mode.
-     *
-     * @param shouldRender
-     * Whether pinned tbody elements should be attached.
-     */
-    private ensurePinnedBodiesRendered(shouldRender: boolean): void {
-        if (!shouldRender) {
-            for (const section of this.getPinnedSections()) {
-                if (section.tbody.parentElement === this.tableElement) {
-                    section.tbody.remove();
-                }
-            }
-            return;
-        }
-
-        for (const section of this.getPinnedSections()) {
-            if (section.tbody.parentElement === this.tableElement) {
-                continue;
-            }
-
-            if (section.position === 'top') {
-                this.tableElement.insertBefore(
-                    section.tbody,
-                    this.tbodyElement
-                );
-            } else {
-                this.tableElement.appendChild(section.tbody);
-            }
-        }
-    }
-
-    private clearPinnedRows(): void {
-        for (const section of this.getPinnedSections()) {
-            section.rows.forEach((row): void => row.destroy());
-            section.rows.length = 0;
-            section.rowById.clear();
-        }
-    }
-
-    private getPinnedSections(
-        pinnedRows: { topIds: RowId[]; bottomIds: RowId[] } = {
-            topIds: [],
-            bottomIds: []
-        }
-    ): PinnedSectionDescriptor[] {
-        return [{
-            position: 'top',
-            rowIds: pinnedRows.topIds,
-            rows: this.pinnedTopRows,
-            tbody: this.pinnedTopTbodyElement,
-            rowById: this.pinnedTopRowById
-        }, {
-            position: 'bottom',
-            rowIds: pinnedRows.bottomIds,
-            rows: this.pinnedBottomRows,
-            tbody: this.pinnedBottomTbodyElement,
-            rowById: this.pinnedBottomRowById
-        }];
-    }
-
-}
-
-interface PinnedSectionDescriptor {
-    position: 'top'|'bottom';
-    rowIds: RowId[];
-    rows: TableRow[];
-    tbody: HTMLElement;
-    rowById: Map<RowId, TableRow>;
 }
 
 export type FocusCursor =

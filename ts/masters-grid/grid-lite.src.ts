@@ -37,7 +37,6 @@ import SvgIcons from '../Grid/Core/UI/SvgIcons.js';
 import Pagination from '../Grid/Core/Pagination/Pagination.js';
 import DataProviderRegistry from '../Grid/Core/Data/DataProviderRegistry.js';
 import ResponsiveComposition from '../Grid/Core/Responsive/ResponsiveComposition.js';
-import RowPinningComposition from '../Grid/Core/RowPinning/RowPinningComposition.js';
 import { merge } from '../Shared/Utilities.js';
 
 // Fill registries
@@ -88,7 +87,6 @@ const G = {
 
 CreditsLiteComposition.compose(G.Grid, G.Table);
 ResponsiveComposition.compose(G.Grid);
-RowPinningComposition.compose(G.Grid);
 
 
 /* *

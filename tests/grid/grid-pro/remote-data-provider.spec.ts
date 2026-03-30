@@ -212,7 +212,9 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll('tr[data-row-id]')
+                vp.pinnedTopTbodyElement.querySelectorAll(
+                    'tr[data-row-id]'
+                ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
             const scrollToRow = async (rowIndex: number): Promise<void> => {
                 vp.scrollToRow(rowIndex);
@@ -221,12 +223,12 @@ test.describe('RemoteDataProvider', () => {
             };
 
             await settle();
-            await grid.pinRow(25);
-            await grid.pinRow(75);
+            await grid.rowPinning.pin(25);
+            await grid.rowPinning.pin(75);
             await settle();
 
             const initial = {
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -282,7 +284,9 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll('tr[data-row-id]')
+                vp.pinnedTopTbodyElement.querySelectorAll(
+                    'tr[data-row-id]'
+                ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
             const scrollToRow = async (rowIndex: number): Promise<void> => {
                 vp.scrollToRow(rowIndex);
@@ -291,11 +295,11 @@ test.describe('RemoteDataProvider', () => {
             };
 
             await settle();
-            await grid.pinRow(5);
+            await grid.rowPinning.pin(5);
             await settle();
 
             const afterPin = {
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -304,11 +308,11 @@ test.describe('RemoteDataProvider', () => {
                 pinnedTop: getPinnedTopIds()
             };
 
-            await grid.unpinRow(5);
+            await grid.rowPinning.unpin(5);
             await settle();
 
             const afterUnpin = {
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -360,16 +364,18 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll('tr[data-row-id]')
+                vp.pinnedTopTbodyElement.querySelectorAll(
+                    'tr[data-row-id]'
+                ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
 
             await settle();
-            await grid.pinRow(5);
+            await grid.rowPinning.pin(5);
             await settle();
 
             const page1 = {
                 currentPage: grid.querying.pagination.currentPage,
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -382,16 +388,16 @@ test.describe('RemoteDataProvider', () => {
 
             const page2 = {
                 currentPage: grid.querying.pagination.currentPage,
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
-            await grid.unpinRow(5);
+            await grid.rowPinning.unpin(5);
             await settle();
 
             const afterUnpin = {
                 currentPage: grid.querying.pagination.currentPage,
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -447,11 +453,13 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll('tr[data-row-id]')
+                vp.pinnedTopTbodyElement.querySelectorAll(
+                    'tr[data-row-id]'
+                ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
 
             await settle();
-            await grid.pinRow(5);
+            await grid.rowPinning.pin(5);
             await settle();
 
             const beforeSort = {
@@ -470,7 +478,7 @@ test.describe('RemoteDataProvider', () => {
             await settle();
 
             const afterSort = {
-                pinnedState: grid.getPinnedRows(),
+                pinnedState: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds(),
                 firstRowId: await grid.dataProvider.getRowId(0)
             };

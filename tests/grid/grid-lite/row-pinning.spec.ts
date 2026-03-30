@@ -1,8 +1,8 @@
 import { test, expect } from '~/fixtures.ts';
 
-test.describe('Grid Lite row pinning', () => {
+test.describe('Grid Pro row pinning', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('grid-lite/demo/minimal-grid');
+        await page.goto('/grid-pro/basic/overview');
 
         await page.evaluate(() => {
             const rowCount = 60;
@@ -41,7 +41,7 @@ test.describe('Grid Lite row pinning', () => {
             ) as HTMLInputElement | null;
 
             function updatePinnedInputs(grid: any): void {
-                const pinned = grid.getPinnedRows();
+                const pinned = grid.rowPinning.getPinnedRows();
 
                 if (topInput) {
                     topInput.value = pinned.topIds.join(',');
@@ -81,8 +81,10 @@ test.describe('Grid Lite row pinning', () => {
             });
 
             function wrapPinnedMethod(methodName: string): void {
-                const method = grid[methodName].bind(grid);
-                grid[methodName] = function (
+                const method = grid.rowPinning[
+                    methodName
+                ]?.bind(grid.rowPinning);
+                grid.rowPinning[methodName] = function (
                     ...args: Array<any>
                 ): Promise<any> {
                     return Promise.resolve(method(...args)).then((result) => {
@@ -92,9 +94,9 @@ test.describe('Grid Lite row pinning', () => {
                 };
             }
 
-            wrapPinnedMethod('pinRow');
-            wrapPinnedMethod('toggleRow');
-            wrapPinnedMethod('unpinRow');
+            wrapPinnedMethod('pin');
+            wrapPinnedMethod('toggle');
+            wrapPinnedMethod('unpin');
 
             (window as any).grid = grid;
             updatePinnedInputs(grid);
@@ -272,8 +274,8 @@ test.describe('Grid Lite row pinning', () => {
                 }
             });
 
-            await grid.pinRow('ROW-001', 'top');
-            await grid.unpinRow('ROW-020');
+            await grid.rowPinning.pin('ROW-001', 'top');
+            await grid.rowPinning.unpin('ROW-020');
 
             return { calls };
         });
@@ -285,7 +287,7 @@ test.describe('Grid Lite row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
 
-            await grid.pinRow('ROW-010', 'top');
+            await grid.rowPinning.pin('ROW-010', 'top');
 
             const topRow = grid.viewport.getRenderedPinnedRowById(
                 'ROW-010',
@@ -320,7 +322,7 @@ test.describe('Grid Lite row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
 
-            await grid.pinRow('ROW-020', 'bottom');
+            await grid.rowPinning.pin('ROW-020', 'bottom');
 
             const bottomRow = grid.viewport.getRenderedPinnedRowById(
                 'ROW-020',
@@ -397,7 +399,7 @@ test.describe('Grid Lite row pinning', () => {
             });
 
             const afterDisable = {
-                pinned: grid.getPinnedRows(),
+                pinned: grid.rowPinning.getPinnedRows(),
                 topConnected: (
                     grid.viewport.pinnedTopTbodyElement.parentElement ===
                     grid.viewport.tableElement
@@ -408,14 +410,14 @@ test.describe('Grid Lite row pinning', () => {
                 )
             };
 
-            await grid.pinRow('ROW-005', 'top');
-            await grid.toggleRow('ROW-006', 'bottom');
-            await grid.unpinRow('ROW-001');
+            await grid.rowPinning.pin('ROW-005', 'top');
+            await grid.rowPinning.toggle('ROW-006', 'bottom');
+            await grid.rowPinning.unpin('ROW-001');
 
             return {
                 afterDisable,
                 afterRuntimeCalls: {
-                    pinned: grid.getPinnedRows(),
+                    pinned: grid.rowPinning.getPinnedRows(),
                     topConnected: (
                         grid.viewport.pinnedTopTbodyElement.parentElement ===
                         grid.viewport.tableElement
@@ -714,9 +716,9 @@ test.describe('Grid Lite row pinning', () => {
             });
 
             const before = activePage();
-            await grid.pinRow('ROW-012', 'top');
+            await grid.rowPinning.pin('ROW-012', 'top');
             const afterPin = activePage();
-            await grid.unpinRow('ROW-012');
+            await grid.rowPinning.unpin('ROW-012');
             const afterUnpin = activePage();
 
             return {
@@ -731,7 +733,7 @@ test.describe('Grid Lite row pinning', () => {
         expect(state.afterUnpin).toBe('2');
     });
 
-    test('pinRow supports insertion index within pinned collection', async ({ page }) => {
+    test('grid.rowPinning.pin supports insertion index within pinned collection', async ({ page }) => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
@@ -750,10 +752,10 @@ test.describe('Grid Lite row pinning', () => {
                 }
             });
 
-            await grid.pinRow('ROW-010', 'top', 0);
+            await grid.rowPinning.pin('ROW-010', 'top', 0);
             const afterFirstInsert = getPinnedTopIds();
 
-            await grid.pinRow('ROW-011', 'top', 1);
+            await grid.rowPinning.pin('ROW-011', 'top', 1);
             const afterSecondInsert = getPinnedTopIds();
 
             return {
@@ -799,7 +801,7 @@ test.describe('Grid Lite row pinning', () => {
             });
 
             const beforeUnpin = getPinnedTopIds();
-            await grid.unpinRow('ROW-001');
+            await grid.rowPinning.unpin('ROW-001');
 
             await grid.update({
                 columns: [{
@@ -1025,7 +1027,7 @@ test.describe('Grid Lite row pinning', () => {
             ).map((el: Element) => (el.textContent || '').trim());
 
             const before = {
-                pinning: grid.getPinnedRows(),
+                pinning: grid.rowPinning.getPinnedRows(),
                 pinnedTop: getPinnedTopIds()
             };
 
@@ -1052,7 +1054,7 @@ test.describe('Grid Lite row pinning', () => {
             return {
                 before,
                 after: {
-                    pinning: grid.getPinnedRows(),
+                    pinning: grid.rowPinning.getPinnedRows(),
                     pinnedTop: getPinnedTopIds(),
                     topRows: grid.viewport.pinnedTopRows.length
                 }
@@ -1083,7 +1085,7 @@ test.describe('Grid Lite row pinning', () => {
             });
 
             return {
-                pinning: grid.getPinnedRows(),
+                pinning: grid.rowPinning.getPinnedRows(),
                 topRows: grid.viewport.pinnedTopRows.length,
                 bottomRows: grid.viewport.pinnedBottomRows.length
             };
@@ -1117,11 +1119,11 @@ test.describe('Grid Lite row pinning', () => {
             targetRowCell?.focus();
             const before = getActiveRowId();
 
-            await grid.pinRow('ROW-006', 'top');
+            await grid.rowPinning.pin('ROW-006', 'top');
             await new Promise((resolve) => setTimeout(resolve, 0));
             const afterPin = getActiveRowId();
 
-            await grid.unpinRow('ROW-006');
+            await grid.rowPinning.unpin('ROW-006');
             await new Promise((resolve) => setTimeout(resolve, 0));
             const afterUnpin = getActiveRowId();
 
@@ -1161,9 +1163,9 @@ test.describe('Grid Lite row pinning', () => {
                 }
             });
 
-            const stringPinned = grid.getPinnedRows();
-            await grid.pinRow(1, 'top');
-            const numericPinned = grid.getPinnedRows();
+            const stringPinned = grid.rowPinning.getPinnedRows();
+            await grid.rowPinning.pin(1, 'top');
+            const numericPinned = grid.rowPinning.getPinnedRows();
 
             return {
                 stringPinned,

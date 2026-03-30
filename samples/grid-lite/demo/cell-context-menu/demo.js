@@ -222,14 +222,6 @@ const menuItems = [{
 }, {
     separator: true
 }, {
-    label: 'Pinning',
-    icon: 'pin',
-    items: [
-        'pinRowTop',
-        'pinRowBottom',
-        'unpinRow'
-    ]
-}, {
     label: 'Edit',
     items: [{
         label: 'Rows',

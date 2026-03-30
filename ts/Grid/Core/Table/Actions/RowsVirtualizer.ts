@@ -86,6 +86,24 @@ class RowsVirtualizer {
     public rowSettings?: RowsSettings;
 
     /**
+     * Optional extension hook to post-process effective row count.
+     *
+     * TODO: Make this more generic.
+     * @internal
+     */
+    public getEffectiveRowCount?: (
+        providerRowCount: number
+    ) => Promise<number>;
+
+    /**
+     * Optional extension hook invoked after visible rows are rendered.
+     *
+     * TODO: Make this more generic.
+     * @internal
+     */
+    public afterRenderRows?: () => Promise<void>;
+
+    /**
      * Cached max element height in CSS pixels.
      */
     private static maxElementHeight?: number;
@@ -348,31 +366,6 @@ class RowsVirtualizer {
             tbody.scrollTop = oldScrollTop;
         }
         tbody.scrollLeft = oldScrollLeft;
-    }
-
-    private async syncRemotePinnedRowsFromCache(): Promise<void> {
-        const { grid } = this.viewport;
-
-        if (
-            grid.options?.data?.providerType !== 'remote' ||
-            !grid.rowPinning?.isEnabled()
-        ) {
-            return;
-        }
-
-        const pinnedRows = grid.rowPinning.getPinnedRows();
-        const pinnedIds = [
-            ...pinnedRows.topIds,
-            ...pinnedRows.bottomIds
-        ];
-
-        if (!pinnedIds.length) {
-            return;
-        }
-
-        await grid.rowPinning.ensurePinnedRowsAvailable(pinnedIds);
-        const renderResult = await this.viewport.renderPinnedRows(true);
-        await grid.rowPinning.handlePinnedRenderResult(renderResult, 'query');
     }
 
     /**
@@ -754,7 +747,7 @@ class RowsVirtualizer {
             }
 
             await vp.syncAriaRowIndexes();
-            await this.syncRemotePinnedRowsFromCache();
+            await this.afterRenderRows?.();
         } finally {
             this.isRendering = false;
 
@@ -1022,27 +1015,12 @@ class RowsVirtualizer {
      * overflow-aware scrolling.
      */
     private async updateGridMetrics(): Promise<void> {
-        const dataProvider = this.viewport.grid.dataProvider;
-        const providerRowCount = await dataProvider?.getRowCount();
+        const providerRowCount = await this.viewport.grid.dataProvider
+            ?.getRowCount();
         this.rowCount = defined(providerRowCount) ? providerRowCount : 0;
-
-        if (this.viewport.grid.querying.pagination.enabled) {
-            const pinnedRows = this.viewport.grid.rowPinning?.getPinnedRows();
-            const pinnedSet = new Set([
-                ...(pinnedRows?.topIds || []),
-                ...(pinnedRows?.bottomIds || [])
-            ]);
-            let pinnedCount = 0;
-
-            for (let i = 0; i < this.rowCount; ++i) {
-                const rowId = await dataProvider?.getRowId(i);
-                if (defined(rowId) && pinnedSet.has(rowId)) {
-                    ++pinnedCount;
-                }
-            }
-
-            this.rowCount = Math.max(this.rowCount - pinnedCount, 0);
-        }
+        this.rowCount = this.getEffectiveRowCount ?
+            await this.getEffectiveRowCount(this.rowCount) :
+            this.rowCount;
 
         this.totalGridHeight = this.rowCount * this.defaultRowHeight;
         this.gridHeightOverflow = Math.max(

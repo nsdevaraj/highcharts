@@ -36,7 +36,7 @@ test.describe('Cell Context Menu', () => {
                 const row = productCell.locator('xpath=ancestor::tr[1]');
                 await expect(row).toHaveAttribute('data-row-index', /.+/);
 
-                const rowIndex = (await row.getAttribute('data-row-index')) ?? '';
+                const rowIndex = await row.getAttribute('data-row-index');
                 const value = ((await productCell.textContent()) ?? '').trim();
                 const expected = rowIndex + '|product|' + value;
 
@@ -55,10 +55,12 @@ test.describe('Cell Context Menu', () => {
         });
     }
 
-    test.describe('Grid Lite', () => {
+    test.describe('Grid Pro', () => {
         test.beforeEach(async ({ page }) => {
             await page.setViewportSize({ width: 900, height: 500 });
-            await page.goto('/grid-lite/e2e/cell-context-menu', { waitUntil: 'networkidle' });
+            await page.goto('/grid-pro/basic/overview', {
+                waitUntil: 'networkidle'
+            });
 
             await page.waitForFunction(() => {
                 return typeof (window as any).Grid !== 'undefined' &&
@@ -203,8 +205,72 @@ test.describe('Cell Context Menu', () => {
         });
 
         test('Context menu closes after scrolling and refreshes context', async ({ page }) => {
+            await page.evaluate(() => {
+                const existing = document.getElementById('cm-scroll');
+                existing?.remove();
+                document.getElementById('cellContextMenuResult')?.remove();
+
+                const result = document.createElement('input');
+                result.id = 'cellContextMenuResult';
+                document.body.appendChild(result);
+
+                const container = document.createElement('div');
+                container.id = 'cm-scroll';
+                container.style.height = '420px';
+                document.body.appendChild(container);
+
+                const rows = 200;
+                const products: string[] = [];
+                const weights: number[] = [];
+
+                for (let i = 0; i < rows; ++i) {
+                    products.push('Product ' + (i + 1));
+                    weights.push(i + 1);
+                }
+
+                (window as any).cmScrollGrid = (window as any).Grid.grid(
+                    container,
+                    {
+                        data: {
+                            columns: {
+                                product: products,
+                                weight: weights
+                            }
+                        },
+                        rendering: {
+                            rows: {
+                                virtualization: true
+                            }
+                        },
+                        columnDefaults: {
+                            cells: {
+                                contextMenu: {
+                                    items: [{
+                                        label: 'Show context',
+                                        icon: 'menu',
+                                        onClick: function (cell) {
+                                            const input = document
+                                                .getElementById(
+                                                    'cellContextMenuResult'
+                                                ) as HTMLInputElement | null;
+
+                                            if (input) {
+                                                input.value =
+                                                    cell.row.index + '|' +
+                                                    cell.column.id + '|' +
+                                                    cell.value;
+                                            }
+                                        }
+                                    }]
+                                }
+                            }
+                        }
+                    }
+                );
+            });
+
             const initialState = await page.evaluate(() => {
-                const grid = (window as any).Grid.grids[0];
+                const grid = (window as any).cmScrollGrid;
                 const vp = grid.viewport;
                 return {
                     virtual: vp.virtualRows,
@@ -217,19 +283,19 @@ test.describe('Cell Context Menu', () => {
             expect(initialState.firstIndex).not.toBeNull();
 
             const productCell = page.locator(
-                'tbody tr[data-row-index="1"] td[data-column-id="product"]'
+                '#cm-scroll tbody tr[data-row-index="1"] td[data-column-id="product"]'
             );
 
             await productCell.click({ button: 'right' });
 
-            const popup = page.locator('.hcg-popup');
+            const popup = page.locator('.hcg-popup').last();
             await expect(popup).toBeVisible();
 
             const initialBox = await popup.boundingBox();
             expect(initialBox, 'Popup should have a bounding box.').not.toBeNull();
 
             await page.evaluate((rowHeight) => {
-                const grid = (window as any).Grid.grids[0];
+                const grid = (window as any).cmScrollGrid;
                 const vp = grid.viewport;
                 const target = vp.tbodyElement;
                 target.scrollTop += rowHeight * 100;
@@ -237,7 +303,7 @@ test.describe('Cell Context Menu', () => {
             }, initialState.rowHeight);
 
             await page.waitForFunction((firstIndex: number | null) => {
-                const grid = (window as any).Grid.grids[0];
+                const grid = (window as any).cmScrollGrid;
                 const vp = grid.viewport;
                 return vp.rows[0]?.index !== firstIndex;
             }, initialState.firstIndex, { timeout: 10000 });
@@ -245,7 +311,7 @@ test.describe('Cell Context Menu', () => {
             await expect(popup).toBeHidden();
 
             const productCellAfterScroll = page.locator(
-                'tbody tr:first-child td[data-column-id="product"]'
+                '#cm-scroll tbody tr:first-child td[data-column-id="product"]'
             );
 
             await expect(productCellAfterScroll).toBeVisible();
@@ -257,7 +323,7 @@ test.describe('Cell Context Menu', () => {
             await expect(rowAfterScroll).toHaveAttribute('data-row-index', /.+/);
 
             const rowIndexAfterScroll =
-                (await rowAfterScroll.getAttribute('data-row-index')) ?? '';
+                await rowAfterScroll.getAttribute('data-row-index');
             const valueAfterScroll = ((await productCellAfterScroll.textContent()) ?? '').trim();
             const expected = rowIndexAfterScroll + '|product|' + valueAfterScroll;
 

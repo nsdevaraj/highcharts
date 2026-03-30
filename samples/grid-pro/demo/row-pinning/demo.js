@@ -56,5 +56,5 @@ const grid = Grid.grid('container', {
     }
 });
 
-const pinned = grid.getPinnedRows();
+const pinned = grid.rowPinning.getPinnedRows();
 renderPinned(pinned.topIds, pinned.bottomIds);
