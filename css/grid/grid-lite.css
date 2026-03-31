@@ -252,6 +252,8 @@
         display: block;
         overflow: hidden;
         flex: 0 0 auto;
+        position: relative;
+        z-index: 1;
 
         > tr {
             display: block;
@@ -259,22 +261,11 @@
     }
 
     > tbody.hcg-tbody-pinned-top {
-        position: relative;
-        z-index: 1;
-        border-bottom: var(--ig-pinned-border);
         border-radius: 0;
-        box-shadow: var(--ig-pinned-top-shadow);
 
         > tr:last-of-type td {
             border-radius: 0;
         }
-    }
-
-    > tbody.hcg-tbody-pinned-bottom {
-        position: relative;
-        z-index: 1;
-        border-top: var(--ig-pinned-border);
-        box-shadow: var(--ig-pinned-bottom-shadow);
     }
 
     > tbody:not(.hcg-tbody-pinned) {
