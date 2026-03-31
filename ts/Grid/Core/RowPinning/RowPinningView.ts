@@ -280,7 +280,10 @@ class RowPinningView {
     }
 
     public syncHorizontalScroll(scrollLeft: number): void {
-        if (!this.pinnedTopTbodyElement.isConnected) {
+        const hasPinnedBody = this.getPinnedSections()
+            .some((section): boolean => section.tbody.isConnected);
+
+        if (!hasPinnedBody) {
             return;
         }
 
@@ -288,7 +291,13 @@ class RowPinningView {
         const transform = offset ? `translateX(${offset}px)` : '';
 
         for (const section of this.getPinnedSections()) {
-            section.tbody.scrollLeft = scrollLeft;
+            if (!section.tbody.isConnected) {
+                continue;
+            }
+
+            // Keep pinned rows aligned via transform only. Updating both the
+            // tbody scroll position and the row transform shifts content twice.
+            section.tbody.scrollLeft = 0;
 
             for (let i = 0, iEnd = section.rows.length; i < iEnd; ++i) {
                 section.rows[i].htmlElement.style.transform = transform;
