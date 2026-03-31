@@ -1269,12 +1269,9 @@ namespace ExportData {
                     className = 'highcharts-empty';
                 }
 
-                if (tagName === 'th' && attributes['aria-sort']) {
+                if (tagName === 'th' && attributes.scope === 'col') {
                     children.push({
                         tagName: 'button',
-                        attributes: {
-                            'aria-pressed': true
-                        },
                         textContent,
                         style: {
                             color: 'inherit',
@@ -1345,8 +1342,7 @@ namespace ExportData {
                                 'highcharts-table-topheading',
                                 {
                                     scope: 'col',
-                                    colspan: curColspan + 1,
-                                    'aria-sort': 'none'
+                                    colspan: curColspan + 1
                                 },
                                 cur
                             ));
@@ -1370,7 +1366,7 @@ namespace ExportData {
                             const cell = getCellHTMLFromValue(
                                 'th',
                                 'highcharts-table-topheading',
-                                { scope: 'col', 'aria-sort': 'none' },
+                                { scope: 'col' },
                                 cur
                             );
                             if (rowspan > 1 && cell.attributes) {
@@ -1400,8 +1396,7 @@ namespace ExportData {
                                     'th',
                                     null,
                                     {
-                                        scope: 'col',
-                                        'aria-sort': 'none'
+                                        scope: 'col'
                                     },
                                     subheaders[i]
                                 )
@@ -1696,7 +1691,7 @@ namespace ExportData {
                                 });
 
                                 if (header !== th) {
-                                    header.setAttribute('aria-sort', 'none');
+                                    header.removeAttribute('aria-sort');
                                 }
                             });
 

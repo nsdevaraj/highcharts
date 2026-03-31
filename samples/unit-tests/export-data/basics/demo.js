@@ -638,7 +638,7 @@ QUnit.test('Missing data in first series (#78)', function (assert) {
             .replace('<caption>Chart title</caption>', '')
             .replace(/>/g, '>\n'),
         // eslint-disable-next-line max-len
-        '<table><caption class=\"highcharts-table-caption\">Chart title</caption><thead><tr><th class=\"highcharts-text\" scope=\"col\" aria-sort=\"none\"><button aria-pressed=\"true\">Category</button></th><th class=\"highcharts-text\" scope=\"col\" aria-sort=\"none\"><button aria-pressed=\"true\">Drop 2</button></th><th class=\"highcharts-text\" scope=\"col\" aria-sort=\"none\"><button aria-pressed=\"true\">Full</button></th></tr></thead><tbody><tr><th class=\"highcharts-number\" scope=\"row\">0</th><td class=\"highcharts-number\">1</td><td class=\"highcharts-number\">1</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">1</th><td class=\"highcharts-number\">1</td><td class=\"highcharts-number\">1</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">2</th><td class=\"highcharts-empty\"></td><td class=\"highcharts-number\">2</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">3</th><td class=\"highcharts-number\">3</td><td class=\"highcharts-number\">3</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">4</th><td class=\"highcharts-number\">4</td><td class=\"highcharts-number\">4</td></tr></tbody></table>'
+        '<table><caption class=\"highcharts-table-caption\">Chart title</caption><thead><tr><th class=\"highcharts-text\" scope=\"col\"><button>Category</button></th><th class=\"highcharts-text\" scope=\"col\"><button>Drop 2</button></th><th class=\"highcharts-text\" scope=\"col\"><button>Full</button></th></tr></thead><tbody><tr><th class=\"highcharts-number\" scope=\"row\">0</th><td class=\"highcharts-number\">1</td><td class=\"highcharts-number\">1</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">1</th><td class=\"highcharts-number\">1</td><td class=\"highcharts-number\">1</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">2</th><td class=\"highcharts-empty\"></td><td class=\"highcharts-number\">2</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">3</th><td class=\"highcharts-number\">3</td><td class=\"highcharts-number\">3</td></tr><tr><th class=\"highcharts-number\" scope=\"row\">4</th><td class=\"highcharts-number\">4</td><td class=\"highcharts-number\">4</td></tr></tbody></table>'
             .replace(/>/g, '>\n'),
         'Empty data in table'
     );
@@ -1498,8 +1498,8 @@ QUnit.test('Sortable table (#16972)', function (assert) {
 
     assert.strictEqual(
         headers[0].getAttribute('aria-sort'),
-        'none',
-        'When sorting a different column, previous aria-sort should reset.'
+        null,
+        'When sorting a different column, previous aria-sort should be removed.'
     );
     assert.strictEqual(
         headers[1].getAttribute('aria-sort'),
@@ -1508,8 +1508,8 @@ QUnit.test('Sortable table (#16972)', function (assert) {
     );
     assert.strictEqual(
         headers[2].getAttribute('aria-sort'),
-        'none',
-        'Unsorted columns should keep aria-sort set to none.'
+        null,
+        'Unsorted columns should not have aria-sort.'
     );
 });
 
