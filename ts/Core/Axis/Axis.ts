@@ -3826,6 +3826,9 @@ class Axis {
             if (axis.staggerLines) {
                 labelOffset *= axis.staggerLines;
             }
+            if (!horiz && isNumber(axis.labelRotation)) {
+                labelOffset -= Math.abs(axis.tickRotCorr.x);
+            }
             axis.labelOffset = labelOffset * (axis.opposite ? -1 : 1);
 
         } else { // Doesn't have data
@@ -3888,7 +3891,8 @@ class Axis {
                     ) :
                     pick(
                         labelOptions.x,
-                        directionFactor * labelOptions.distance
+                        axis.tickRotCorr.x +
+                            directionFactor * labelOptions.distance
                     )
             );
         }
