@@ -97,6 +97,16 @@ class Table {
     public rows: TableRow[] = [];
 
     /**
+     * Optional supplemental row rendered by composed modules.
+     */
+    public treeStickyRow?: TableRow;
+
+    /**
+     * Optional supplemental rows rendered by composed modules.
+     */
+    public treeStickyRows?: TableRow[];
+
+    /**
      * The resize observer for the table container.
      * @internal
      */
@@ -420,6 +430,7 @@ class Table {
         });
 
         this.grid.dirtyFlags.delete('reflow');
+        fireEvent(this, 'afterReflow');
     }
 
     /**
@@ -628,14 +639,21 @@ class Table {
         }
 
         const rowClass = '.' + Globals.getClassName('rowElement');
-        const firstRowTop = this.tbodyElement
-            .querySelectorAll(rowClass)[0]
-            .getBoundingClientRect().top;
+        const stickyRows = new Set(
+            (this.treeStickyRows || (this.treeStickyRow ?
+                [this.treeStickyRow] :
+                []))
+                .map((row): HTMLTableRowElement => row.htmlElement)
+        );
+        const rows = Array.from(this.tbodyElement.querySelectorAll(rowClass))
+            .filter(
+                (row): boolean =>
+                    !stickyRows.has(row as HTMLTableRowElement)
+            );
+        const firstRowTop = rows[0].getBoundingClientRect().top;
 
         this.tbodyElement.scrollTop = (
-            this.tbodyElement
-                .querySelectorAll(rowClass)[index]
-                .getBoundingClientRect().top
+            rows[index].getBoundingClientRect().top
         ) - firstRowTop;
     }
 
@@ -695,6 +713,18 @@ class Table {
             return;
         }
 
+        const cellIndex = Array.prototype.indexOf.call(tr.children, td);
+        const stickyRows = this.treeStickyRows || (
+            this.treeStickyRow ? [this.treeStickyRow] : []
+        );
+        const stickyRow = stickyRows.find(
+            (row): boolean => row.htmlElement === tr
+        );
+
+        if (stickyRow) {
+            return stickyRow.cells[cellIndex];
+        }
+
         const rowIndexAttr = tr.getAttribute('data-row-index');
         if (rowIndexAttr === null) {
             return;
@@ -707,8 +737,6 @@ class Table {
             return;
         }
 
-        // Find cell index by position in row
-        const cellIndex = Array.prototype.indexOf.call(tr.children, td);
         return row.cells[cellIndex];
     }
 

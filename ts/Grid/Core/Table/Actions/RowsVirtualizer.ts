@@ -857,6 +857,49 @@ class RowsVirtualizer {
     }
 
     /**
+     * Estimates the current top offset of a row in the virtualized scroll
+     * space, accounting for the active scroll compression offset.
+     *
+     * @param index
+     * The row index in the projected data order.
+     *
+     * @returns
+     * The estimated top offset in pixels.
+     */
+    public getEstimatedRowTop(index: number): number {
+        const topOffset = index * this.defaultRowHeight;
+
+        if (
+            !this.viewport.virtualRows ||
+            this.gridHeightOverflow <= 0
+        ) {
+            return topOffset;
+        }
+
+        return Math.floor(topOffset - this.scrollOffset);
+    }
+
+    /**
+     * Estimates the current bottom offset of a row in the virtualized scroll
+     * space.
+     *
+     * @param index
+     * The row index in the projected data order.
+     *
+     * @param rowHeight
+     * The height of the row.
+     *
+     * @returns
+     * The estimated bottom offset in pixels.
+     */
+    public getEstimatedRowBottom(
+        index: number,
+        rowHeight: number = this.defaultRowHeight
+    ): number {
+        return this.getEstimatedRowTop(index) + rowHeight;
+    }
+
+    /**
      * Gets a row from the pool or creates a new one for the given index.
      *
      * @param index

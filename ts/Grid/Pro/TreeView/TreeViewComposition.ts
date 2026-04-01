@@ -24,6 +24,7 @@
 import type Grid from '../../Core/Grid';
 import type { RowId } from '../../Core/Data/DataProvider';
 import type Table from '../../Core/Table/Table';
+import type TableRow from '../../Core/Table/Body/TableRow';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
 import type {
@@ -34,6 +35,7 @@ import type {
 
 import Globals from '../../Core/Globals.js';
 import TreeProjectionController from './TreeProjectionController.js';
+import TreeStickyRowController from './TreeStickyRowController.js';
 import { createGridIcon } from '../../Core/UI/SvgIcons.js';
 import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
 
@@ -48,6 +50,7 @@ type TreeToggleClickListener = (event: MouseEvent) => void;
 type TreeToggleDblClickListener = (event: MouseEvent) => void;
 type TreeToggleMouseDownListener = (event: MouseEvent) => void;
 type TreeToggleKeyDownListener = (event: KeyboardEvent) => void;
+type TreeToggleScrollListener = () => void;
 type TreeToggleContext = {
     cell: TableCell;
     controller: TreeProjectionController;
@@ -58,11 +61,33 @@ type TreeToggleListeners = {
     dblClick: TreeToggleDblClickListener;
     mouseDown: TreeToggleMouseDownListener;
     keyDown: TreeToggleKeyDownListener;
+    scroll?: TreeToggleScrollListener;
+    stickyBody?: HTMLElement;
 };
 
 const treeToggleAttribute = 'data-hcg-tree-toggle';
 const treeToggleSelector = '[' + treeToggleAttribute + ']';
 const treeToggleListeners = new WeakMap<Table, TreeToggleListeners>();
+
+/**
+ * Returns whether an element belongs to the main body or sticky overlay body.
+ *
+ * @param table
+ * Table viewport handling the event.
+ *
+ * @param element
+ * DOM element from the delegated event.
+ */
+function isTreeEventElementWithinRoots(
+    table: Table,
+    element: Element
+): boolean {
+    return table.tbodyElement.contains(element) || (
+        table.treeStickyRowController
+            ?.getStickyBodyElement()
+            .contains(element) || false
+    );
+}
 
 /**
  * Composes Grid Pro with TreeView projection infrastructure.
@@ -86,10 +111,14 @@ export function compose(
     }
 
     addEvent(GridClass, 'beforeLoad', onBeforeLoad);
+    addEvent(GridClass, 'afterLoad', onAfterLoad);
     addEvent(GridClass, 'beforeDestroy', onBeforeDestroy);
+    addEvent(GridClass, 'afterRedraw', onAfterRedraw);
     addEvent(GridClass, 'beforeTreeRowToggle', onBeforeTreeRowToggle);
     addEvent(GridClass, 'afterTreeRowToggle', onAfterTreeRowToggle);
     addEvent(TableClass, 'beforeInit', onTableBeforeInit);
+    addEvent(TableClass, 'afterInit', onTableAfterInit);
+    addEvent(TableClass, 'afterReflow', onTableAfterReflow);
     addEvent(TableClass, 'afterDestroy', onTableAfterDestroy);
     addEvent(TableCellClass, 'afterRender', onAfterCellRender);
 }
@@ -101,6 +130,13 @@ function onBeforeLoad(this: Grid): void {
     if (!this.treeView) {
         this.treeView = new TreeProjectionController(this);
     }
+}
+
+/**
+ * Schedules sticky parent row refresh after initial render.
+ */
+function onAfterLoad(this: Grid): void {
+    this.viewport?.treeStickyRowController?.scheduleRefresh(false, true);
 }
 
 /**
@@ -145,6 +181,13 @@ function onAfterTreeRowToggle(
     e: AfterTreeRowToggleEvent
 ): void {
     this.options?.events?.afterTreeRowToggle?.call(this, e);
+}
+
+/**
+ * Schedules sticky parent row refresh after grid redraws.
+ */
+function onAfterRedraw(this: Grid): void {
+    this.viewport?.treeStickyRowController?.scheduleRefresh(true, true);
 }
 
 /**
@@ -224,8 +267,13 @@ function restoreTreeCellFocus(
     context: TreeToggleContext
 ): void {
     const columnIndex = context.cell.column.index;
-    const restoredCell = context.cell.row.viewport
-        .getRow(context.rowId)
+    const viewport = context.cell.row.viewport;
+    const restoredCell = (
+        viewport.treeStickyRows?.find(
+            (row): boolean => row.id === context.rowId
+        ) ||
+        viewport.getRow(context.rowId)
+    )
         ?.cells[columnIndex];
 
     restoredCell?.htmlElement.focus({
@@ -261,13 +309,19 @@ async function toggleTreeRow(
  * Adds delegated listeners for tree toggle buttons and keyboard shortcuts.
  */
 function onTableBeforeInit(this: Table): void {
+    this.treeStickyRowController = new TreeStickyRowController(this);
+    const stickyBody = this.treeStickyRowController.getStickyBodyElement();
+
     const clickListener = (event: MouseEvent): void => {
         if (!(event.target instanceof Element)) {
             return;
         }
 
         const toggleButton = event.target.closest(treeToggleSelector);
-        if (!toggleButton || !this.tbodyElement.contains(toggleButton)) {
+        if (
+            !toggleButton ||
+            !isTreeEventElementWithinRoots(this, toggleButton)
+        ) {
             return;
         }
 
@@ -309,7 +363,10 @@ function onTableBeforeInit(this: Table): void {
         }
 
         const toggleButton = event.target.closest(treeToggleSelector);
-        if (!toggleButton || !this.tbodyElement.contains(toggleButton)) {
+        if (
+            !toggleButton ||
+            !isTreeEventElementWithinRoots(this, toggleButton)
+        ) {
             return;
         }
 
@@ -346,12 +403,44 @@ function onTableBeforeInit(this: Table): void {
     this.tbodyElement.addEventListener('dblclick', dblClickListener);
     this.tbodyElement.addEventListener('mousedown', mouseDownListener);
     this.tbodyElement.addEventListener('keydown', keyDownListener);
+    stickyBody.addEventListener('click', clickListener);
+    stickyBody.addEventListener('dblclick', dblClickListener);
+    stickyBody.addEventListener('mousedown', mouseDownListener);
+    stickyBody.addEventListener('keydown', keyDownListener);
     treeToggleListeners.set(this, {
         click: clickListener,
         dblClick: dblClickListener,
         mouseDown: mouseDownListener,
-        keyDown: keyDownListener
+        keyDown: keyDownListener,
+        stickyBody
     });
+}
+
+/**
+ * Adds scroll listener for sticky parent row positioning after the table is
+ * fully initialized.
+ */
+function onTableAfterInit(this: Table): void {
+    const listeners = treeToggleListeners.get(this);
+    if (!listeners) {
+        return;
+    }
+
+    const scrollListener = (): void => {
+        this.treeStickyRowController?.handleScroll();
+    };
+
+    this.tbodyElement.addEventListener('scroll', scrollListener);
+    listeners.scroll = scrollListener;
+
+    this.treeStickyRowController?.scheduleRefresh(false, true);
+}
+
+/**
+ * Repositions sticky parent rows after table reflow.
+ */
+function onTableAfterReflow(this: Table): void {
+    this.treeStickyRowController?.scheduleRefresh(false, true);
 }
 
 /**
@@ -367,7 +456,22 @@ function onTableAfterDestroy(this: Table): void {
     this.tbodyElement.removeEventListener('dblclick', listeners.dblClick);
     this.tbodyElement.removeEventListener('mousedown', listeners.mouseDown);
     this.tbodyElement.removeEventListener('keydown', listeners.keyDown);
+    listeners.stickyBody?.removeEventListener('click', listeners.click);
+    listeners.stickyBody?.removeEventListener('dblclick', listeners.dblClick);
+    listeners.stickyBody?.removeEventListener(
+        'mousedown',
+        listeners.mouseDown
+    );
+    listeners.stickyBody?.removeEventListener('keydown', listeners.keyDown);
+    if (listeners.scroll) {
+        this.tbodyElement.removeEventListener('scroll', listeners.scroll);
+    }
     treeToggleListeners.delete(this);
+
+    this.treeStickyRowController?.destroy();
+    delete this.treeStickyRowController;
+    delete this.treeStickyRow;
+    delete this.treeStickyRows;
 }
 
 /**
@@ -478,6 +582,14 @@ function onAfterCellRender(this: TableCell): void {
 declare module '../../Core/Grid' {
     export default interface Grid {
         treeView?: TreeProjectionController;
+    }
+}
+
+declare module '../../Core/Table/Table' {
+    export default interface Table {
+        treeStickyRow?: TableRow;
+        treeStickyRows?: TableRow[];
+        treeStickyRowController?: TreeStickyRowController;
     }
 }
 

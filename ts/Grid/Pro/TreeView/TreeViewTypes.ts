@@ -137,9 +137,11 @@ export interface TreeIndexBuildResult {
  */
 export interface TreeProjectionRowState {
     id: RowId;
+    parentId: RowId | null;
     depth: number;
     hasChildren: boolean;
     isExpanded: boolean;
+    lastVisibleDescendantId?: RowId;
     isAncestorOnly?: boolean;
 }
 
