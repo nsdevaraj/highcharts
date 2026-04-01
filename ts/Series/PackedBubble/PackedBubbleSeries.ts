@@ -1227,8 +1227,6 @@ class PackedBubbleSeries extends BubbleSeries {
  * */
 
 interface PackedBubbleSeries extends DragNodesSeries, NetworkgraphSeries {
-    allowOutsidePlotInteraction:
-        typeof BubbleSeries.prototype.allowOutsidePlotInteraction;
     pointClass: typeof PackedBubblePoint;
     bubblePadding: BubbleSeriesType['bubblePadding'];
     /**
