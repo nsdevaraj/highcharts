@@ -48,19 +48,18 @@ const {
         map: MapSeries
     }
 } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
-    error,
     extend,
     isNumber,
     isObject,
     merge,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
+import { error } from '../../Core/Utilities.js';
 
 /**
- * Normalize longitute value to -180:180 range.
+ * Normalize longitude value to -180:180 range.
  * @private
  */
 function normalizeLonValue(lon: number): number {
@@ -172,7 +171,7 @@ class GeoHeatmapSeries extends MapSeries {
              * point. Unless options are set in the [colorAxis](#colorAxis), the
              * default value is pulled from the [options.colors](#colors) array.
              *
-             * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+             * @type      {Highcharts.ColorType}
              * @product   highmaps
              * @apioption plotOptions.geoheatmap.color
              */
@@ -253,7 +252,6 @@ class GeoHeatmapSeries extends MapSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * For updated colsize and rowsize options
@@ -821,7 +819,7 @@ export default GeoHeatmapSeries;
  * Individual color for the point. By default the color is either used
  * to denote the value, or pulled from the global `colors` array.
  *
- * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+ * @type      {Highcharts.ColorType}
  * @product   highmaps
  * @apioption series.geoheatmap.data.color
  */

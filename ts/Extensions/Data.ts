@@ -3,7 +3,7 @@
  *  Data module
  *
  *  (c) 2012-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -36,18 +36,18 @@ const { ajax } = HU;
 import Point from '../Core/Series/Point.js';
 import SeriesRegistry from '../Core/Series/SeriesRegistry.js';
 const { seriesTypes } = SeriesRegistry;
-import U from '../Core/Utilities.js';
-const {
+import {
     addEvent,
     defined,
     extend,
     fireEvent,
+    internalClearTimeout,
     isNumber,
     merge,
     objectEach,
     pick,
     splat
-} = U;
+} from '../Shared/Utilities.js';
 
 /* *
  *
@@ -75,7 +75,7 @@ interface DataAfterCompleteCallbackFunction {
 }
 
 interface DataBeforeParseCallbackFunction {
-    (csv: string): string;
+    (csv: string, ctx: Data): string;
 }
 
 interface DataColumnsArray extends Array<DataValueType> {
@@ -128,7 +128,7 @@ interface DataParseDateCallbackFunction {
     (dateValue: string): number;
 }
 interface DataParsedCallbackFunction {
-    (columns: Array<DataColumnsArray>): (boolean|undefined);
+    (columns: Array<DataColumnsArray>, ctx: Data): (boolean|undefined);
 }
 interface DataValueCountObject {
     global: number;
@@ -420,11 +420,11 @@ class Data {
 
         // Always stop old polling when we have new options
         if (this.liveDataTimeout !== void 0) {
-            clearTimeout(this.liveDataTimeout);
+            internalClearTimeout(this.liveDataTimeout);
         }
 
         // This is a two-dimensional array holding the raw, trimmed string
-        // values with the same organisation as the columns array. It makes it
+        // values with the same organization as the columns array. It makes it
         // possible for example to revert from interpreted timestamps to
         // string-based categories.
         this.rawColumns = [];
@@ -818,7 +818,7 @@ class Data {
                     token = '';
 
 
-                // We should be able to detect dateformats within 13 rows
+                // We should be able to detect dateFormats within 13 rows
                 if (i > 13) {
                     return true;
                 }
@@ -1047,7 +1047,7 @@ class Data {
         }
 
         if (csv && options.beforeParse) {
-            csv = options.beforeParse.call(this, csv);
+            csv = options.beforeParse.call(this, csv, this);
         }
 
         if (csv) {
@@ -1249,7 +1249,7 @@ class Data {
                 }
 
                 if (initialFetch) {
-                    clearTimeout(data.liveDataTimeout);
+                    internalClearTimeout(data.liveDataTimeout);
                     chart.liveDataURL = url;
                 }
 
@@ -1474,7 +1474,7 @@ class Data {
      *        Remove all spaces between numbers.
      *
      * @return {string}
-     *         Trimed string
+     *         Trimmed string
      */
     public trim(
         str: string,
@@ -1851,7 +1851,7 @@ class Data {
      */
     public parsed(): (boolean|undefined) {
         if (this.options.parsed) {
-            return this.options.parsed.call(this, this.columns as any);
+            return this.options.parsed.call(this, this.columns as any, this);
         }
     }
 

@@ -52,20 +52,19 @@ const { animObject } = A;
 import DataTableCore from '../../Data/DataTableCore.js';
 import MarkerClusterDefaults from './MarkerClusterDefaults.js';
 const { cluster: clusterDefaults } = MarkerClusterDefaults;
-import U from '../../Core/Utilities.js';
-const {
-    addEvent,
+import {
     defined,
-    error,
-    isArray,
-    isFunction,
-    isObject,
-    isNumber,
-    merge,
     objectEach,
+    isArray,
+    isNumber,
+    isObject,
+    merge,
+    syncTimeout,
     relativeLength,
-    syncTimeout
-} = U;
+    isFunction,
+    addEvent
+} from '../../Shared/Utilities.js';
+import { error } from '../../Core/Utilities.js';
 
 /* *
  *
@@ -127,7 +126,7 @@ const markerClusterAlgorithms: Record<string, MarkerClusterAlgorithmFunction> = 
                 )
             ),
             iterations = options.iterations,
-            // Max pixel difference beetwen new and old cluster position.
+            // Max pixel difference between new and old cluster position.
             maxClusterShift = 1;
 
         let currentIteration = 0,
@@ -461,7 +460,7 @@ function fadeInElement(
  * Util function.
  * @internal
  */
-function fadeInNewPointAndDestoryOld(
+function fadeInNewPointAndDestroyOld(
     newPointObj: MarkerClusterPointsState,
     oldPoints: Array<MarkerClusterPointsState>,
     animation: (boolean|Partial<AnimationOptions>),
@@ -707,7 +706,7 @@ function seriesAnimateClusterPoint(
         offset = 0,
         newX = 0,
         newY = 0,
-        isOldPointGrahic = false,
+        isOldPointGraphic = false,
         isCbHandled = false;
 
     if (oldState && newState) {
@@ -790,7 +789,7 @@ function seriesAnimateClusterPoint(
                     oldPoints.push(oldPointObj);
 
                     if (oldPointObj.point?.graphic) {
-                        isOldPointGrahic = true;
+                        isOldPointGraphic = true;
                         oldPointObj.point.graphic.show();
                         oldPointObj.point.graphic.animate({
                             x: newX - (oldPointObj.point.graphic.radius || 0),
@@ -798,7 +797,7 @@ function seriesAnimateClusterPoint(
                             opacity: 0.4
                         }, animation, function (): void {
                             isCbHandled = true;
-                            fadeInNewPointAndDestoryOld(
+                            fadeInNewPointAndDestroyOld(
                                 newPointObj, oldPoints, animation, 0.7
                             );
                         });
@@ -822,15 +821,15 @@ function seriesAnimateClusterPoint(
             // Make sure point is faded in.
             syncTimeout(function (): void {
                 if (!isCbHandled) {
-                    fadeInNewPointAndDestoryOld(
+                    fadeInNewPointAndDestroyOld(
                         newPointObj, oldPoints, animation, 0.85
                     );
                 }
             }, animDuration);
 
-            if (!isOldPointGrahic) {
+            if (!isOldPointGraphic) {
                 syncTimeout(function (): void {
-                    fadeInNewPointAndDestoryOld(
+                    fadeInNewPointAndDestroyOld(
                         newPointObj, oldPoints, animation, 0.1
                     );
                 }, animDuration / 2);

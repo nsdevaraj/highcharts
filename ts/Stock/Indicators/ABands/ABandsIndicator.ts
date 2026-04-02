@@ -28,12 +28,7 @@ import SeriesRegistry from '../../../Core/Series/SeriesRegistry.js';
 const {
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const {
-    correctFloat,
-    extend,
-    merge
-} = U;
+import { correctFloat, extend, merge } from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -110,7 +105,7 @@ class ABandsIndicator extends SMAIndicator {
      */
     public static defaultOptions: ABandsOptions = merge(SMAIndicator.defaultOptions, {
         /**
-         * Option for fill color between lines in Accelleration bands Indicator.
+         * Option for fill color between lines in Acceleration bands Indicator.
          *
          * @sample {highstock} stock/indicators/indicator-area-fill
          *      Background fill between lines.

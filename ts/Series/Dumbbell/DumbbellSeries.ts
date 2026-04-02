@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Sebastian Bochan, Rafal Sebestjanski
+ *  Author: Sebastian Bochan, Rafał Sebestjański
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -35,12 +35,7 @@ const {
     columnrange: ColumnRangeSeries
 } = SeriesRegistry.seriesTypes;
 import SVGRenderer from '../../Core/Renderer/SVG/SVGRenderer.js';
-import U from '../../Core/Utilities.js';
-const {
-    extend,
-    merge,
-    pick
-} = U;
+import { extend, merge, pick } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -379,7 +374,7 @@ class DumbbellSeries extends AreaRangeSeries {
     }
 
     /**
-     * Set the shape arguments for dummbells.
+     * Set the shape arguments for dumbbells.
      * @private
      */
     public setShapeArgs(): void {

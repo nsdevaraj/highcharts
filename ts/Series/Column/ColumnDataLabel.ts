@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -29,11 +29,7 @@ import H from '../../Core/Globals.js';
 const { composed } = H;
 import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const { series: Series } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
-    merge,
-    pushUnique
-} = U;
+import { merge, pushUnique } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -52,7 +48,7 @@ namespace ColumnDataLabel {
     /**
      * Override the basic data label alignment by adjusting for the position of
      * the column.
-     * @private
+     * @internal
      */
     function alignDataLabel(
         this: ColumnSeries,
@@ -142,7 +138,7 @@ namespace ColumnDataLabel {
         }
     }
 
-    /** @private */
+    /** @internal */
     export function compose(
         ColumnSeriesClass: typeof ColumnSeries
     ): void {

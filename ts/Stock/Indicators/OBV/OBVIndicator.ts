@@ -28,13 +28,8 @@ import Series from '../../../Core/Series/Series';
 const {
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const {
-    isNumber,
-    error,
-    extend,
-    merge
-} = U;
+import { extend, isNumber, merge } from '../../../Shared/Utilities.js';
+import { error } from '../../../Core/Utilities.js';
 
 /* *
  *
@@ -131,9 +126,9 @@ class OBVIndicator extends SMAIndicator {
         let OBVPoint: Array<number> = [],
             i: number = 1,
             previousOBV: number = 0,
-            curentOBV: number = 0,
+            currentOBV: number = 0,
             previousClose: number = 0,
-            curentClose: number = 0,
+            currentClose: number = 0,
             volume: Array<number>;
 
         // Checks if volume series exists.
@@ -150,23 +145,23 @@ class OBVIndicator extends SMAIndicator {
             yData.push(OBVPoint[1]);
 
             for (i; i < yVal.length; i++) {
-                curentClose = hasOHLC ?
+                currentClose = hasOHLC ?
                     (yVal as Array<Array<number>>)[i][3] : (yVal as Array<number>)[i];
 
-                if (curentClose > previousClose) { // Up
-                    curentOBV = previousOBV + volume[i];
-                } else if (curentClose === previousClose) { // Constant
-                    curentOBV = previousOBV;
+                if (currentClose > previousClose) { // Up
+                    currentOBV = previousOBV + volume[i];
+                } else if (currentClose === previousClose) { // Constant
+                    currentOBV = previousOBV;
                 } else { // Down
-                    curentOBV = previousOBV - volume[i];
+                    currentOBV = previousOBV - volume[i];
                 }
 
                 // Add point.
-                OBVPoint = [xVal[i], curentOBV];
+                OBVPoint = [xVal[i], currentOBV];
 
                 // Assign current as previous for next iteration.
-                previousOBV = curentOBV;
-                previousClose = curentClose;
+                previousOBV = currentOBV;
+                previousClose = currentClose;
 
                 OBV.push(OBVPoint);
                 xData.push(xVal[i]);

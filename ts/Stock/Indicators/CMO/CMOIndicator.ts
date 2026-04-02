@@ -23,8 +23,7 @@ import SeriesRegistry from '../../../Core/Series/SeriesRegistry.js';
 const {
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const { isNumber, merge } = U;
+import { isNumber, merge } from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -50,7 +49,7 @@ class CMOIndicator extends SMAIndicator {
      * */
 
     /**
-     * Chande Momentum Oscilator (CMO) technical indicator. This series
+     * Chande Momentum Oscillator (CMO) technical indicator. This series
      * requires the `linkedTo` option to be set and should be loaded after
      * the `stock/indicators/indicators.js` file.
      *

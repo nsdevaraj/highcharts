@@ -10,7 +10,7 @@
  *
  *  Authors:
  *  - Mikkel Espolin Birkeland
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -26,10 +26,7 @@
 
 import Globals from '../Globals.js';
 import { setHTMLContent } from '../GridUtils.js';
-import U from '../../../Core/Utilities.js';
-
-const { defined } = U;
-
+import { defined } from '../../../Shared/Utilities.js';
 
 /* *
  *

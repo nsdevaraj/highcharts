@@ -3,7 +3,7 @@
  *  Highcharts module with textPath functionality.
  *
  *  (c) 2009-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -24,11 +24,11 @@ import type DataLabelOptions from '../Core/Series/DataLabelOptions';
 import SVGElement from '../Core/Renderer/SVG/SVGElement';
 import SVGAttributes from '../Core/Renderer/SVG/SVGAttributes';
 import H from '../Core/Globals.js';
-import U from '../Core/Utilities.js';
 import Point from '../Core/Series/Point';
 import BBoxObject from '../Core/Renderer/BBoxObject';
+import { addEvent, defined, extend, merge } from '../Shared/Utilities.js';
+import { uniqueKey } from '../Core/Utilities.js';
 const { deg2rad } = H;
-const { addEvent, merge, uniqueKey, defined, extend } = U;
 
 /* *
  *

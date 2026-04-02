@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2009-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  Dot plot series type for Highcharts
  *
@@ -37,13 +37,7 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const {
     column: ColumnSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
-    extend,
-    isNumber,
-    merge,
-    pick
-} = U;
+import { extend, isNumber, merge, pick } from '../../Shared/Utilities.js';
 
 /* *
  *

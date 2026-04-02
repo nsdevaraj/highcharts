@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -138,7 +138,6 @@ export interface Axis3DTitleOptions {
      * @requires highcharts-3d
      */
     skew3d: (boolean|null);
-
 }
 
 /* *

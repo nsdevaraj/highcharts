@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -21,12 +21,7 @@ import type SVGPath from './SVGPath';
 import type SymbolOptions from './SymbolOptions';
 import type { SymbolTypeRegistry } from './SymbolType';
 
-import U from '../../Utilities.js';
-const {
-    defined,
-    isNumber,
-    pick
-} = U;
+import { defined, isNumber, pick } from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -160,9 +155,9 @@ function arc(
 /**
  * Callout shape used for default tooltips.
  *
- * @param {number} cx
+ * @param {number} x
  * Center X
- * @param {number} cy
+ * @param {number} y
  * Center Y
  * @param {number} w
  * Width
@@ -340,7 +335,6 @@ function circle(
         open: false
     });
 }
-
 
 /**
  * Diamond symbol path.
@@ -522,7 +516,6 @@ declare module './SymbolType' {
         square: typeof rect;
         triangle: typeof triangle;
         'triangle-down': typeof triangleDown;
-        cross: SymbolFunction
     }
 }
 

@@ -34,8 +34,7 @@ import type {
     ColumnCollection as DataTableColumnCollection
 } from '../DataTable.js';
 import DataConverterUtils from './DataConverterUtils.js';
-import U from '../../Core/Utilities.js';
-const { merge } = U;
+import { merge } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -423,7 +422,7 @@ class CSVConverter extends DataConverter {
                 cl,
                 token = '';
 
-            // We should be able to detect dateformats within 13 rows
+            // We should be able to detect dateFormats within 13 rows
             if (i > 13) {
                 break;
             }

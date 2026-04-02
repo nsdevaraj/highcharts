@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2015-2026 Highsoft AS
- *  Author: Oystein Moseng
+ *  Author: Øystein Moseng
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -20,14 +20,13 @@
  * */
 
 import H from '../Core/Globals.js';
+import { error } from '../Core/Utilities.js';
 const {
     isSafari,
     win,
     win: { document: doc }
 } = H;
 import RegexLimits from '../Extensions/RegexLimits.js';
-import U from '../Core/Utilities.js';
-const { error } = U;
 
 /* *
  *
@@ -208,7 +207,7 @@ export function getScript(
         script.type = 'text/javascript';
         script.src = scriptLocation;
 
-        // Resolve in case of a succesful script fetching
+        // Resolve in case of a successful script fetching
         script.onload = (): void => {
             resolve();
         };

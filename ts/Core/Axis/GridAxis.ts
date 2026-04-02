@@ -38,19 +38,19 @@ import Chart from '../Chart/Chart.js';
 import H from '../Globals.js';
 const { dateFormats } = H;
 import Tick from './Tick.js';
-import U from '../Utilities.js';
-const {
-    addEvent,
+import {
     defined,
-    erase,
     find,
+    erase,
     isArray,
     isNumber,
+    isObject as isObjectUtils,
     merge,
     pick,
-    timeUnits,
-    wrap
-} = U;
+    wrap,
+    addEvent
+} from '../../Shared/Utilities.js';
+import { timeUnits } from '../Utilities.js';
 
 /* *
  *
@@ -146,7 +146,7 @@ export interface GridAxisOptions {
      * axes, check the [#yAxis.staticScale](yAxis.staticScale) option.
      *
      * @sample gantt/grid-axis/cellheight
-     *         Gant chart with custom cell height
+     *         Gantt chart with custom cell height
      */
     cellHeight?: number;
     /**
@@ -204,7 +204,7 @@ function argsToArray(args: IArguments): Array<any> {
 /** @internal */
 function isObject(x: unknown): x is object {
     // Always use strict mode
-    return U.isObject(x, true);
+    return isObjectUtils(x, true);
 }
 
 /** @internal */
@@ -1632,7 +1632,7 @@ export default GridAxis;
  * the [#yAxis.staticScale](yAxis.staticScale) option.
  *
  * @sample gantt/grid-axis/cellheight
- *         Gant chart with custom cell height
+ *         Gantt chart with custom cell height
  * @type      {number}
  * @apioption xAxis.grid.cellHeight
  */

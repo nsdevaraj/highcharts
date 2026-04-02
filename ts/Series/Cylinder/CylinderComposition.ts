@@ -38,11 +38,7 @@ const {
 import Math3D from '../../Core/Math3D.js';
 const { perspective } = Math3D;
 import SVGElement3DCylinder from './SVGElement3DCylinder.js';
-import U from '../../Core/Utilities.js';
-const {
-    extend,
-    pick
-} = U;
+import { extend, pick } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -147,7 +143,7 @@ function rendererCylinderPath(
         // Decide zIndexes of parts based on cuboid logic, for consistency.
         cuboidData = this.cuboidPath(shapeArgs),
         isTopFirst = !cuboidData.isTop,
-        isFronFirst = !cuboidData.isFront,
+        isFrontFirst = !cuboidData.isFront,
 
         top = renderer.getCylinderEnd(chart as any, shapeArgs),
         bottom = renderer.getCylinderEnd(chart as any, shapeArgs, true);
@@ -161,8 +157,8 @@ function rendererCylinderPath(
             top: isTopFirst ? 3 : 0,
             bottom: isTopFirst ? 0 : 3,
 
-            front: isFronFirst ? 2 : 1,
-            back: isFronFirst ? 1 : 2,
+            front: isFrontFirst ? 2 : 1,
+            back: isFrontFirst ? 1 : 2,
 
             group: cuboidData.zIndexes.group
         }

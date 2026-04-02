@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -25,7 +25,7 @@ import type { DeepPartial } from '../../Shared/Types';
 import type RangeSelector from '../RangeSelector/RangeSelector';
 import type { SymbolTypeRegistry } from '../../Core/Renderer/SVG/SymbolType';
 import type { SeriesTypeOptions } from '../../Core/Series/SeriesType';
-import type Utilities from '../../Core/Utilities';
+import type { RelativeSize } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -86,7 +86,7 @@ declare module '../../Core/Series/SeriesOptions' {
 export interface NavigatorHandlesOptions {
     backgroundColor?: ColorType;
     borderColor?: ColorType;
-    borderRadius?: Utilities.RelativeSize;
+    borderRadius?: RelativeSize;
     enabled?: boolean;
     height?: number;
     inverted?: boolean;

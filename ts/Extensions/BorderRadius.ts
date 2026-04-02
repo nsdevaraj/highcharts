@@ -2,7 +2,7 @@
  *
  *  Highcharts Border Radius module
  *
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -30,14 +30,13 @@ const { defaultOptions } = D;
 import H from '../Core/Globals.js';
 const { noop } = H;
 import Series from '../Core/Series/Series.js';
-import U from '../Core/Utilities.js';
-const {
+import {
     addEvent,
     extend,
     isObject,
     merge,
     relativeLength
-} = U;
+} from '../Shared/Utilities.js';
 
 /* *
  *
@@ -67,7 +66,7 @@ export interface BorderRadiusOptionsObject {
      * For column charts, where in the point or stack to apply rounding. The
      * `end` value means only those corners at the point value will be rounded,
      * leaving the corners at the base or threshold unrounded. This is the most
-     * intuitive behaviour. The `all` value means also the base will be
+     * intuitive behavior. The `all` value means also the base will be
      * rounded.
      */
     where?: 'end'|'all';
@@ -695,7 +694,7 @@ export default BorderRadius;
  * For column charts, where in the point or stack to apply rounding. The `end`
  * value means only those corners at the point value will be rounded, leaving
  * the corners at the base or threshold unrounded. This is the most intuitive
- * behaviour. The `all` value means also the base will be rounded.
+ * behavior. The `all` value means also the base will be rounded.
  *
  * @sample  {highcharts} highcharts/plotoptions/column-borderradius-where-all
  *          Rounding on all corners

@@ -30,12 +30,7 @@ import H from '../../../Core/Globals.js';
 const {
     isFirefox
 } = H;
-import U from '../../../Core/Utilities.js';
-const {
-    merge,
-    fireEvent,
-    objectEach
-} = U;
+import { fireEvent, merge, objectEach } from '../../../Shared/Utilities.js';
 
 
 /**
@@ -323,7 +318,8 @@ class CellEditToolbar extends EditToolbar {
                 fireEvent(row, 'cellChange', { cell: row.cells[0], row });
             }
 
-            fireEvent(editMode, 'cellDestroyed', {
+            fireEvent(editMode, 'layoutChanged', {
+                type: 'cellDestroyed',
                 target: cellId,
                 board: board
             });

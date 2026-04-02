@@ -4,7 +4,7 @@
  *  diagram.
  *
  *  (c) 2016-2026 Highsoft AS
- *  Authors: Jon Arild Nygard
+ *  Authors: Jon Arild Nygård
  *
  *  Layout algorithm by Ben Frederickson:
  *  https://www.benfrederickson.com/better-venn-diagrams/
@@ -63,15 +63,14 @@ const {
 import VennPoint from './VennPoint.js';
 import VennSeriesDefaults from './VennSeriesDefaults.js';
 import VennUtils from './VennUtils.js';
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
     extend,
     isArray,
     isNumber,
     isObject,
     merge
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -112,7 +111,7 @@ class VennSeries extends ScatterSeries {
      * distance from the internal circles, and as large possible distance to the
      * external circles.
      * @private
-     * @todo Optimize the intial position.
+     * @todo Optimize the initial position.
      * @todo Add unit tests.
      * @param {Array<Highcharts.CircleObject>} internal
      * Internal circles.
@@ -152,7 +151,7 @@ class VennSeries extends ScatterSeries {
                         );
 
                         // If the margin better than the current best, then
-                        // update sbest.
+                        // update best.
                         if (best.margin < margin) {
                             best.point = point;
                             best.margin = margin;
@@ -275,7 +274,7 @@ class VennSeries extends ScatterSeries {
      *
      * @private
      * @todo Add support for constrained MDS.
-     * @param {Array<Highchats.VennRelationObject>} relations
+     * @param {Array<Highcharts.VennRelationObject>} relations
      * List of the overlap between two or more sets, or the size of a single
      * set.
      * @return {Highcharts.Dictionary<*>}
@@ -411,7 +410,6 @@ class VennSeries extends ScatterSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     public animate(init?: boolean): void {
         if (!init) {
@@ -659,7 +657,6 @@ class VennSeries extends ScatterSeries {
         }
     }
 
-    /* eslint-enable valid-jsdoc */
 }
 
 /* *

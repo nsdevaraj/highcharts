@@ -30,13 +30,7 @@ import SeriesRegistry from '../../../Core/Series/SeriesRegistry.js';
 const {
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const {
-    merge,
-    extend,
-    defined,
-    isArray
-} = U;
+import { defined, extend, isArray, merge } from '../../../Shared/Utilities.js';
 
 /**
  *
@@ -210,7 +204,7 @@ class PivotPointsIndicator extends SMAIndicator {
         return path;
     }
 
-    // TODO: Rewrite this logic to use multiple datalabels
+    // TODO: Rewrite this logic to use multiple dataLabels
     public drawDataLabels(this: PivotPointsIndicator): void {
         const indicator = this,
             pointMapping: Array<(string|boolean)> = indicator.pointArrayMap;

@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -63,8 +63,7 @@ import H from '../Globals.js';
 const { deg2rad } = H;
 import { Palette } from '../Color/Palettes.js';
 import Tick from './Tick.js';
-import U from '../Utilities.js';
-const {
+import {
     arrayMax,
     arrayMin,
     clamp,
@@ -72,11 +71,9 @@ const {
     defined,
     destroyObjectProperties,
     erase,
-    error,
     extend,
     fireEvent,
     getClosestDistance,
-    insertItem,
     isArray,
     isNumber,
     isString,
@@ -88,7 +85,8 @@ const {
     removeEvent,
     splat,
     syncTimeout
-} = U;
+} from '../../Shared/Utilities.js';
+import { error, insertItem } from '../Utilities.js';
 
 const getNormalizedTickInterval = (
     axis: Axis,
@@ -318,6 +316,7 @@ class Axis {
      * @type {boolean|Highcharts.AxisCrosshairOptions}
      */
     public crosshair?: AxisCrosshairOptions;
+    public crossShowTimer?: number;
 
     /** @internal */
     public dataMax?: number;
@@ -648,7 +647,7 @@ class Axis {
      * */
 
     /**
-     * Overrideable function to initialize the axis.
+     * Overridable function to initialize the axis.
      *
      * @see {@link Axis}
      *
@@ -792,7 +791,7 @@ class Axis {
         }
 
 
-        // Placeholder for plotlines and plotbands groups
+        // Placeholder for plotLines and plotBands groups
         axis.plotLinesAndBandsGroups = {};
 
         // Shorthand types
@@ -971,9 +970,6 @@ class Axis {
      * @param {Highcharts.AxisLabelsFormatterContextObject} this
      * Formatter context of axis label.
      *
-     * @param {Highcharts.AxisLabelsFormatterContextObject} [ctx]
-     * Formatter context of axis label.
-     *
      * @return {string}
      * The formatted label content.
      */
@@ -1029,19 +1025,20 @@ class Axis {
                     value !== 0
                 ) { // #5480
                     ret = numberFormatter(
-                        value / multi, -1
+                        value / multi, -1, void 0, void 0, chart
                     ) + numericSymbols[i];
                 }
             }
         }
 
-        if (typeof ret === 'undefined') {
-            if (Math.abs(value) >= 10000) { // Add thousands separators
-                ret = numberFormatter(value, -1);
-            } else { // Small numbers
-                ret = numberFormatter(value, -1, void 0, ''); // #2466
-            }
-        }
+        ret ??= numberFormatter(
+            value,
+            -1,
+            void 0,
+            // Add thousands separators when 10 000 or more
+            Math.abs(value) < 10000 ? '' : void 0,
+            chart
+        );
 
         return ret;
     }
@@ -2457,7 +2454,7 @@ class Axis {
                 this.tickPositions = tickPositions;
                 tickPositionerResult = tickPositioner.apply(
                     axis,
-                    [this.min, this.max]
+                    [this.min, this.max, axis]
                 );
                 if (tickPositionerResult) {
                     tickPositions = tickPositionerResult;
@@ -2490,7 +2487,7 @@ class Axis {
         this.trimTicks(tickPositions, startOnTick, endOnTick);
         if (!this.isLinked && isNumber(this.min) && isNumber(this.max)) {
 
-            // Substract half a unit (#2619, #2846, #2515, #3390), but not in
+            // Subtract half a unit (#2619, #2846, #2515, #3390), but not in
             // case of multiple ticks (#6897)
             if (
                 this.single &&
@@ -3016,10 +3013,10 @@ class Axis {
      *
      * @function Highcharts.Axis#setExtremes
      *
-     * @param {number|string} [newMin]
+     * @param {number|string} [min]
      * The new minimum value. For datetime axes, date strings are accepted.
      *
-     * @param {number|string} [newMax]
+     * @param {number|string} [max]
      * The new maximum value. For datetime axes, date strings are accepted.
      *
      * @param {boolean} [redraw=true]
@@ -3042,8 +3039,8 @@ class Axis {
         eventArguments?: Partial<AxisSetExtremesEventObject>
     ): void {
         const chart = this.chart;
-        this.series.forEach((serie): void => {
-            delete serie.kdTree;
+        this.series.forEach((s): void => {
+            delete s.kdTree;
         });
 
         min = chart.time.parse(min);
@@ -3685,12 +3682,6 @@ class Axis {
      *
      * @internal
      * @function Highcharts.Axis#generateTick
-     *
-     * @param {number} pos
-     * The tick position in axis values.
-     *
-     * @param {number} [i]
-     * The index of the tick in {@link Axis.tickPositions}.
      */
     public generateTick(pos: number): void {
         const axis = this,
@@ -4032,7 +4023,7 @@ class Axis {
             fontMetrics = this.chart.renderer.fontMetrics(axisTitle),
             // The part of a multiline text that is below the baseline of the
             // first line. Subtract 1 to preserve pixel-perfectness from the
-            // old behaviour (v5.0.12), where only one line was allowed.
+            // old behavior (v5.0.12), where only one line was allowed.
             textHeightOvershoot = axisTitle ? Math.max(
                 axisTitle.getBBox(false, 0).height - fontMetrics.h - 1,
                 0
@@ -4218,7 +4209,7 @@ class Axis {
             }
 
             // Major ticks. Pull out the first item and render it last so that
-            // we can get the position of the neighbour label. #808.
+            // we can get the position of the neighbor label. #808.
             if (tickPositions.length) { // #1300
                 tickPositions.forEach(function (pos: number, i: number): void {
                     axis.renderTick(pos, i, slideInTicks);
@@ -4459,7 +4450,7 @@ class Axis {
             }
         );
 
-        // Destroy each generated group for plotlines and plotbands
+        // Destroy each generated group for plotLines and plotBands
         for (const plotGroup in axis.plotLinesAndBandsGroups) { // eslint-disable-line guard-for-in
             axis.plotLinesAndBandsGroups[plotGroup] =
                 axis.plotLinesAndBandsGroups[plotGroup].destroy() as any;
@@ -4493,12 +4484,12 @@ class Axis {
 
         const options = this.crosshair,
             snap = options?.snap ?? true,
-            chart = this.chart;
+            chart = this.chart,
+            graphic = this.cross;
 
-        let path,
+        let path: SVGPath | null | undefined,
             pos,
-            categorized,
-            graphic = this.cross,
+            categorized: boolean | undefined,
             crossOptions: Axis.PlotLinePathOptions;
 
         fireEvent(this, 'drawCrosshair', { e: e, point: point });
@@ -4517,23 +4508,24 @@ class Axis {
         ) {
             this.hideCrosshair();
         } else {
+            clearTimeout(this.crossShowTimer);
 
             // Get the path
             if (!snap) {
                 pos = e &&
                     (
                         this.horiz ?
-                            e.chartX - (this.pos as any) :
-                            this.len - e.chartY + (this.pos as any)
+                            e.chartX - this.pos :
+                            this.len - e.chartY + this.pos
                     );
             } else if (defined(point)) {
                 // #3834
                 pos = pick(
                     this.coll !== 'colorAxis' ?
-                        (point as any).crosshairPos : // 3D axis extension
+                        point.crosshairPos : // 3D axis extension
                         null,
                     this.isXAxis ?
-                        (point as any).plotX :
+                        point.plotX :
                         this.len - (point as any).plotY
                 );
             }
@@ -4543,7 +4535,7 @@ class Axis {
                     // Value, only used on radial
                     value: point && (this.isXAxis ?
                         point.x :
-                        pick(point.stackY, point.y)) as any,
+                        pick(point.stackY, point.y)),
                     translatedValue: pos
                 };
 
@@ -4569,54 +4561,70 @@ class Axis {
 
             categorized = this.categories && !this.isRadial;
 
-            // Draw the cross
-            if (!graphic) {
-                this.cross = graphic = chart.renderer
-                    .path()
-                    .addClass(
-                        'highcharts-crosshair highcharts-crosshair-' +
-                        (categorized ? 'category ' : 'thin ') +
-                        (options.className || '')
-                    )
-                    .attr({
-                        zIndex: pick(options.zIndex, 2)
-                    })
-                    .add();
+            this.crossShowTimer = syncTimeout((): void => {
+                // Get the *current* crosshair, in case it was created by
+                // another call while this one was delayed.
+                let cross = this.cross;
 
-                // Presentational attributes
-                if (!chart.styledMode) {
-                    graphic.attr({
-                        stroke: options.color ||
-                            (
-                                categorized ?
-                                    Color
-                                        .parse(Palette.highlightColor20)
-                                        .setOpacity(0.25)
-                                        .get() :
-                                    Palette.neutralColor20
-                            ),
-                        'stroke-width': pick(options.width, 1)
-                    }).css({
-                        'pointer-events': 'none'
-                    });
-                    if (options.dashStyle) {
-                        graphic.attr({
-                            dashstyle: options.dashStyle
+                // Draw the cross
+                if (!cross) {
+                    this.cross = cross = chart.renderer
+                        .path()
+                        .addClass(
+                            'highcharts-crosshair highcharts-crosshair-' +
+                            (categorized ? 'category ' : 'thin ') +
+                            (options.className || '')
+                        )
+                        .attr({
+                            zIndex: pick(options.zIndex, 2)
+                        })
+                        .add();
+
+                    // Presentational attributes
+                    if (!chart.styledMode) {
+                        cross.attr({
+                            stroke: options.color ||
+                                (
+                                    categorized ?
+                                        Color
+                                            .parse(Palette.highlightColor20)
+                                            .setOpacity(0.25)
+                                            .get() :
+                                        Palette.neutralColor20
+                                ),
+                            'stroke-width': pick(options.width, 1)
+                        }).css({
+                            'pointer-events': 'none'
                         });
+                        if (options.dashStyle) {
+                            cross.attr({
+                                dashstyle: options.dashStyle
+                            });
+                        }
                     }
                 }
-            }
 
-            graphic.show().attr({
-                d: path
-            });
+                cross
+                    .show()
+                    .animate(
+                        { d: path as SVGPath },
+                        animObject(options?.animation)
+                    );
 
-            if (categorized && !(options as any).width) {
-                graphic.attr({
-                    'stroke-width': this.transA
-                });
-            }
-            (this.cross as any).e = e;
+                if (categorized && !options.width) {
+                    cross.attr({
+                        'stroke-width': this.transA
+                    });
+                }
+                if (this.cross) {
+                    this.cross.e = e;
+                }
+            },
+            // Only use delay if the crosshair is currently hidden
+            (!graphic || graphic.attr('visibility') === 'hidden') ?
+                options.showDelay || 0 :
+                0
+            );
         }
 
         fireEvent(this, 'afterDrawCrosshair', { e: e, point: point });
@@ -4628,6 +4636,8 @@ class Axis {
      * @function Highcharts.Axis#hideCrosshair
      */
     public hideCrosshair(): void {
+        clearTimeout(this.crossShowTimer);
+
         if (this.cross) {
             this.cross.hide();
         }
@@ -4961,6 +4971,8 @@ export default Axis;
  * @param {Highcharts.AxisLabelsFormatterContextObject} this
  *
  * @param {Highcharts.AxisLabelsFormatterContextObject} ctx
+ * Since v12.5.0, the formatter context passed as an extra argument for arrow
+ * functions.
  *
  * @return {string}
  */
@@ -5072,7 +5084,17 @@ export default Axis;
  *
  * @param {Highcharts.Axis} this
  *
- * @return {Highcharts.AxisTickPositionsArray}
+ * @param {number} min
+ * Current minimum value.
+ *
+ * @param {number} max
+ * Current maximum value.
+ *
+ * @param {Highcharts.Axis} [ctx]
+ * Since v12.5.0, the axis context passed as an extra argument for arrow
+ * functions.
+ *
+ * @return {Highcharts.AxisTickPositionsArray|undefined}
  */
 
 /**
@@ -5139,6 +5161,10 @@ export default Axis;
  *
  * @param {number} value
  * Y value of the data point
+ *
+ * @param {Highcharts.Axis} [ctx]
+ * Since v12.5.0, the axis context passed as an extra argument for arrow
+ * functions.
  *
  * @return {string}
  */

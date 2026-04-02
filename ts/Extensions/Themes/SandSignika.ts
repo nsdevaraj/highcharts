@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -26,11 +26,7 @@ import type { DefaultOptions } from '../../Core/Options';
 import D from '../../Core/Defaults.js';
 const { setOptions } = D;
 import H from '../../Core/Globals.js';
-import U from '../../Core/Utilities.js';
-const {
-    addEvent,
-    createElement
-} = U;
+import { addEvent, createElement } from '../../Shared/Utilities.js';
 
 /* *
  *

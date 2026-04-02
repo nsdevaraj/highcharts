@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -27,11 +27,7 @@ import type Table from '../Table';
 import type Column from '../Column.js';
 import type ColumnsResizer from '../Actions/ColumnsResizer';
 
-import U from '../../../../Core/Utilities.js';
-const {
-    getStyle,
-    defined
-} = U;
+import { defined, getStyle } from '../../../../Shared/Utilities.js';
 
 
 /* *
@@ -212,7 +208,7 @@ abstract class ResizingMode {
     }
 
     /**
-     * Recaulculates the changing dimentions of the table.
+     * Recalculates the changing dimensions of the table.
      */
     public reflow(): void {
         const vp = this.viewport;

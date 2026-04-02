@@ -3,7 +3,7 @@
  *  Highcharts funnel module
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -25,8 +25,7 @@ import type PyramidSeriesOptions from './PyramidSeriesOptions';
 import FunnelSeries from '../Funnel/FunnelSeries.js';
 import PyramidSeriesDefaults from './PyramidSeriesDefaults.js';
 import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
-import U from '../../Core/Utilities.js';
-const { merge } = U;
+import { merge } from '../../Shared/Utilities.js';
 
 /* *
  *

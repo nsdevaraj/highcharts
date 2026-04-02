@@ -3,7 +3,7 @@
  *  Solid angular gauge module
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -32,15 +32,14 @@ const {
 } = SeriesRegistry.seriesTypes;
 import SolidGaugeAxis from '../../Core/Axis/SolidGaugeAxis.js';
 import SolidGaugeSeriesDefaults from './SolidGaugeSeriesDefaults.js';
-import U from '../../Core/Utilities.js';
-const {
+import {
     clamp,
     extend,
     isNumber,
     merge,
-    pick,
-    pInt
-} = U;
+    pInt,
+    pick
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -55,7 +54,7 @@ const {
  * @class
  * @name Highcharts.seriesTypes.solidgauge
  *
- * @augments Highcarts.Series
+ * @augments Highcharts.Series
  */
 class SolidGaugeSeries extends GaugeSeries {
 

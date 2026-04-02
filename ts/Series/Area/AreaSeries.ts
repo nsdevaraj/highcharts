@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -32,13 +32,13 @@ const {
         line: LineSeries
     }
 } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
+import {
+    defined,
     extend,
     merge,
     objectEach,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -110,7 +110,6 @@ class AreaSeries extends LineSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Draw the graph and the underlying area. This method calls the Series
@@ -219,6 +218,7 @@ class AreaSeries extends LineSeries {
                 side: string
             ): void {
                 const point = points[i],
+                    otherPoint = points[otherI],
                     stackedValues =
                         stacking && (stacks[point.x].points[seriesIndex]),
                     nullVal = (point as any)[side + 'Null'] || 0,
@@ -235,7 +235,12 @@ class AreaSeries extends LineSeries {
                     bottom = stackedValues[0] + cliffVal;
                     isNull = !!nullVal;
 
-                } else if (!stacking && points[otherI]?.isNull) {
+                } else if (
+                    !stacking &&
+                    otherPoint &&
+                    (otherPoint.isNull ||
+                        !defined(otherPoint.plotY))
+                ) {
                     top = bottom = threshold;
                 }
 
@@ -279,7 +284,9 @@ class AreaSeries extends LineSeries {
                     points[i].leftNull = points[i].rightNull = void 0;
             }
 
-            isNull = points[i].isNull;
+            // Treat points with undefined plotY as null (e.g. non-positive
+            // values on logarithmic axis, #18422)
+            isNull = points[i].isNull || !defined(points[i].plotY);
             plotX = pick(points[i].rectPlotX, points[i].plotX);
             yBottom = stacking ?
                 pick(points[i].yBottom, translatedThreshold) :
@@ -357,7 +364,10 @@ class AreaSeries extends LineSeries {
             yAxisSeries = yAxis.series,
             seriesLength = yAxisSeries.length,
             upOrDown = yAxis.options.reversedStacks ? 1 : -1,
-            seriesIndex = yAxisSeries.indexOf(series);
+            seriesIndex = yAxisSeries.indexOf(series),
+            translatedThreshold = yAxis.getThreshold(
+                series.options.threshold || 0
+            );
 
 
         points = points || this.points;
@@ -470,18 +480,20 @@ class AreaSeries extends LineSeries {
                         // down
                         i += upOrDown;
                     }
-                    y = pick(y, 0);
-                    y = yAxis.translate(// #6272
-                        y, 0 as any, 1 as any, 0 as any, 1 as any
-                    );
+                    y ||= 0;
+                    const plotY = yAxis.positiveValuesOnly && y <= 0 ?
+                        translatedThreshold :
+                        yAxis.translate(// #6272
+                            y, false, true, false, true
+                        );
                     segment.push({ // @todo create real point object
                         isNull: true,
                         plotX: xAxis.translate(// #6272
-                            x as any, 0 as any, 0 as any, 0 as any, 1 as any
+                            x as any, false, false, false, true
                         ),
                         x: x as any,
-                        plotY: y,
-                        yBottom: y
+                        plotY,
+                        yBottom: plotY
                     } as any);
                 }
             });
@@ -491,7 +503,6 @@ class AreaSeries extends LineSeries {
         return segment;
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

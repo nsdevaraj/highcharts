@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -20,14 +20,13 @@
 import type { ApproximationArray } from './ApproximationType';
 
 import ApproximationRegistry from './ApproximationRegistry.js';
-import U from '../../Core/Utilities.js';
-const {
+import {
     arrayMax,
     arrayMin,
     correctFloat,
     extend,
     isNumber
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *

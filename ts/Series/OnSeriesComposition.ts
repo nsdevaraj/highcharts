@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -27,12 +27,7 @@ import SplinePoint from './Spline/SplinePoint';
 const { prototype: columnProto } = ColumnSeries;
 import Series from '../Core/Series/Series.js';
 const { prototype: seriesProto } = Series;
-import U from '../Core/Utilities.js';
-const {
-    defined,
-    pushUnique,
-    stableSort
-} = U;
+import { defined, pushUnique, stableSort } from '../Shared/Utilities.js';
 
 /* *
  *

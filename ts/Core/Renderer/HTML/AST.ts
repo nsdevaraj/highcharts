@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -26,17 +26,16 @@ const {
     SVG_NS,
     win
 } = H;
-import U from '../../Utilities.js';
-const {
+import {
     attr,
     createElement,
     css,
-    error,
     isFunction,
     isString,
     objectEach,
     splat
-} = U;
+} from '../../../Shared/Utilities.js';
+import { error } from '../../Utilities.js';
 const {
     trustedTypes
 } = win;

@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -33,11 +33,7 @@ import type {
 import { CellRenderer, CellRendererOptions } from '../CellRenderer.js';
 import { registerRenderer } from '../CellRendererRegistry.js';
 import DateTimeInputContent from '../ContentTypes/DateTimeInputContent.js';
-
-import U from '../../../../Core/Utilities.js';
-const {
-    merge
-} = U;
+import { merge } from '../../../../Shared/Utilities.js';
 
 
 /* *

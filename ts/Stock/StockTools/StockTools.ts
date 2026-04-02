@@ -33,13 +33,12 @@ const {
     isNotNavigatorYAxis,
     isPriceIndicatorEnabled
 } = STU;
-import U from '../../Core/Utilities.js';
-const {
+import {
     correctFloat,
     defined,
     isNumber,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -338,7 +337,7 @@ function navigationResizeYAxes(
     this: NavigationBindings,
     removedYAxisProps?: AxisPositions
 ): void {
-    // The height of the new axis before rescalling. In %, but as a number.
+    // The height of the new axis before rescaling. In %, but as a number.
     const defaultHeight = 20;
     const chart = this.chart,
         // Only non-navigator axes

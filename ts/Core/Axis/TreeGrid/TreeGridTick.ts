@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2016-2026 Highsoft AS
- *  Authors: Jon Arild Nygard
+ *  Authors: Jon Arild Nygård
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -33,16 +33,15 @@ import type { TreeGridAxisComposition } from './TreeGridAxis';
 import type { TreeGridAxisLabelIconOptions } from './TreeGridAxisOptions';
 
 import { Palette } from '../../Color/Palettes.js';
-import U from '../../Utilities.js';
-const {
+import {
     addEvent,
     correctFloat,
-    removeEvent,
-    isObject,
     isNumber,
+    isObject,
     pick,
+    removeEvent,
     wrap
-} = U;
+} from '../../../Shared/Utilities.js';
 
 /* *
  *

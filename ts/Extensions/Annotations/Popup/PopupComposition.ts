@@ -31,12 +31,7 @@ import type Pointer from '../../../Core/Pointer';
 import H from '../../../Core/Globals.js';
 const { composed } = H;
 import Popup from './Popup.js';
-import U from '../../../Core/Utilities.js';
-const {
-    addEvent,
-    pushUnique,
-    wrap
-} = U;
+import { addEvent, pushUnique, wrap } from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -60,18 +55,18 @@ interface PopupConfigObject {
 
 /** @internal */
 function compose(
-    NagivationBindingsClass: typeof NavigationBindings,
+    NavigationBindingsClass: typeof NavigationBindings,
     PointerClass: typeof Pointer
 ): void {
 
     if (pushUnique(composed, 'Popup')) {
         addEvent(
-            NagivationBindingsClass,
+            NavigationBindingsClass,
             'closePopup',
             onNavigationBindingsClosePopup
         );
         addEvent(
-            NagivationBindingsClass,
+            NavigationBindingsClass,
             'showPopup',
             onNavigationBindingsShowPopup
         );

@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *  - Sebastian Bochan
  *
  * */
@@ -30,11 +30,7 @@ import type HeaderRow from './Header/HeaderRow';
 import Column from './Column';
 import Row from './Row';
 import Templating from '../../../Core/Templating.js';
-import U from '../../../Core/Utilities.js';
-
-const {
-    fireEvent
-} = U;
+import { fireEvent } from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -112,7 +108,12 @@ abstract class Cell {
         this.htmlElement = this.init();
         this.htmlElement.setAttribute('tabindex', '-1');
 
-        if (!this.column?.options.cells?.editMode?.enabled) {
+        if (
+            !this.column ||
+            !this.column.viewport.grid.columnPolicy.isColumnEditable(
+                this.column.id
+            )
+        ) {
             this.htmlElement.setAttribute('aria-readonly', 'true');
         }
 

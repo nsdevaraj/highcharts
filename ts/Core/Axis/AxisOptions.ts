@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -14,6 +14,7 @@
  *
  * */
 
+import type AnimationOptions from '../Animation/AnimationOptions';
 import type { AlignValue } from '../Renderer/AlignObject';
 import type Axis from './Axis';
 import type Chart from '../Chart/Chart';
@@ -163,6 +164,10 @@ export interface AxisCrosshairLabelOptions {
     /**
      * Formatter function for the label text.
      *
+     * Since v12.5.0, the callback also receives `ctx` as the second argument,
+     * so that arrow functions can access the same context as regular functions
+     * using `this`.
+     *
      * @since   2.1
      * @product highstock
      */
@@ -198,6 +203,15 @@ export interface AxisCrosshairLabelOptions {
 }
 
 export interface AxisCrosshairOptions {
+
+    /**
+     * Animation for the crosshair as it moves between values. Set to
+     * `false` to disable animation. Used by the color axis marker.
+     *
+     * @product highcharts highstock highmaps
+     * @since next
+     */
+    animation?: (boolean|Partial<AnimationOptions>);
 
     /**
      * A class name for the crosshair, especially as a hook for styling.
@@ -249,6 +263,17 @@ export interface AxisCrosshairOptions {
      * @product highstock
      */
     label?: AxisCrosshairLabelOptions;
+
+    /**
+    * The number of milliseconds to wait until the crosshair is shown when
+    * mouse over a point. Works on initial hover.
+    *
+    * @sample {highcharts|highstock} highcharts/tooltip/showdelay/
+    *
+    * @default 0
+    * @since next
+    */
+    showDelay?: number,
 
     /**
      * Whether the crosshair should snap to the point or follow the pointer
@@ -545,7 +570,9 @@ export interface AxisLabelOptions {
      * Callback JavaScript function to format the label. The value
      * is given by `this.value`. Additional properties for `this` are
      * `axis`, `chart`, `isFirst`, `isLast` and `text` which holds the
-     * value of the default formatter.
+     * value of the default formatter. Since v12.5.0, the callback also
+     * receives `ctx` as the first argument, so that arrow functions can
+     * access the same context as regular functions using `this`.
      *
      * Defaults to a built in function returning a formatted string
      * depending on whether the axis is `category`, `datetime`,
@@ -1748,10 +1775,13 @@ export interface AxisOptions {
 
     /**
      * A callback function returning array defining where the ticks are
-     * laid out on the axis. This overrides the default behaviour of
+     * laid out on the axis. This overrides the default behavior of
      * [tickPixelInterval](#xAxis.tickPixelInterval) and [tickInterval](
      * #xAxis.tickInterval). The automatic tick positions are accessible
-     * through `this.tickPositions` and can be modified by the callback.
+     * through `this.tickPositions` and can be modified by the callback. Since
+     * v12.5.0, the callback also receives `ctx` as the third argument, so that
+     * arrow functions can access the same context as regular functions using
+     * `this`.
      *
      * @see [tickPositions](#xAxis.tickPositions)
      *
@@ -1764,7 +1794,7 @@ export interface AxisOptions {
 
     /**
      * An array defining where the ticks are laid out on the axis. This
-     * overrides the default behaviour of [tickPixelInterval](
+     * overrides the default behavior of [tickPixelInterval](
      * #xAxis.tickPixelInterval) and [tickInterval](#xAxis.tickInterval).
      *
      * Note: When working with date-time axes, be aware of time zone
@@ -1946,7 +1976,8 @@ export interface AxisTickPositionerCallback {
     (
         this: Axis,
         min: number,
-        max: number
+        max: number,
+        ctx?: Axis
     ): (TickPositionsArray|undefined);
 }
 

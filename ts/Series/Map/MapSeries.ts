@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -57,21 +57,20 @@ const {
     column: ColumnSeries,
     scatter: ScatterSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
+import {
+    defined,
     extend,
     find,
     fireEvent,
     getNestedProperty,
     isArray,
-    defined,
     isNumber,
     isObject,
     merge,
     objectEach,
     pick,
     splat
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -907,7 +906,7 @@ class MapSeries extends ScatterSeries {
             }
         }
         // The processedXData array is used by general chart logic for checking
-        // data length in various scanarios.
+        // data length in various scenarios.
         this.dataTable.rowCount = processedData.length;
 
         return void 0;

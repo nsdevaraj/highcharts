@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *  - Sebastian Bochan
  *
  * */
@@ -37,17 +37,11 @@ import Globals from '../../Core/Globals.js';
 import CellEditing from './CellEditing.js';
 import CellRendererRegistry from '../CellRendering/CellRendererRegistry.js';
 import GU from '../../Core/GridUtils.js';
-import U from '../../../Core/Utilities.js';
+import { addEvent, merge, pushUnique } from '../../../Shared/Utilities.js';
 
 const {
     makeHTMLElement
 } = GU;
-
-const {
-    addEvent,
-    merge,
-    pushUnique
-} = U;
 
 
 /* *
@@ -193,10 +187,10 @@ function createEditModeRenderer(column: Column): EditModeRendererType {
  * Callback function called after column initialization.
  */
 function afterColumnInit(this: Column): void {
-    const { options } = this;
-
-    if (options?.cells?.editMode?.enabled) {
+    if (this.viewport.grid.columnPolicy.isColumnEditable(this.id)) {
         this.editModeRenderer = createEditModeRenderer(this);
+    } else {
+        delete this.editModeRenderer;
     }
 }
 
@@ -241,7 +235,12 @@ function addEditableCellA11yHint(this: TableCell): void {
     const editableLang = this.row.viewport.grid.options
         ?.lang?.accessibility?.cellEditing?.editable;
 
-    if (!this.column.options.cells?.editMode?.enabled || !editableLang) {
+    if (
+        !this.column.viewport.grid.columnPolicy.isColumnEditable(
+            this.column.id
+        ) ||
+        !editableLang
+    ) {
         return;
     }
 

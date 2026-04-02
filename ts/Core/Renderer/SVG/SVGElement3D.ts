@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  Extensions to the SVGRenderer class to enable 3D shapes
  *
@@ -33,11 +33,7 @@ import RendererRegistry from '../RendererRegistry.js';
 const {
     Element: SVGElement
 } = RendererRegistry.getRendererType().prototype;
-import U from '../../Utilities.js';
-const {
-    defined,
-    pick
-} = U;
+import { defined, pick } from '../../../Shared/Utilities.js';
 
 /* *
  *

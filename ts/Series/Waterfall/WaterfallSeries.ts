@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -31,8 +31,10 @@ const {
     column: ColumnSeries,
     line: LineSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
+import WaterfallAxis from '../../Core/Axis/WaterfallAxis.js';
+import WaterfallPoint from './WaterfallPoint.js';
+import WaterfallSeriesDefaults from './WaterfallSeriesDefaults.js';
+import {
     addEvent,
     arrayMax,
     arrayMin,
@@ -43,10 +45,7 @@ const {
     merge,
     objectEach,
     pick
-} = U;
-import WaterfallAxis from '../../Core/Axis/WaterfallAxis.js';
-import WaterfallPoint from './WaterfallPoint.js';
-import WaterfallSeriesDefaults from './WaterfallSeriesDefaults.js';
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -619,7 +618,6 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
         previousY = threshold,
         y,
         total,
-        yPos,
         hPos;
 
     for (let i = 0; i < points.length; i++) {
@@ -702,33 +700,28 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
                         actualStackX.threshold + actualStackX.stackTotal;
                 }
 
+                hPos = y - Math.abs(pointY);
+
                 if (yAxis.reversed) {
-                    yPos = (pointY >= 0) ? (y - pointY) : (y + pointY);
-                    hPos = y;
-                } else {
-                    yPos = y;
-                    hPos = y - pointY;
+                    [y, hPos] = [hPos, y];
                 }
 
-                point.below = yPos <= threshold;
+                point.below = y <= threshold;
 
                 box.y = yAxis.translate(
-                    yPos,
+                    y,
                     false,
                     true,
                     false,
                     true
                 );
-                box.height = Math.abs(
-                    box.y -
-                    yAxis.translate(
-                        hPos,
-                        false,
-                        true,
-                        false,
-                        true
-                    )
-                );
+                box.height = yAxis.translate(
+                    hPos,
+                    false,
+                    true,
+                    false,
+                    true
+                ) - box.y;
 
                 const dummyStackItem = yAxis.waterfall?.dummyStackItem;
                 if (dummyStackItem) {
@@ -775,22 +768,19 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
                 point.below = range[1] <= threshold;
             } else if (point.isIntermediateSum) {
                 if (pointY >= 0) {
-                    yPos = range[1] + previousIntermediate;
+                    y = range[1] + previousIntermediate;
                     hPos = previousIntermediate;
                 } else {
-                    yPos = previousIntermediate;
+                    y = previousIntermediate;
                     hPos = range[1] + previousIntermediate;
                 }
 
                 if (yAxis.reversed) {
-                    // Swapping values
-                    yPos ^= hPos;
-                    hPos ^= yPos;
-                    yPos ^= hPos;
+                    [y, hPos] = [hPos, y];
                 }
 
                 box.y = yAxis.translate(
-                    yPos,
+                    y,
                     false,
                     true,
                     false,
@@ -811,7 +801,7 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
                 );
 
                 previousIntermediate += range[1];
-                point.below = yPos <= threshold;
+                point.below = y <= threshold;
 
             // If it's not the sum point, update previous stack end position
             // and get shape height (#3886)
@@ -825,13 +815,13 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
                         true
                     ) - box.y :
                     yAxis.translate(
-                        previousY,
+                        previousY + yValue,
                         false,
                         true,
                         false,
                         true
                     ) - yAxis.translate(
-                        previousY - yValue,
+                        previousY,
                         false,
                         true,
                         false,
@@ -841,12 +831,12 @@ addEvent(WaterfallSeries, 'afterColumnTranslate', function (): void {
                 previousY += yValue;
                 point.below = previousY < threshold;
             }
+        }
 
-            // #3952 Negative sum or intermediate sum not rendered correctly
-            if (box.height < 0) {
-                box.y += box.height;
-                box.height *= -1;
-            }
+        // #3952 Negative sum or intermediate sum not rendered correctly
+        if (box.height < 0) {
+            box.y += box.height;
+            box.height *= -1;
         }
 
         point.plotY = box.y;

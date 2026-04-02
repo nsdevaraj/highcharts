@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2019-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  Item series type for Highcharts
  *
@@ -22,8 +22,7 @@
 import type ItemSeriesOptions from './ItemSeriesOptions';
 
 import SeriesDefaults from '../../Core/Series/SeriesDefaults.js';
-import U from '../../Core/Utilities.js';
-const { merge } = U;
+import { merge } from '../../Shared/Utilities.js';
 
 /* *
  *

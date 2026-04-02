@@ -7,7 +7,7 @@
  *
  *
  *  Authors:
- *  - Pawel Lysy
+ *  - Paweł Lysy
  *  - Kamil Kubik
  *
  * */
@@ -33,8 +33,7 @@ import DataConnector, {
     type Event as DataConnectorEvent
 } from './DataConnector.js';
 import JSONConverter from '../Converters/JSONConverter.js';
-import U from '../../Core/Utilities.js';
-const { merge, fireEvent } = U;
+import { fireEvent, merge } from '../../Shared/Utilities.js';
 
 /* *
  *

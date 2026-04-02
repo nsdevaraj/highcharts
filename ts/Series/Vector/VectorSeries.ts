@@ -3,7 +3,7 @@
  *  Vector plot series module
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -34,14 +34,8 @@ const {
         scatter: ScatterSeries
     }
 } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
-    arrayMax,
-    extend,
-    merge,
-    pick
-} = U;
 import VectorSeriesDefaults from './VectorSeriesDefaults.js';
+import { arrayMax, extend, merge, pick } from '../../Shared/Utilities.js';
 
 /* *
  *

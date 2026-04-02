@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi, Magdalena Gut
+ *  Author: Torstein Hønsi, Magdalena Gut
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -17,13 +17,9 @@
 
 import type SVGElement from '../../Core/Renderer/SVG/SVGElement.js';
 import type { PictorialPathOptions } from './PictorialSeriesOptions';
-import U from '../../Core/Utilities.js';
 
 import Axis from '../../Core/Axis/Axis.js';
-
-const {
-    defined
-} = U;
+import { defined } from '../../Shared/Utilities.js';
 
 /**
  *

@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -25,8 +25,7 @@ const {
     tooltipFormatter: pointTooltipFormatter
 } = Point.prototype;
 import Series from '../Core/Series/Series.js';
-import U from '../Core/Utilities.js';
-const {
+import {
     addEvent,
     arrayMax,
     arrayMin,
@@ -36,7 +35,7 @@ const {
     isNumber,
     isString,
     pick
-} = U;
+} from '../Shared/Utilities.js';
 
 /* *
  *
@@ -143,15 +142,6 @@ namespace DataModifyComposition {
      * compare and cumulative support.
      *
      * @private
-     *
-     * @param SeriesClass
-     * Series class to use.
-     *
-     * @param AxisClass
-     * Axis class to extend.
-     *
-     * @param PointClass
-     * Point class to use.
      */
     export function compose<T extends typeof Series>(
         SeriesClass: T,
@@ -453,7 +443,7 @@ namespace DataModifyComposition {
      * ********************************************************************** */
 
     /* ********************************************************************** *
-     *  Start Cumulative Sum logic, author: Rafal Sebestjanski                *
+     *  Start Cumulative Sum logic, author: Rafał Sebestjański                *
      * ********************************************************************** */
 
     /**
@@ -583,7 +573,7 @@ namespace DataModifyComposition {
          * @function Highcharts.Series#getCumulativeExtremes
          *
          * @param {Array} [activeYData]
-         *        An array cointaining all the points' y values
+         *        An array containing all the points' y values
          *        in a visible range.
          */
         static getCumulativeExtremes(

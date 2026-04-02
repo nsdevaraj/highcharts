@@ -30,13 +30,12 @@ const {
     },
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const {
-    extend,
-    merge,
+import {
     correctFloat,
-    isArray
-} = U;
+    extend,
+    isArray,
+    merge
+} from '../../../Shared/Utilities.js';
 
 /* *
  *
@@ -92,7 +91,7 @@ class AOIndicator extends SMAIndicator {
          * @sample {highstock} stock/indicators/ao/
          *         greaterBarColor
          *
-         * @type  {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type  {Highcharts.ColorType}
          * @since 7.0.0
          */
         greaterBarColor: Palette.positiveColor,
@@ -104,7 +103,7 @@ class AOIndicator extends SMAIndicator {
          * @sample {highstock} stock/indicators/ao/
          *         lowerBarColor
          *
-         * @type  {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type  {Highcharts.ColorType}
          * @since 7.0.0
          */
         lowerBarColor: Palette.negativeColor,

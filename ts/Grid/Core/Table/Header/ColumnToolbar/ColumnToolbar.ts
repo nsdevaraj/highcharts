@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -32,10 +32,9 @@ import ToolbarButton from '../../../UI/ToolbarButton.js';
 import SortToolbarButton from './ToolbarButtons/SortToolbarButton.js';
 import FilterToolbarButton from './ToolbarButtons/FilterToolbarButton.js';
 import MenuToolbarButton from './ToolbarButtons/MenuToolbarButton.js';
-import U from '../../../../../Core/Utilities.js';
+import { getStyle } from '../../../../../Shared/Utilities.js';
 
 const { makeHTMLElement } = GridUtils;
-const { getStyle } = U;
 
 
 /* *
@@ -120,16 +119,18 @@ class HeaderCellToolbar implements Toolbar {
      */
     private renderFull(): void {
         const columnOptions = this.column.options;
-        const sortingEnabled = columnOptions.sorting?.enabled ??
-            columnOptions.sorting?.sortable;
+        const sortingEnabled = this.column.viewport.grid.columnPolicy
+            .isColumnSortingEnabled(this.column.id);
 
         if (sortingEnabled) {
             new SortToolbarButton().add(this);
         }
 
         if (
-            columnOptions.filtering?.enabled &&
-            !columnOptions.filtering.inline
+            this.column.viewport.grid.columnPolicy.isColumnFilteringEnabled(
+                this.column.id
+            ) &&
+            !columnOptions.filtering?.inline
         ) {
             new FilterToolbarButton().add(this);
         }
@@ -137,13 +138,15 @@ class HeaderCellToolbar implements Toolbar {
 
     private renderMinimized(): void {
         const columnOptions = this.column.options;
-        const sortingEnabled = columnOptions.sorting?.enabled ??
-            columnOptions.sorting?.sortable;
+        const sortingEnabled = this.column.viewport.grid.columnPolicy
+            .isColumnSortingEnabled(this.column.id);
 
         if (
             sortingEnabled || (
-                columnOptions.filtering?.enabled &&
-                !columnOptions.filtering.inline
+                this.column.viewport.grid.columnPolicy.isColumnFilteringEnabled(
+                    this.column.id
+                ) &&
+                !columnOptions.filtering?.inline
             )
         ) {
             new MenuToolbarButton().add(this);

@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -29,18 +29,18 @@ import AST from './AST.js';
 import H from '../../Globals.js';
 const { composed, isFirefox } = H;
 import SVGElement from '../SVG/SVGElement.js';
-import U from '../../Utilities.js';
-const {
+import {
     attr,
-    css,
     createElement,
+    css,
     defined,
     extend,
     getAlignFactor,
     isNumber,
     pInt,
     pushUnique
-} = U;
+} from '../../../Shared/Utilities.js';
+
 
 /* *
  *
@@ -574,7 +574,7 @@ class HTMLElement extends SVGElement {
 
     /**
      * Add the element to a group wrapper. For HTML elements, a parallel div
-     * will be created for each ancenstor SVG `g` element.
+     * will be created for each ancestor SVG `g` element.
      *
      * @internal
      */

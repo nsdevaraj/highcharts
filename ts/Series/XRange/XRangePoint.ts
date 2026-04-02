@@ -3,7 +3,7 @@
  *  X-range series module
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi, Lars A. V. Cabrera
+ *  Author: Torstein Hønsi, Lars A. V. Cabrera
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -32,9 +32,8 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const {
     column: { prototype: { pointClass: ColumnPoint } }
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const { extend } = U;
 import XRangeSeries from './XRangeSeries.js';
+import { extend } from '../../Shared/Utilities.js';
 
 /* *
  *

@@ -9,7 +9,7 @@
  *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -27,11 +27,9 @@ import type {
     CellType as DataTableCellType,
     Column as DataTableColumnType
 } from '../../../Data/DataTable';
+import { defined } from '../../../Shared/Utilities.js';
 import type QueryingController from '../Querying/QueryingController';
 import type { ColumnDataType } from '../Table/Column';
-
-import U from '../../../Core/Utilities.js';
-const { defined } = U;
 
 
 /**
@@ -220,6 +218,21 @@ export interface DataProviderOptions {
      * @default 'local'
      */
     providerType?: string;
+
+    /**
+     * Whether columns should be generated automatically from data source
+     * column ids.
+     *
+     * If set to `false`, only columns explicitly configured in `columns[]`
+     * (or referenced by `header`) will be rendered.
+     *
+     * With `autogenerateColumns: true` and no `header`, source columns are
+     * rendered in provider order, and custom configured columns are appended
+     * at the end in their definition order.
+     *
+     * @default true
+     */
+    autogenerateColumns?: boolean;
 }
 
 

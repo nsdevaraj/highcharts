@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -25,11 +25,7 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const {
     spline: { prototype: splineProto }
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
-    merge,
-    extend
-} = U;
+import { extend, merge } from '../../Shared/Utilities.js';
 
 /* *
  *

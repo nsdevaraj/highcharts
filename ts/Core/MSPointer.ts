@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -30,9 +30,8 @@ const {
     win
 } = H;
 import Pointer from './Pointer.js';
-import U from './Utilities.js';
 import DOMElementType from './Renderer/DOMElementType';
-const {
+import {
     addEvent,
     attr,
     css,
@@ -41,7 +40,7 @@ const {
     pick,
     pushUnique,
     removeEvent
-} = U;
+} from '../Shared/Utilities.js';
 
 /* *
  *
@@ -86,7 +85,6 @@ const hasPointerEvent = !!win.PointerEvent;
  *
  * */
 
-/* eslint-disable valid-jsdoc */
 
 /** @internal */
 function getWebkitTouches(): void {

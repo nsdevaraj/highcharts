@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -29,11 +29,7 @@ const {
 import { Palette } from './Color/Palettes.js';
 import Palettes from './Color/Palettes.js';
 import Time from './Time.js';
-import U from './Utilities.js';
-const {
-    fireEvent,
-    merge
-} = U;
+import { fireEvent, merge } from '../Shared/Utilities.js';
 
 /* *
  *
@@ -88,7 +84,7 @@ const defaultOptions: DefaultOptions = {
      * @sample highcharts/members/theme-v10/
      *         Latest release styled like version 10
      *
-     * @type    {Array<(Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject)>}
+     * @type    {Array<Highcharts.ColorType>}
      * @default [
      *     "#2caffe",
      *     "#544fc5",
@@ -1033,7 +1029,7 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} maps/legend/border-background/
          *         Border and background options
          *
-         * @type      {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type      {Highcharts.ColorType}
          * @apioption legend.backgroundColor
          */
 
@@ -1250,11 +1246,13 @@ const defaultOptions: DefaultOptions = {
          * @apioption legend.labelFormat
          */
 
-        /* eslint-disable valid-jsdoc */
         /**
          * Callback function to format each of the series' labels. The `this`
          * keyword refers to the series object, or the point object in case of
-         * pie charts. By default the series or point name is printed.
+         * pie charts. By default the series or point name is printed. Since
+         * v12.5.0, the callback also receives `ctx` as the first argument, so
+         * that arrow functions can access the same context as regular
+         * functions using `this`.
          *
          * @productdesc {highmaps}
          * In Highmaps the context can also be a data class in case of a
@@ -1341,7 +1339,7 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} maps/legend/border-background/
          *         Border and background options
          *
-         * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type {Highcharts.ColorType}
          */
         borderColor: Palette.neutralColor40,
 
@@ -1453,7 +1451,7 @@ const defaultOptions: DefaultOptions = {
              * @sample  {highstock} highcharts/legend/navigation/
              *          Legend page navigation demonstrated
              *
-             * @type  {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+             * @type  {Highcharts.ColorType}
              * @since 2.2.4
              */
             activeColor: Palette.highlightColor100,
@@ -1470,7 +1468,7 @@ const defaultOptions: DefaultOptions = {
              * @sample {highstock} highcharts/legend/navigation/
              *         Legend page navigation demonstrated
              *
-             * @type  {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+             * @type  {Highcharts.ColorType}
              * @since 2.2.4
              */
             inactiveColor: Palette.neutralColor20
@@ -2023,7 +2021,7 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} maps/tooltip/background-border/ Background and
          *         border demo
          *
-         * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type {Highcharts.ColorType}
          * @apioption tooltip.borderColor
          */
 
@@ -2204,6 +2202,10 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} maps/tooltip/formatter/
          *         String formatting
          *
+         * Since v12.5.0, the callback also receives `ctx` as the second
+         * argument, so that arrow functions can access the same context as
+         * regular functions using `this`.
+         *
          * @type      {Highcharts.TooltipFormatterCallbackFunction}
          * @apioption tooltip.formatter
          */
@@ -2211,7 +2213,8 @@ const defaultOptions: DefaultOptions = {
         /**
          * Callback function to format the text of the tooltip for
          * visible null points.
-         * Works analogously to [formatter](#tooltip.formatter).
+         * Works analogously to [formatter](#tooltip.formatter), including the
+         * `ctx` callback argument added in v12.5.0.
          *
          * @sample highcharts/plotoptions/series-nullformat
          *         Format data label and tooltip for null point.
@@ -2247,7 +2250,9 @@ const defaultOptions: DefaultOptions = {
         /**
          * A callback function for formatting the HTML output for a single point
          * in the tooltip. Like the `pointFormat` string, but with more
-         * flexibility.
+         * flexibility. Since v12.5.0, the callback also receives `ctx` as the
+         * first argument, so that arrow functions can access the same context
+         * as regular functions using `this`.
          *
          * @type      {Highcharts.FormatterCallbackFunction<Highcharts.Point>}
          * @since     4.1.0
@@ -2257,10 +2262,13 @@ const defaultOptions: DefaultOptions = {
 
         /**
          * A callback function to place the tooltip in a custom position. The
-         * callback receives three parameters: `labelWidth`, `labelHeight` and
-         * `point`, where point contains values for `plotX` and `plotY` telling
-         * where the reference point is in the plot area. Add `chart.plotLeft`
-         * and `chart.plotTop` to get the full coordinates.
+         * callback receives four parameters: `labelWidth`, `labelHeight`,
+         * `point`, and `ctx`, where point contains values for `plotX` and
+         * `plotY` telling where the reference point is in the plot area, and
+         * `ctx` is the tooltip context (so that arrow-functions can access the
+         * same context as a normal function using `this`). Add
+         * `chart.plotLeft` and `chart.plotTop` to get the full coordinates.
+         * Since v12.5.0, the callback receives `ctx`.
          *
          * To find the actual hovered `Point` instance, use
          * `this.chart.hoverPoint`. For shared or split tooltips, all the hover
@@ -2497,6 +2505,16 @@ const defaultOptions: DefaultOptions = {
          * @since 3.0
          */
         hideDelay: 500,
+
+        /**
+         * The number of milliseconds to wait until the tooltip is shown when
+         * mouse over a point. Works on initial hover.
+         *
+         * @sample {highcharts|highstock} highcharts/tooltip/showdelay/
+         *
+         * @since next
+         */
+        showDelay: 0,
 
         /**
          * Padding inside the tooltip, in pixels.
@@ -2739,7 +2757,7 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} highcharts/css/tooltip-border-background/
          *         Tooltip in styled mode
          *
-         * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
+         * @type {Highcharts.ColorType}
          */
         backgroundColor: Palette.backgroundColor,
 
@@ -2840,7 +2858,7 @@ const defaultOptions: DefaultOptions = {
     },
 
     /**
-     * Highchart by default puts a credits label in the lower right corner
+     * Highcharts by default puts a credits label in the lower right corner
      * of the chart. This can be changed using these options.
      */
     credits: {
@@ -3066,7 +3084,7 @@ export default DefaultOptions;
  * @name Highcharts.ChartAddSeriesEventObject#options
  * @type {Highcharts.SeriesOptionsType}
  *//**
- * Prevents the default behaviour of the event.
+ * Prevents the default behavior of the event.
  * @name Highcharts.ChartAddSeriesEventObject#preventDefault
  * @type {Function}
  *//**
@@ -3175,7 +3193,7 @@ export default DefaultOptions;
  *        The chart on which the event occurred.
  *
  * @param {Highcharts.SelectEventObject} event
- *        Event informations
+ *        Event information
  *
  * @return {boolean|undefined}
  *         Return false to prevent the default action, usually zoom.

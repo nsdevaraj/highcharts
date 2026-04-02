@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -26,9 +26,8 @@ import type { GradientColorStop } from '../../Color/GradientColor';
 import type Point from '../../Series/Point';
 
 import Color from '../../Color/Color.js';
+import { merge } from '../../../Shared/Utilities.js';
 const { parse: color } = Color;
-import U from '../../Utilities.js';
-const { merge } = U;
 
 /* *
  *

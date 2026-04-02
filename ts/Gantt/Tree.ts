@@ -2,7 +2,7 @@
  *
  *  (c) 2016-2026 Highsoft AS
  *
- *  Authors: Jon Arild Nygard
+ *  Authors: Jon Arild Nygård
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -18,12 +18,7 @@
  *
  * */
 
-import U from '../Core/Utilities.js';
-const {
-    extend,
-    isNumber,
-    pick
-} = U;
+import { extend, isNumber, pick } from '../Shared/Utilities.js';
 
 /* *
  *

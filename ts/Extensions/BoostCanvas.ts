@@ -2,7 +2,7 @@
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
- *  Author: Torstein Honsi, Christer Vasseng
+ *  Author: Torstein Hønsi, Christer Vasseng
  *
  *  This module serves as a fallback for the Boost module in IE9 and IE10. Newer
  *  browsers support WebGL which is faster.
@@ -56,15 +56,15 @@ const {
     noop
 } = H;
 import { Palette } from '../Core/Color/Palettes.js';
-import U from '../Core/Utilities.js';
-const {
+import {
     addEvent,
     fireEvent,
+    internalClearTimeout,
     isNumber,
     merge,
     pick,
     wrap
-} = U;
+} from '../Shared/Utilities.js';
 
 /* *
  *
@@ -582,7 +582,7 @@ namespace BoostCanvas {
                     opacity: 1
                 }
             });
-            U.clearTimeout(destroyLoadingDiv);
+            internalClearTimeout(destroyLoadingDiv);
             chart.showLoading('Drawing...');
             chart.options.loading = loadingOptions; // Reset
         }

@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -26,12 +26,7 @@ const {
     column: ColumnSeries,
     line: LineSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
-    addEvent,
-    extend,
-    merge
-} = U;
+import { addEvent, extend, merge } from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -75,7 +70,6 @@ class ScatterSeries extends LineSeries {
      *
      * */
 
-    /* eslint-disable valid-jsdoc */
 
     /**
      * Optionally add the jitter effect.
@@ -143,7 +137,6 @@ class ScatterSeries extends LineSeries {
         }
     }
 
-    /* eslint-enable valid-jsdoc */
 
 }
 

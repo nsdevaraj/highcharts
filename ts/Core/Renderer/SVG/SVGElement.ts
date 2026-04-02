@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -54,8 +54,7 @@ const {
     win,
     isFirefox
 } = H;
-import U from '../../Utilities.js';
-const {
+import {
     addEvent,
     attr,
     createElement,
@@ -73,13 +72,13 @@ const {
     isString,
     merge,
     objectEach,
-    pick,
     pInt,
+    pick,
     pushUnique,
     replaceNested,
-    syncTimeout,
-    uniqueKey
-} = U;
+    syncTimeout
+} from '../../../Shared/Utilities.js';
+import { uniqueKey } from '../../Utilities.js';
 
 /* *
  *
@@ -106,7 +105,7 @@ declare module '../CSSObject' {
  * rendering layer of Highcharts. Combined with the
  * {@link Highcharts.SVGRenderer}
  * object, these prototypes allow freeform annotation in the charts or even in
- * HTML pages without instanciating a chart. The SVGElement can also wrap HTML
+ * HTML pages without instantiating a chart. The SVGElement can also wrap HTML
  * labels, when `text` or `label` elements are created with the `useHTML`
  * parameter.
  *
@@ -507,7 +506,7 @@ class SVGElement implements SVGElementBase {
             alignedObjects = renderer.alignedObjects,
             initialAlignment = Boolean(alignOptions);
 
-        // First call on instanciate
+        // First call on instantiate
         if (alignOptions) {
             this.alignOptions = alignOptions;
             this.alignByTranslate = alignByTranslate;
@@ -1439,7 +1438,7 @@ class SVGElement implements SVGElementBase {
 
     /**
      * @internal
-     * @function Highcharts.SVGElement#dSettter
+     * @function Highcharts.SVGElement#dSetter
      * @param {number|string|Highcharts.SVGPathArray} value
      * @param {string} key
      * @param {Highcharts.SVGDOMElement} element
@@ -2759,7 +2758,7 @@ export default SVGElement;
  * @type {number|undefined}
  *//**
  * @name Highcharts.SVGAttributes#fill
- * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject|undefined}
+ * @type {Highcharts.ColorType|undefined}
  *//**
  * @name Highcharts.SVGAttributes#inverted
  * @type {boolean|undefined}
@@ -2783,7 +2782,7 @@ export default SVGElement;
  * @type {number|undefined}
  *//**
  * @name Highcharts.SVGAttributes#stroke
- * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject|undefined}
+ * @type {Highcharts.ColorType|undefined}
  *//**
  * @name Highcharts.SVGAttributes#style
  * @type {string|Highcharts.CSSObject|undefined}

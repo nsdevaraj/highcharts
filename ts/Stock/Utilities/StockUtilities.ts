@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -18,10 +18,7 @@
  * */
 
 import type Chart from '../../Core/Chart/Chart';
-import U from '../../Core/Utilities.js';
-const {
-    defined
-} = U;
+import { defined } from '../../Shared/Utilities.js';
 
 /* *
  *

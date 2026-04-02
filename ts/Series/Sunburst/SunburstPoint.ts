@@ -4,7 +4,7 @@
  *
  *  (c) 2016-2026 Highsoft AS
  *
- *  Authors: Jon Arild Nygard
+ *  Authors: Jon Arild Nygård
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -32,12 +32,7 @@ const {
     }
 } = SeriesRegistry;
 import SunburstNode from './SunburstNode';
-import U from '../../Core/Utilities.js';
-const {
-    correctFloat,
-    extend,
-    pInt
-} = U;
+import { correctFloat, extend, pInt } from '../../Shared/Utilities.js';
 
 
 /* *

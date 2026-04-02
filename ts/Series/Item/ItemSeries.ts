@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2019-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  Item series type for Highcharts
  *
@@ -32,15 +32,14 @@ import SeriesRegistry from '../../Core/Series/SeriesRegistry.js';
 const {
     pie: PieSeries
 } = SeriesRegistry.seriesTypes;
-import U from '../../Core/Utilities.js';
-const {
+import {
     defined,
     extend,
     fireEvent,
     isNumber,
     merge,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *

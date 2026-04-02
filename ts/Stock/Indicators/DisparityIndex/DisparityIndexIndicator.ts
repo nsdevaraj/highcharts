@@ -1,6 +1,6 @@
 /* *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Rafal Sebestjanski
+ *  Author: Rafał Sebestjański
  *
  *  Disparity Index technical indicator for Highcharts Stock
  *
@@ -31,14 +31,13 @@ import SeriesRegistry from '../../../Core/Series/SeriesRegistry.js';
 const {
     sma: SMAIndicator
 } = SeriesRegistry.seriesTypes;
-import U from '../../../Core/Utilities.js';
-const {
+import {
     correctFloat,
     defined,
     extend,
     isArray,
     merge
-} = U;
+} from '../../../Shared/Utilities.js';
 
 /* *
  *

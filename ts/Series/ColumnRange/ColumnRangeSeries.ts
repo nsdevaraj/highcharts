@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -35,15 +35,14 @@ const {
         }
     }
 } = SeriesRegistry;
-import U from '../../Core/Utilities.js';
-const {
+import {
     addEvent,
     clamp,
     extend,
     isNumber,
     merge,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *
@@ -244,7 +243,7 @@ class ColumnRangeSeries extends AreaRangeSeries {
                         y + height,
                         y,
                         start,
-                        start + point.pointWidth
+                        start + (point.pointWidth || 0)
                     );
                 } else {
 

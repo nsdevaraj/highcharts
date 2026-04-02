@@ -7,7 +7,7 @@
  *
  *
  *  Authors:
- *  - Karol Kolodziej
+ *  - Karol Kołodziej
  *
  * */
 
@@ -25,10 +25,7 @@ import type { Options } from './GridComponentOptions';
 import type { DeepPartial } from '../../../Shared/Types';
 
 import DataConverter from '../../../Data/Converters/DataConverter.js';
-import U from '../../../Core/Utilities.js';
-const {
-    uniqueKey
-} = U;
+import { uniqueKey } from '../../../Core/Utilities.js';
 
 /* *
  *

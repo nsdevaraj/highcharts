@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -25,8 +25,7 @@ import type SVGRenderer from './SVGRenderer';
 import type { SymbolKey } from './SymbolType';
 
 import SVGElement from './SVGElement.js';
-import U from '../../Utilities.js';
-const {
+import {
     defined,
     extend,
     getAlignFactor,
@@ -34,7 +33,7 @@ const {
     merge,
     pick,
     removeEvent
-} = U;
+} from '../../../Shared/Utilities.js';
 
 /* *
  *

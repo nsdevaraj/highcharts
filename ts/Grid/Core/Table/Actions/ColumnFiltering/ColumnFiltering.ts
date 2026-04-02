@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *  - Sebastian Bochan
  *  - Kamil Kubik
  *
@@ -29,12 +29,11 @@ import type { Condition } from './FilteringTypes';
 import type FilterCell from './FilterCell.js';
 import type { FilteringCondition } from '../../../Options';
 
-import U from '../../../../../Core/Utilities.js';
 import GU from '../../../GridUtils.js';
 import Globals from '../../../Globals.js';
 import { conditionsMap } from './FilteringTypes.js';
+import { defined, fireEvent } from '../../../../../Shared/Utilities.js';
 
-const { defined, fireEvent } = U;
 const { makeHTMLElement } = GU;
 
 /* *
@@ -185,7 +184,11 @@ class ColumnFiltering {
     public renderFilteringContent(container: HTMLElement): void {
         const column = this.column;
         const columnType = column.dataType;
-        if (!column.options.filtering?.enabled) {
+        if (
+            !column.viewport.grid.columnPolicy.isColumnFilteringEnabled(
+                column.id
+            )
+        ) {
             return;
         }
 

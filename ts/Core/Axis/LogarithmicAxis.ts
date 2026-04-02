@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -19,12 +19,11 @@
 
 import type Axis from './Axis';
 
-import U from '../Utilities.js';
-const {
+import {
     addEvent,
     normalizeTickInterval,
     pick
-} = U;
+} from '../../Shared/Utilities.js';
 
 /* *
  *

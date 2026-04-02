@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *
  * */
 
@@ -27,10 +27,9 @@ import type Button from './Button';
 
 import GridUtils from '../GridUtils.js';
 import Globals from '../Globals.js';
-import U from '../../../Core/Utilities.js';
+import { fireEvent } from '../../../Shared/Utilities.js';
 
 const { makeHTMLElement } = GridUtils;
-const { fireEvent } = U;
 
 
 /* *
