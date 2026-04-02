@@ -50,6 +50,7 @@ type TreeToggleClickListener = (event: MouseEvent) => void;
 type TreeToggleDblClickListener = (event: MouseEvent) => void;
 type TreeToggleMouseDownListener = (event: MouseEvent) => void;
 type TreeToggleKeyDownListener = (event: KeyboardEvent) => void;
+type TreeToggleWheelListener = (event: WheelEvent) => void;
 type TreeToggleScrollListener = () => void;
 type TreeToggleContext = {
     cell: TableCell;
@@ -61,6 +62,7 @@ type TreeToggleListeners = {
     dblClick: TreeToggleDblClickListener;
     mouseDown: TreeToggleMouseDownListener;
     keyDown: TreeToggleKeyDownListener;
+    wheel?: TreeToggleWheelListener;
     scroll?: TreeToggleScrollListener;
     stickyBody?: HTMLElement;
 };
@@ -282,6 +284,40 @@ function restoreTreeCellFocus(
 }
 
 /**
+ * Converts wheel delta to CSS pixels.
+ *
+ * @param event
+ * Wheel event raised over the sticky overlay.
+ *
+ * @param viewportSize
+ * The relevant viewport size for page-based deltas.
+ *
+ * @param lineSize
+ * Pixel size used for line-based deltas.
+ */
+function normalizeWheelDelta(
+    event: WheelEvent,
+    viewportSize: number,
+    lineSize: number
+): [number, number] {
+    if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+        return [
+            event.deltaX * lineSize,
+            event.deltaY * lineSize
+        ];
+    }
+
+    if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+        return [
+            event.deltaX * viewportSize,
+            event.deltaY * viewportSize
+        ];
+    }
+
+    return [event.deltaX, event.deltaY];
+}
+
+/**
  * Toggles tree row and restores focus when redraw replaces the DOM cell.
  *
  * @param context
@@ -399,6 +435,46 @@ function onTableBeforeInit(this: Table): void {
         void toggleTreeRow(context, event);
     };
 
+    const wheelListener = (event: WheelEvent): void => {
+        if (event.ctrlKey) {
+            return;
+        }
+
+        const tbody = this.tbodyElement;
+        const [deltaX, deltaY] = normalizeWheelDelta(
+            event,
+            tbody.clientHeight,
+            this.rowsVirtualizer.defaultRowHeight
+        );
+        const maxScrollTop = Math.max(
+            tbody.scrollHeight - tbody.clientHeight,
+            0
+        );
+        const maxScrollLeft = Math.max(
+            tbody.scrollWidth - tbody.clientWidth,
+            0
+        );
+        const nextScrollTop = Math.max(
+            0,
+            Math.min(tbody.scrollTop + deltaY, maxScrollTop)
+        );
+        const nextScrollLeft = Math.max(
+            0,
+            Math.min(tbody.scrollLeft + deltaX, maxScrollLeft)
+        );
+
+        if (
+            nextScrollTop === tbody.scrollTop &&
+            nextScrollLeft === tbody.scrollLeft
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+        tbody.scrollTop = nextScrollTop;
+        tbody.scrollLeft = nextScrollLeft;
+    };
+
     this.tbodyElement.addEventListener('click', clickListener);
     this.tbodyElement.addEventListener('dblclick', dblClickListener);
     this.tbodyElement.addEventListener('mousedown', mouseDownListener);
@@ -407,11 +483,15 @@ function onTableBeforeInit(this: Table): void {
     stickyBody.addEventListener('dblclick', dblClickListener);
     stickyBody.addEventListener('mousedown', mouseDownListener);
     stickyBody.addEventListener('keydown', keyDownListener);
+    stickyBody.addEventListener('wheel', wheelListener, {
+        passive: false
+    });
     treeToggleListeners.set(this, {
         click: clickListener,
         dblClick: dblClickListener,
         mouseDown: mouseDownListener,
         keyDown: keyDownListener,
+        wheel: wheelListener,
         stickyBody
     });
 }
@@ -463,6 +543,9 @@ function onTableAfterDestroy(this: Table): void {
         listeners.mouseDown
     );
     listeners.stickyBody?.removeEventListener('keydown', listeners.keyDown);
+    if (listeners.wheel) {
+        listeners.stickyBody?.removeEventListener('wheel', listeners.wheel);
+    }
     if (listeners.scroll) {
         this.tbodyElement.removeEventListener('scroll', listeners.scroll);
     }
