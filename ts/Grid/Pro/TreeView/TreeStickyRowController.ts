@@ -110,6 +110,17 @@ class TreeStickyRowController {
         return this.stickyRows;
     }
 
+    public getStickyRowsHeight(): number {
+        return this.stickyRows.reduce(
+            (height, row): number =>
+                height + (
+                    row.htmlElement.offsetHeight ||
+                    this.viewport.rowsVirtualizer.defaultRowHeight
+                ),
+            0
+        );
+    }
+
     public getStickyBodyElement(): HTMLTableSectionElement {
         return this.ensureStickyBody();
     }
@@ -167,8 +178,6 @@ class TreeStickyRowController {
     private clearStickyRows(): void {
         ++this.refreshToken;
         this.activeRowIds.length = 0;
-        delete this.viewport.treeStickyRow;
-        delete this.viewport.treeStickyRows;
 
         if (this.stickyBodyElement) {
             this.stickyBodyElement.style.height = '0';
@@ -608,8 +617,6 @@ class TreeStickyRowController {
         }
 
         this.syncStickyBodyPosition();
-        this.viewport.treeStickyRow = nextStickyRows[0];
-        this.viewport.treeStickyRows = nextStickyRows;
 
         return true;
     }
@@ -625,14 +632,7 @@ class TreeStickyRowController {
 
         stickyBodyElement.style.top = tbodyElement.offsetTop + 'px';
         stickyBodyElement.style.width = bodyWidth + 'px';
-        stickyBodyElement.style.height = this.stickyRows.reduce(
-            (height, row): number =>
-                height + (
-                    row.htmlElement.offsetHeight ||
-                    this.viewport.rowsVirtualizer.defaultRowHeight
-                ),
-            0
-        ) + 'px';
+        stickyBodyElement.style.height = this.getStickyRowsHeight() + 'px';
         stickyBodyElement.style.transform = tbodyElement.scrollLeft ?
             `translateX(${-tbodyElement.scrollLeft}px)` :
             '';

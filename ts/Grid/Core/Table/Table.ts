@@ -97,16 +97,6 @@ class Table {
     public rows: TableRow[] = [];
 
     /**
-     * Optional supplemental row rendered by composed modules.
-     */
-    public treeStickyRow?: TableRow;
-
-    /**
-     * Optional supplemental rows rendered by composed modules.
-     */
-    public treeStickyRows?: TableRow[];
-
-    /**
      * The resize observer for the table container.
      * @internal
      */
@@ -638,43 +628,45 @@ class Table {
      * Try it: {@link https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/grid-lite/basic/scroll-to-row | Scroll to row}
      */
     public scrollToRow(index: number): void {
-        const stickyRowsHeight = this.getStickyRowsHeight();
+        const viewportTopInset = this.getViewportTopInset();
 
         if (this.virtualRows) {
             this.tbodyElement.scrollTop =
                 Math.max(
                     0,
                     index * this.rowsVirtualizer.defaultRowHeight -
-                    stickyRowsHeight
+                    viewportTopInset
                 );
             return;
         }
 
         const rowClass = '.' + Globals.getClassName('rowElement');
-        const stickyRows = new Set(
-            (this.treeStickyRows || (this.treeStickyRow ?
-                [this.treeStickyRow] :
-                []))
-                .map((row): HTMLTableRowElement => row.htmlElement)
-        );
-        const rows = Array.from(this.tbodyElement.querySelectorAll(rowClass))
-            .filter(
-                (row): boolean =>
-                    !stickyRows.has(row as HTMLTableRowElement)
-            );
+        const rows = Array.from(this.tbodyElement.querySelectorAll(rowClass));
         const firstRowTop = rows[0].getBoundingClientRect().top;
 
         this.tbodyElement.scrollTop = Math.max(
             0,
             (
                 rows[index].getBoundingClientRect().top
-            ) - firstRowTop - stickyRowsHeight
+            ) - firstRowTop - viewportTopInset
         );
     }
 
     /**
-     * Ensures that a row is fully visible inside the scrollable body, taking
-     * the sticky tree rows overlay into account.
+     * Returns the top inset of the visible table body area. Composed modules
+     * can extend this via the `getViewportTopInset` event.
+     */
+    public getViewportTopInset(): number {
+        const eventObject = {
+            top: 0
+        };
+
+        fireEvent(this, 'getViewportTopInset', eventObject);
+        return eventObject.top;
+    }
+
+    /**
+     * Ensures that a row is fully visible inside the scrollable body.
      *
      * @param row
      * The row to reveal.
@@ -689,8 +681,7 @@ class Table {
 
         const tbodyRect = this.tbodyElement.getBoundingClientRect();
         const rowRect = row.htmlElement.getBoundingClientRect();
-        const stickyRowsHeight = this.getStickyRowsHeight();
-        const visibleTop = tbodyRect.top + stickyRowsHeight;
+        const visibleTop = tbodyRect.top + this.getViewportTopInset();
         const visibleBottom = tbodyRect.bottom;
         const visibleHeight = Math.max(visibleBottom - visibleTop, 0);
         const maxScrollTop = Math.max(
@@ -716,49 +707,7 @@ class Table {
     }
 
     /**
-     * Returns the current height occupied by sticky tree rows.
-     */
-    public getStickyRowsHeight(): number {
-        return (this.treeStickyRows || []).reduce(
-            (height, stickyRow): number =>
-                height + stickyRow.htmlElement.offsetHeight,
-            0
-        );
-    }
-
-    /**
-     * Returns the rows that should participate in keyboard navigation. Sticky
-     * tree clones are treated as the visible representatives of their rows and
-     * replace matching rows from the main body.
-     */
-    public getKeyboardNavigableRows(): TableRow[] {
-        const stickyRows = this.treeStickyRows || [];
-
-        if (!stickyRows.length) {
-            return this.rows;
-        }
-
-        const stickyRowIds = new Set<RowId>();
-        for (let i = 0, iEnd = stickyRows.length; i < iEnd; ++i) {
-            const rowId = stickyRows[i].id;
-
-            if (typeof rowId !== 'undefined') {
-                stickyRowIds.add(rowId);
-            }
-        }
-
-        return stickyRows.concat(
-            this.rows.filter((row): boolean => (
-                typeof row.id === 'undefined' ||
-                !stickyRowIds.has(row.id)
-            ))
-        );
-    }
-
-    /**
-     * Focuses a body cell by its row index in the projected table order. When
-     * a sticky tree clone represents that row, it is preferred over the main
-     * body row.
+     * Focuses a body cell by its row index in the rendered table order.
      *
      * @param rowIndex
      * The target row index.
@@ -776,7 +725,7 @@ class Table {
             return;
         }
 
-        const targetRow = this.getKeyboardNavigableRows().find(
+        const targetRow = this.rows.find(
             (row): boolean => row.index === rowIndex
         );
         const targetCell = targetRow?.cells[columnIndex];
@@ -853,18 +802,6 @@ class Table {
             return;
         }
 
-        const cellIndex = Array.prototype.indexOf.call(tr.children, td);
-        const stickyRows = this.treeStickyRows || (
-            this.treeStickyRow ? [this.treeStickyRow] : []
-        );
-        const stickyRow = stickyRows.find(
-            (row): boolean => row.htmlElement === tr
-        );
-
-        if (stickyRow) {
-            return stickyRow.cells[cellIndex];
-        }
-
         const rowIndexAttr = tr.getAttribute('data-row-index');
         if (rowIndexAttr === null) {
             return;
@@ -877,6 +814,7 @@ class Table {
             return;
         }
 
+        const cellIndex = Array.prototype.indexOf.call(tr.children, td);
         return row.cells[cellIndex];
     }
 
