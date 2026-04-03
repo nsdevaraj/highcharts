@@ -758,6 +758,7 @@ addEvent(AreaRangeSeries, 'afterTranslate', function (): void {
  *
  * */
 
+/** @internal */
 interface AreaRangeSeries {
     deferTranslatePolar: boolean;
     pointArrayMap: Array<string>;
@@ -780,6 +781,7 @@ extend(AreaRangeSeries.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         arearange: typeof AreaRangeSeries;
@@ -795,4 +797,5 @@ SeriesRegistry.registerSeriesType('arearange', AreaRangeSeries);
  *
  * */
 
+/** @internal */
 export default AreaRangeSeries;
