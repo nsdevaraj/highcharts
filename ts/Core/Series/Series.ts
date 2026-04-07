@@ -4692,6 +4692,16 @@ class Series {
                     }
                 }
             }
+
+            // Also destroy node labels when data labels are disabled. Do not
+            // call resolveColor here to avoid reassigning colorByPoint colors.
+            if (kinds.dataLabel && this.nodes) { // #23385
+                for (const point of this.nodes) {
+                    if (point?.series) {
+                        point.destroyElements({ dataLabel: 1 });
+                    }
+                }
+            }
         }
 
         series.initialType = initialType;
