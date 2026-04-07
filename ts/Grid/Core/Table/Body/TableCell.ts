@@ -9,7 +9,7 @@
  *
  *
  *  Authors:
- *  - Dawid Dragula
+ *  - Dawid Draguła
  *  - Sebastian Bochan
  *
  * */
@@ -156,7 +156,7 @@ class TableCell extends Cell {
         this.htmlElement.style.opacity = '0.5';
 
         if (!defined(value)) {
-            value = await this.getSourceValue();
+            value = await this.column.getCellValue(this);
 
             // Discard stale response if cell was reused for a different row
             if (fetchToken !== this.asyncFetchToken) {
@@ -213,7 +213,7 @@ class TableCell extends Cell {
     private getCellStyles(): CSSObject {
         const { grid } = this.column.viewport;
         const rawColumnOptions =
-            grid.columnOptionsMap?.[this.column.id]?.options;
+            grid.columnPolicy.getIndividualColumnOptions(this.column.id);
 
         return {
             ...mergeStyleValues(
@@ -239,7 +239,22 @@ class TableCell extends Cell {
      * content.
      */
     private async updateDataset(): Promise<boolean> {
-        const oldValue = await this.getSourceValue();
+        const sourceColumnId = this.column.viewport.grid.columnPolicy
+            .getColumnSourceId(this.column.id);
+        if (!sourceColumnId) {
+            return false;
+        }
+
+        const oldValue = this.row.pinnedSection ?
+            (
+                sourceColumnId in this.row.data ?
+                    this.row.data[sourceColumnId] :
+                    this.row.data[this.column.id]
+            ) as DataTableCellType :
+            await this.column.viewport.grid.dataProvider?.getValue(
+                sourceColumnId,
+                this.row.index
+            );
 
         if (oldValue === this.value) {
             // Abort if the value is the same as in the data table.
@@ -247,15 +262,19 @@ class TableCell extends Cell {
         }
 
         const vp = this.column.viewport;
+        const { dataProvider: dp } = vp.grid;
         const rowId = this.row.id;
-        if (!vp.grid.dataProvider || rowId === void 0) {
+        if (!dp || rowId === void 0) {
             return false;
         }
 
         this.row.data[this.column.id] = this.value;
-        await vp.grid.dataProvider.setValue(
+        if (sourceColumnId !== this.column.id) {
+            this.row.data[sourceColumnId] = this.value;
+        }
+        await dp.setValue(
             this.value,
-            this.column.id,
+            sourceColumnId,
             rowId
         );
         vp.grid.rowPinning?.updatePinnedRowValue(
@@ -276,17 +295,6 @@ class TableCell extends Cell {
 
         await vp.updateRows();
         return true;
-    }
-
-    private async getSourceValue(): Promise<DataTableCellType | undefined> {
-        if (this.row.pinnedSection) {
-            return this.row.data[this.column.id] as DataTableCellType;
-        }
-
-        return await this.column.viewport.grid.dataProvider?.getValue(
-            this.column.id,
-            this.row.index
-        );
     }
 
     /**

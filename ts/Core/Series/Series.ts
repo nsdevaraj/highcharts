@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -1691,7 +1691,7 @@ class Series {
 
             series.colorCounter = 0; // For series with colorByPoint (#1547)
 
-            // In turbo mode, look for one- or twodimensional arrays of numbers.
+            // In turbo mode, look for one- or 2-dimensional arrays of numbers.
             // The first and the last valid value are tested, and we assume that
             // all the rest are defined the same way. Although the 'for' loops
             // are similar, they are repeated inside each if-else conditional
