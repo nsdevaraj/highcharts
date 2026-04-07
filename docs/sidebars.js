@@ -376,6 +376,7 @@ module.exports = {
             'react/data-handling',
             'react/chart-instance',
             'react/typescript',
+            'react/component-wrapping',
             'react/highcharts-instance',
             'react/options-component-format',
             'react/nextjs',
