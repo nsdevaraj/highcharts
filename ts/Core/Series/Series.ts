@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -28,7 +28,7 @@ import type {
     Column,
     ColumnCollection
 } from '../../Data/DataTable';
-import type { DeepPartial } from '../../Shared/Types';
+import type { DeepPartial, TypedArray } from '../../Shared/Types';
 import type { EventCallback } from '../Callback';
 import type KDPointSearchObjectBase from './KDPointSearchObjectBase';
 import type Legend from '../Legend/Legend';
@@ -56,7 +56,6 @@ import type SVGAttributes from '../Renderer/SVG/SVGAttributes';
 import type SVGPath from '../Renderer/SVG/SVGPath';
 import type { SymbolKey } from '../Renderer/SVG/SymbolType';
 import type TooltipOptions from '../TooltipOptions';
-import type Types from '../../Shared/Types';
 
 import A from '../Animation/AnimationUtilities.js';
 const {
@@ -1691,7 +1690,7 @@ class Series {
 
             series.colorCounter = 0; // For series with colorByPoint (#1547)
 
-            // In turbo mode, look for one- or twodimensional arrays of numbers.
+            // In turbo mode, look for one- or 2-dimensional arrays of numbers.
             // The first and the last valid value are tested, and we assume that
             // all the rest are defined the same way. Although the 'for' loops
             // are similar, they are repeated inside each if-else conditional
@@ -1960,7 +1959,7 @@ class Series {
             xExtremes,
             min,
             max,
-            xData: Array<number>|Types.TypedArray = series.getColumn('x'),
+            xData: Array<number>|TypedArray = series.getColumn('x'),
             modified = table,
             updatingNames = false;
 
@@ -2267,7 +2266,7 @@ class Series {
      * The data to inspect. Defaults to the current data within the visible
      * range.
      */
-    public getXExtremes(xData: Array<number>|Types.TypedArray): RangeSelector.RangeObject {
+    public getXExtremes(xData: Array<number>|TypedArray): RangeSelector.RangeObject {
         return {
             min: arrayMin(xData),
             max: arrayMax(xData)
@@ -2290,7 +2289,7 @@ class Series {
         yData?: (
             Array<(number|null)>|
             Array<Array<(number|null)>>|
-            Types.TypedArray
+            TypedArray
         ),
         forceExtremesFromAll?: boolean
     ): DataExtremesObject {
