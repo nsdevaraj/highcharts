@@ -153,7 +153,7 @@ is set in exporting.chartConfig.`
                 if (parsedUrl.hostname === 'fonts.googleapis.com') {
                     fetchAttemptedForCrossOrigin = true;
                 }
-            } catch (e) {
+            } catch {
                 // Ignore invalid URLs; they are not relevant for this test.
             }
         }
