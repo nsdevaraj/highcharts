@@ -71,6 +71,6 @@ function test_grid() {
                     header: ['x']
                 }
             }]
-        }]
+        }
     });
 }
