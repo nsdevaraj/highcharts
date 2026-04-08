@@ -16,6 +16,20 @@
 
 /* *
  *
+ *  Constants
+ *
+ * */
+
+const GRID_KEY_PART_REGEXP = /^[A-Z0-9]{4}$/;
+const GRID_KEY_WILDCARD_DOMAINS = [
+    'highcharts.com',
+    'jsfiddle.net',
+    'stackblitz.com',
+    'highcharts.com.cn'
+] as const;
+
+/* *
+ *
  *  Class
  *
  * */
@@ -89,7 +103,7 @@ class LicenseValidation {
         }
 
         for (const part of parts) {
-            if (part.length !== 4) {
+            if (!GRID_KEY_PART_REGEXP.test(part)) {
                 return false;
             }
         }
@@ -131,14 +145,7 @@ class LicenseValidation {
             return true;
         }
 
-        const wildcardDomains = [
-            'highcharts.com',
-            'jsfiddle.net',
-            'stackblitz.com',
-            'highcharts.com.cn'
-        ];
-
-        for (const domain of wildcardDomains) {
+        for (const domain of GRID_KEY_WILDCARD_DOMAINS) {
             if (hostname === domain || hostname.endsWith(`.${domain}`)) {
                 return true;
             }

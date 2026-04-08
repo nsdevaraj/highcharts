@@ -247,26 +247,6 @@ export interface Options {
      */
     rendering?: RenderingSettings;
 
-    /**
-     * Grid Key for Grid Pro. Get your Grid Key at:
-     * https://shop.highcharts.com
-     *
-     * The Grid Key can be set globally using `Grid.setOptions()` or
-     * on individual Grid instances. One Grid Key works for all
-     * Grid instances on a page.
-     *
-     * @example
-     * // Global setting (recommended)
-     * Grid.setOptions({ gridKey: 'ABCD-EFGH-IJKL-MN0P' });
-     *
-     * @example
-     * // Per instance (auto-promotes to global)
-     * Grid.grid('container', {
-     *   gridKey: 'ABCD-EFGH-IJKL-MN0P',
-     *   dataTable: {...}
-     * });
-     */
-    gridKey?: string;
 }
 
 /**
