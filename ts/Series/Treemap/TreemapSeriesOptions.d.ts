@@ -2,7 +2,7 @@
  *
  *  (c) 2014-2026 Highsoft AS
  *
- *  Authors: Jon Arild Nygard / Oystein Moseng
+ *  Authors: Jon Arild Nygård / Øystein Moseng
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -440,7 +440,7 @@ export interface TreemapSeriesOptions extends ScatterSeriesOptions {
 
     /**
      * When the series contains less points than the crop threshold, all
-     * points are drawn, event if the points fall outside the visible plot
+     * points are drawn, even if the points fall outside the visible plot
      * area at the current zoom. The advantage of drawing all points
      * (including markers and columns), is that animation is performed on
      * updates. On the other hand, when the series contains more points than

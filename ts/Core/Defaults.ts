@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -2858,7 +2858,7 @@ const defaultOptions: DefaultOptions = {
     },
 
     /**
-     * Highchart by default puts a credits label in the lower right corner
+     * Highcharts by default puts a credits label in the lower right corner
      * of the chart. This can be changed using these options.
      */
     credits: {
@@ -3084,7 +3084,7 @@ export default DefaultOptions;
  * @name Highcharts.ChartAddSeriesEventObject#options
  * @type {Highcharts.SeriesOptionsType}
  *//**
- * Prevents the default behaviour of the event.
+ * Prevents the default behavior of the event.
  * @name Highcharts.ChartAddSeriesEventObject#preventDefault
  * @type {Function}
  *//**
@@ -3193,7 +3193,7 @@ export default DefaultOptions;
  *        The chart on which the event occurred.
  *
  * @param {Highcharts.SelectEventObject} event
- *        Event informations
+ *        Event information
  *
  * @return {boolean|undefined}
  *         Return false to prevent the default action, usually zoom.

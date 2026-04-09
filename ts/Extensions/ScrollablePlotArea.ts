@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Torstein Honsi
+ *  Author: Torstein Hønsi
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -542,7 +542,7 @@ export class ScrollablePlotArea {
                 scrollablePixelsY
             } = this.chart,
             fixedRenderer = this.fixedRenderer,
-            fixedSelectors = ScrollablePlotArea.fixedSelectors;
+            fixedSelectors = ScrollablePlotArea.fixedSelectors.slice();
 
         let axisClass: (string|undefined);
 

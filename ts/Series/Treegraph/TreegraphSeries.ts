@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Pawel Lysy Grzegorz Blachlinski
+ *  Author: Paweł Lysy Grzegorz Blachliński
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -122,7 +122,7 @@ class TreegraphSeries extends TreemapSeries {
 
     public nodeList: Array<TreegraphNode> = [];
 
-    public layoutAlgorythm!: TreegraphLayout;
+    public layoutAlgorithm!: TreegraphLayout;
 
     public links: Array<TreegraphLink> = [];
 
@@ -136,7 +136,7 @@ class TreegraphSeries extends TreemapSeries {
 
     public init(): void {
         super.init.apply(this, arguments);
-        this.layoutAlgorythm = new TreegraphLayout();
+        this.layoutAlgorithm = new TreegraphLayout();
 
         // Register the link data labels in the label collector for overlap
         // detection.
@@ -379,7 +379,7 @@ class TreegraphSeries extends TreemapSeries {
         series.links = series.getLinks();
         series.setTreeValues(tree);
 
-        this.layoutAlgorythm.calculatePositions(series);
+        this.layoutAlgorithm.calculatePositions(series);
         series.layoutModifier = this.getLayoutModifiers();
 
         this.points.forEach((point): void => {
@@ -569,7 +569,7 @@ class TreegraphSeries extends TreemapSeries {
     }
 
     /**
-     * Treegraph has two separate collecions of nodes and lines,
+     * Treegraph has two separate collections of nodes and lines,
      * render dataLabels for both sets.
      */
     public drawDataLabels(): void {
