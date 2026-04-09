@@ -770,7 +770,7 @@ namespace StockChart {
             transVal: number;
 
         if (
-            chart.options.isStock &&
+            (chart.options.isStock || chart.hasParallelCoordinates) &&
             // Ignore in case of colorAxis or zAxis. #3360, #3524, #6720
             (axis.coll === 'xAxis' || axis.coll === 'yAxis')
         ) {
@@ -846,11 +846,12 @@ namespace StockChart {
                     const crossingPosName = horiz ? 'top' : 'left',
                         crossingLenName = horiz ? 'height' : 'width';
                     if (
-                        !acrossPanes &&
+                        !chart.hasParallelCoordinates &&
                         // If the perpendicular position is set explicitly on
                         // the axis, use it. For example, if `top` and `height`
                         // options are set on a horizontal x-axis, the grid
                         // lines should conform to that position.
+                        !acrossPanes &&
                         (
                             axis.options[crossingPosName] ||
                             axis.options[crossingLenName]
