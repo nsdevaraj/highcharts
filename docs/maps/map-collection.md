@@ -3,6 +3,8 @@ Map Collection
 
 For your convenience, Highcharts Maps offers a free [collection of maps](https://code.highcharts.com/mapdata/), optimized for use with Highcharts Maps. For common maps, it saves you the trouble of finding or drawing suitable SVG or GeoJSON/TopoJSON maps. Instead, you can choose between hundreds of pre-generated maps of countries, regions and other administration levels.
 
+All maps in the collection can be previewed in [this interactive demo](https://www.highcharts.com/demo/maps/all-maps).
+
 The Highcharts Maps Collection maps mainly follow [United Nations cartographic standards](https://www.un.org/geospatial/mapsgeo). These maps are specifically designed to reflect internationally recognized boundaries and regions. For users requiring a specific geopolitical perspective, such as [World with Palestine areas](https://code.highcharts.com/mapdata/), the collection offers three different resolutions. These maps detail regions like the West Bank and Gaza to ensure accurate representation based on the UN's view of world borders.
 
 ![west-bank-gaza.jpg](west-bank-gaza.jpg)
@@ -42,7 +44,7 @@ Alternatively, you can apply different maps for different series ([view demo](ht
 ```js
 series: [{
     mapData: map,
-    ...
+    // ...
 ```
 
 
@@ -52,6 +54,9 @@ data: [['us-ny', 0], ['us-mi', 5], ['us-tx', 3], ['us-ak', 5]]
 ```
 For other data joining options, see the [`series.joinBy`](https://api.highcharts.com/highmaps/plotOptions.series.joinBy) and [`series.keys`](https://api.highcharts.com/highcharts/plotOptions.series.keys) options.
 
+### Download the source code
+
+The source code for the Map Collection is available on [GitHub](https://github.com/highcharts/map-collection-dist). Each release is tagged with the version number and linked assets: https://github.com/highcharts/map-collection-dist/releases
 
 ### Install from our CDN
 
@@ -77,7 +82,6 @@ Highcharts.mapChart('container', {
 Specific map versions are available via versioned URLs.
 For example: <code>https://code.highcharts.com/mapdata/<strong>2.3</strong>/custom/world.topo.json</code>
 corresponds to version **^2.3**.
-
 
 Map properties
 --------------
