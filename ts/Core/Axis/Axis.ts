@@ -4969,7 +4969,7 @@ export default Axis;
  * @param {Highcharts.AxisLabelsFormatterContextObject} this
  *
  * @param {Highcharts.AxisLabelsFormatterContextObject} ctx
- * Since v12.5.0, the formatter context passed as an extra argument for arrow
+ * Since v12.6.0, the formatter context passed as an extra argument for arrow
  * functions.
  *
  * @return {string}
@@ -5089,7 +5089,7 @@ export default Axis;
  * Current maximum value.
  *
  * @param {Highcharts.Axis} [ctx]
- * Since v12.5.0, the axis context passed as an extra argument for arrow
+ * Since v12.6.0, the axis context passed as an extra argument for arrow
  * functions.
  *
  * @return {Highcharts.AxisTickPositionsArray|undefined}
@@ -5161,7 +5161,7 @@ export default Axis;
  * Y value of the data point
  *
  * @param {Highcharts.Axis} [ctx]
- * Since v12.5.0, the axis context passed as an extra argument for arrow
+ * Since v12.6.0, the axis context passed as an extra argument for arrow
  * functions.
  *
  * @return {string}
