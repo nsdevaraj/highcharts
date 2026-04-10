@@ -3891,10 +3891,20 @@ class Axis {
                     ) :
                     pick(
                         labelOptions.x,
-                        axis.tickRotCorr.x +
-                            directionFactor * labelOptions.distance
+                        directionFactor * (
+                            labelOptions.distance -
+                            Math.abs(axis.tickRotCorr.x)
+                        )
                     )
             );
+
+            if (
+                !horiz &&
+                axis.labelAlign === 'center' &&
+                isNumber(axis.labelRotation)
+            ) {
+                labelOffsetPadded += Math.abs(axis.tickRotCorr.x);
+            }
         }
 
         axis.axisTitleMargin = pick(titleOffsetOption, labelOffsetPadded);
