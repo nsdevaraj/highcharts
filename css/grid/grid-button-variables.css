@@ -59,7 +59,7 @@
         --ig-button-selected-background: var(--hcg-header-button-selected-background, var(--ig-button-background));
     }
 
-    tbody td {
+    tbody :where(.hcg-cell) {
         --ig-button-background: var(--hcg-cell-button-background, var(--ig-button-background-base));
         --ig-button-color: var(--hcg-cell-button-color, var(--ig-button-color-base));
         --ig-button-border-width: var(--hcg-cell-button-border-width, var(--ig-button-border-width-base));
