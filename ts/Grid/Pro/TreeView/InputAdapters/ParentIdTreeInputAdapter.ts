@@ -31,7 +31,7 @@ import type {
     NormalizedTreeInputParentIdOptions
 } from '../TreeViewOptionsNormalizer';
 
-import { isNumber, isString } from '../../../../Shared/Utilities.js';
+import { defined, isNumber, isString } from '../../../../Shared/Utilities.js';
 
 
 /* *
@@ -163,7 +163,7 @@ function normalizeRowIdValue(
     rowIndex: number,
     allowNull: boolean
 ): RowId | null {
-    if (value === null || typeof value === 'undefined') {
+    if (!defined(value)) {
         if (allowNull) {
             return null;
         }
@@ -214,7 +214,7 @@ function validateAcyclic(
             }
 
             const loopStart = pathIndex.get(current);
-            if (typeof loopStart !== 'undefined') {
+            if (defined(loopStart)) {
                 const cycle = path
                     .slice(loopStart)
                     .concat(current)

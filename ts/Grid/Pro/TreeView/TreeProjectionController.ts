@@ -50,7 +50,7 @@ import {
 import {
     normalizeTreeViewOptions
 } from './TreeViewOptionsNormalizer.js';
-import { fireEvent } from '../../../Shared/Utilities.js';
+import { defined, fireEvent } from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -441,7 +441,7 @@ class TreeProjectionController {
      */
     private clearTreeRowMetaState(): void {
         for (const [rowId, rowMeta] of this.grid.rowMeta) {
-            if (typeof rowMeta.expanded === 'undefined') {
+            if (!defined(rowMeta.expanded)) {
                 continue;
             }
 
@@ -466,8 +466,8 @@ class TreeProjectionController {
      */
     private setRowMetaExpanded(rowId: RowId, expanded?: boolean): boolean {
         const rowMeta = this.grid.rowMeta.get(rowId);
-        if (typeof expanded === 'undefined') {
-            if (typeof rowMeta?.expanded === 'undefined') {
+        if (!defined(expanded)) {
+            if (!defined(rowMeta?.expanded)) {
                 return false;
             }
 
@@ -563,7 +563,7 @@ class TreeProjectionController {
         }
 
         for (const [rowId, meta] of this.grid.rowMeta) {
-            if (typeof meta.expanded === 'undefined') {
+            if (!defined(meta.expanded)) {
                 continue;
             }
 
@@ -710,7 +710,7 @@ class TreeProjectionController {
                 (
                     explicitExpanded === true ||
                     (
-                        typeof explicitExpanded === 'undefined' &&
+                        !defined(explicitExpanded) &&
                         isAncestorOnly
                     )
                 )

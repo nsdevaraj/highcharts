@@ -31,7 +31,7 @@ import type {
     NormalizedTreeInputPathOptions
 } from '../TreeViewOptionsNormalizer';
 
-import { isNumber, isString } from '../../../../Shared/Utilities.js';
+import { defined, isNumber, isString } from '../../../../Shared/Utilities.js';
 
 
 /* *
@@ -133,7 +133,7 @@ export function buildIndexFromColumns(
      */
     function ensureNodeForPath(path: string): RowId {
         const existingId = pathToId.get(path);
-        if (typeof existingId !== 'undefined') {
+        if (defined(existingId)) {
             return existingId;
         }
 
@@ -171,7 +171,7 @@ export function buildIndexFromColumns(
         const nodeId = sourceRowOrder[i];
         const node = nodes.get(nodeId);
         const path = pathById.get(nodeId);
-        if (!node || typeof path === 'undefined') {
+        if (!node || !defined(path)) {
             continue;
         }
 
@@ -214,7 +214,7 @@ function normalizeRowIdValue(
     columnId: string,
     rowIndex: number
 ): RowId {
-    if (value === null || typeof value === 'undefined') {
+    if (!defined(value)) {
         throw new Error(
             `TreeView: Missing value in "${columnId}" at row ${rowIndex}.`
         );
