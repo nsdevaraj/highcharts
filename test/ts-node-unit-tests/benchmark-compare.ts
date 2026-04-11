@@ -6,6 +6,10 @@ import { basename, join, resolve } from 'node:path';
 
 const TMP_FILE_PATH = resolve(__dirname, '../../tmp/benchmarks');
 
+const REPORT_TABLE_INTRO = `> Rows with average difference between **−5%** and **+5%** are collapsed under a toggle inside each benchmark section.
+
+`;
+
 function regression (yValues: number[], xValues: number[]){
     const yMean = yValues.reduce((a, b) => a + b) / yValues.length;
     const xMean = xValues.reduce((a, b) => a + b) / xValues.length;
@@ -183,7 +187,13 @@ async function compare (base: BenchResults, actual: BenchResults){
         }
     });
 
-    const markdownTableRows = actual.map((entry, i) =>{
+    const markdownTableHeader = `| Sample size | Avg: PR (ms) | Avg: Master (ms) | Avg Δ (ms) | Avg Δ (%) | Median: PR (ms) | Median: Master (ms) | Median Δ (ms) | Median Δ (%) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |`;
+
+    const fmt = (n: number | undefined, sign: string = '') =>
+        n === undefined || Number.isNaN(n) ? '—' : `${Math.round(n)}${sign}`;
+
+    const rowBands = actual.map((entry, i) => {
         const baseEntry = base.find(b => b.sampleSize === entry.sampleSize) ?? base[i];
 
         const diff = entry.avg - baseEntry.avg;
@@ -194,20 +204,44 @@ async function compare (base: BenchResults, actual: BenchResults){
         const medianDiff = medianPR - medianMaster;
         const medianPerc = (medianDiff / medianMaster) * 100;
 
-        const fmt = (n: number | undefined, sign: string = '') =>
-            n === undefined || Number.isNaN(n) ? '—' : `${Math.round(n)}${sign}`;
+        const line = `| ${entry.sampleSize} | ${fmt(entry.avg)} | ${fmt(baseEntry.avg)} | ${fmt(diff)} | **${fmt(avgPerc, '%')}** | ${fmt(medianPR)} | ${fmt(medianMaster)} | ${fmt(medianDiff)} | **${fmt(medianPerc, '%')}** |`;
+        const inQuietBand = !Number.isNaN(avgPerc) && avgPerc >= -5 && avgPerc <= 5;
 
-        return `| ${entry.sampleSize} | ${fmt(entry.avg)} | ${fmt(baseEntry.avg)} | ${fmt(diff)} | **${fmt(avgPerc, '%')}** | ${fmt(medianPR)} | ${fmt(medianMaster)} | ${fmt(medianDiff)} | **${fmt(medianPerc, '%')}** |`;
+        return { line, inQuietBand };
     });
 
-    const markdownTableHeader = `| Sample size | Avg: PR (ms) | Avg: Master (ms) | Avg Δ (ms) | Avg Δ (%) | Median: PR (ms) | Median: Master (ms) | Median Δ (ms) | Median Δ (%) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |`;
+    const loudLines = rowBands.filter(r => !r.inQuietBand).map(r => r.line);
+    const quietLines = rowBands.filter(r => r.inQuietBand).map(r => r.line);
+
+    const detailsSummary = `See hidden ${benchmarkTitle} results.`;
+
+    let benchSummaryMd: string;
+    if (quietLines.length === 0) {
+        benchSummaryMd = `${markdownTableHeader}
+${loudLines.join('\n')}`;
+    } else if (loudLines.length === 0) {
+        benchSummaryMd = `<details><summary>${detailsSummary}</summary>
+
+${markdownTableHeader}
+${quietLines.join('\n')}
+
+</details>`;
+    } else {
+        benchSummaryMd = `${markdownTableHeader}
+${loudLines.join('\n')}
+
+<details><summary>${detailsSummary}</summary>
+
+${markdownTableHeader}
+${quietLines.join('\n')}
+
+</details>`;
+    }
 
     await appendFile(
         join(TMP_FILE_PATH, 'table.md'),
         `### ${benchmarkTitle}
-${markdownTableHeader}
-${markdownTableRows.join('\n')}
+${benchSummaryMd}
 
 `);
 
@@ -279,7 +313,7 @@ async function compareDirectories(
 }
 async function compareBenchmarks (){
 
-    await writeFile(join(TMP_FILE_PATH, 'table.md'), '');
+    await writeFile(join(TMP_FILE_PATH, 'table.md'), REPORT_TABLE_INTRO);
     await writeFile(join(TMP_FILE_PATH, 'report.html'), `
         <script src="https://code.highcharts.com/highcharts.js"></script>`);
 
