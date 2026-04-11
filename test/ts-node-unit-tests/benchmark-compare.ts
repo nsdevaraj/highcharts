@@ -1,11 +1,9 @@
 /// <reference lib="dom" />
 import type { BenchResults } from './benchmark.d.ts';
 import { opendir, readFile, appendFile, writeFile } from 'node:fs/promises';
-import type { Dir } from 'fs';
 import { basename, join, resolve } from 'node:path';
 
 const TMP_FILE_PATH = resolve(__dirname, '../../tmp/benchmarks');
-
 const REPORT_TABLE_INTRO = `> Rows with average difference between **−5%** and **+5%** are collapsed under a toggle inside each benchmark section.
 
 `;
@@ -18,13 +16,12 @@ function regression (yValues: number[], xValues: number[]){
     let numerator = 0;
     let slopeDenominator = 0;
 
-
     for (let i = 0; i< yValues.length; i++){
         numerator += (xValues[i] - xMean) * (yValues[i] - yMean);
         slopeDenominator += Math.pow(xValues[i] - xMean, 2);
     }
 
-    slope = numerator/slopeDenominator;
+    slope = numerator / slopeDenominator;
 
     const intercept = yMean - xMean * slope;
 
@@ -61,8 +58,7 @@ function getSeriesData (
         type: 'scatter',
         data: xValues.map((x, i) => [x, yValues[i]]),
         visible
-    },
-    {
+    }, {
         name: `${seriesName} - Regression`,
         type: 'line',
         data: xValues.map(x => [x, predict(x, slope, intercept)]),
@@ -110,8 +106,7 @@ async function compare (base: BenchResults, actual: BenchResults){
 
             return carry;
         }
-    },
-    {
+    }, {
         base: [],
         actual: []
     });
@@ -259,15 +254,15 @@ async function compareFile(actualFilePath: string, baseFilePath: string, compari
     const actualFileContent = await readFile(
         actualFilePath,
         'utf-8'
-    ).catch((e)=> console.log(e, 'couldnt read actual file'));
+    ).catch((e)=> console.log(e, 'couldn\'t read actual file'));
 
     if (!actualFileContent) {
         return comparisonsMade;
     }
         // Do a compare
         const baseFileContent = await readFile(
-        baseFilePath,
-            'utf-8'
+            baseFilePath,
+                'utf-8'
         ).catch(() => {throw new Error('File vanished');});
 
         const actual = JSON.parse(actualFileContent);
@@ -278,7 +273,7 @@ async function compareFile(actualFilePath: string, baseFilePath: string, compari
         return comparisonsMade;
     }
     await compare(base, actual);
-    return comparisonsMade+1;
+    return comparisonsMade + 1;
 
 }
 
@@ -292,16 +287,13 @@ async function compareDirectories(
         throw new Error(`Could not open ${TMP_FILE_PATH}. It may not exist. Try running \`npm run benchmark\``);
     });
     for await (const dirEntry of directory) {
-
-        const isFile = dirEntry.isFile() && dirEntry.name.endsWith('.json');
-        const isDir = dirEntry.isDirectory();
-        if (isFile){
+        if (dirEntry.isFile() && dirEntry.name.endsWith('.json')){
             comparisonsMade = await compareFile(
                 join(actualDirPath, dirEntry.name),
                 join(baseDirPath, dirEntry.name),
                 comparisonsMade
             );
-        } else if(isDir) {
+        } else if(dirEntry.isDirectory()) {
             comparisonsMade = await compareDirectories(
                 comparisonsMade,
                 join(baseDirPath, dirEntry.name),
