@@ -747,6 +747,41 @@ class Table {
     }
 
     /**
+     * Restores focus to a rendered body cell. Composed modules can prevent the
+     * default focus transfer via the `beforeRestoreCellFocus` event.
+     *
+     * @param cell
+     * Rendered body cell to focus.
+     *
+     * @param rowIndex
+     * Target row index in the rendered/projected order.
+     *
+     * @param columnIndex
+     * Target column index.
+     */
+    public restoreRenderedCellFocus(
+        cell: Cell | undefined,
+        rowIndex: number,
+        columnIndex: number
+    ): void {
+        if (!cell) {
+            return;
+        }
+
+        const eventObject: RestoreCellFocusEvent = {
+            cell,
+            columnIndex,
+            rowIndex
+        };
+
+        fireEvent(this, 'beforeRestoreCellFocus', eventObject, (): void => {
+            cell.htmlElement.focus({
+                preventScroll: true
+            });
+        });
+    }
+
+    /**
      * Get the widthRatio value from the width in pixels. The widthRatio is
      * calculated based on the width of the viewport.
      *
@@ -952,6 +987,17 @@ export interface ViewportStateMetadata {
     scrollLeft: number;
     columnResizing: ColumnResizingMode;
     focusCursor?: [number, number];
+}
+
+/**
+ * Event object emitted before focus is restored to a rendered body cell.
+ */
+export interface RestoreCellFocusEvent {
+    cell: Cell;
+    columnIndex: number;
+    rowIndex: number;
+    defaultPrevented?: boolean;
+    preventDefault?: () => void;
 }
 
 

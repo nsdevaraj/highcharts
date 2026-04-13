@@ -38,6 +38,18 @@ type StickyCandidate = {
     rowIndex: number;
 };
 
+type VisibleRowReference = {
+    id?: RowId;
+    index: number;
+};
+
+type StickyFocusState = {
+    columnIndex: number;
+    inStickyBody: boolean;
+    rowIndex: number;
+    sourceElement: HTMLTableCellElement;
+};
+
 const stickyRowClassName = Globals.classNamePrefix + 'tree-sticky-row';
 const stickyBodyClassName = Globals.classNamePrefix + 'tree-sticky-body';
 const maxStickyRows = 10;
@@ -197,8 +209,11 @@ class TreeStickyRowController {
      * Updates sticky rows in response to viewport scrolling.
      */
     public handleScroll(): void {
+        const focusState = this.captureFocusState();
+
         if (!this.enabled) {
             this.clearStickyRows();
+            this.restoreFocusState(focusState);
             return;
         }
 
@@ -206,6 +221,7 @@ class TreeStickyRowController {
 
         if (!candidates.length) {
             this.clearStickyRows();
+            this.restoreFocusState(focusState);
             return;
         }
 
@@ -214,10 +230,11 @@ class TreeStickyRowController {
             this.areSameActiveRowIds(candidates)
         ) {
             this.positionStickyRows(candidates);
+            this.restoreFocusState(focusState);
             return;
         }
 
-        this.scheduleRefresh(true);
+        this.scheduleRefresh();
     }
 
     /**
@@ -234,6 +251,8 @@ class TreeStickyRowController {
         reflowRow: boolean = false
     ): void {
         if (!this.enabled) {
+            const focusState = this.captureFocusState();
+
             if (typeof this.animationFrameId === 'number') {
                 cancelAnimationFrame(this.animationFrameId);
                 delete this.animationFrameId;
@@ -242,6 +261,7 @@ class TreeStickyRowController {
             this.needsRowSync = false;
             this.needsRowReflow = false;
             this.clearStickyRows();
+            this.restoreFocusState(focusState);
 
             return;
         }
@@ -277,6 +297,39 @@ class TreeStickyRowController {
         }
 
         return true;
+    }
+
+    /**
+     * Captures current table cell focus shared with the sticky overlay.
+     */
+    private captureFocusState(): StickyFocusState | undefined {
+        const focusCursor = this.viewport.focusCursor;
+        const activeElement = document.activeElement;
+
+        if (
+            !focusCursor ||
+            !(activeElement instanceof HTMLTableCellElement)
+        ) {
+            return;
+        }
+
+        const inStickyBody = !!(
+            this.stickyBodyElement?.contains(activeElement)
+        );
+
+        if (
+            !inStickyBody &&
+            !this.viewport.tbodyElement.contains(activeElement)
+        ) {
+            return;
+        }
+
+        return {
+            columnIndex: focusCursor[1],
+            inStickyBody,
+            rowIndex: focusCursor[0],
+            sourceElement: activeElement
+        };
     }
 
     /**
@@ -359,11 +412,22 @@ class TreeStickyRowController {
      *
      * @param visibleTop
      * Scroll position within the viewport body.
+     *
+     * @param projectionState
+     * Current projection metadata for visible tree rows.
      */
-    private findTopVisibleRow(visibleTop: number): TableRow | undefined {
+    private findTopVisibleRow(
+        visibleTop: number,
+        projectionState: TreeProjectionState
+    ): VisibleRowReference | undefined {
         const { rows } = this.viewport;
+        const rowsLength = rows.length;
 
-        for (let i = 0, iEnd = rows.length; i < iEnd; ++i) {
+        if (!rowsLength) {
+            return;
+        }
+
+        for (let i = 0; i < rowsLength; ++i) {
             const row = rows[i];
             const rowTop = this.getRowTop(row);
             const rowBottom = rowTop + row.htmlElement.offsetHeight;
@@ -373,7 +437,39 @@ class TreeStickyRowController {
             }
         }
 
-        return rows[rows.length - 1];
+        if (!this.viewport.virtualRows) {
+            return rows[rowsLength - 1];
+        }
+
+        const firstRow = rows[0];
+        const lastRow = rows[rowsLength - 1];
+        const firstRowTop = this.getRowTop(firstRow);
+        const lastRowBottom = (
+            this.getRowTop(lastRow) +
+            lastRow.htmlElement.offsetHeight
+        );
+        const rowHeight = this.viewport.rowsVirtualizer.defaultRowHeight;
+        let estimatedRowIndex = lastRow.index;
+
+        if (visibleTop < firstRowTop) {
+            estimatedRowIndex = firstRow.index - Math.ceil(
+                (firstRowTop - visibleTop) / rowHeight
+            );
+        } else if (visibleTop >= lastRowBottom) {
+            estimatedRowIndex = lastRow.index + Math.floor(
+                (visibleTop - lastRowBottom) / rowHeight
+            ) + 1;
+        }
+
+        estimatedRowIndex = Math.max(
+            0,
+            Math.min(estimatedRowIndex, projectionState.rowIds.length - 1)
+        );
+
+        return {
+            id: projectionState.rowIds[estimatedRowIndex],
+            index: estimatedRowIndex
+        };
     }
 
     /**
@@ -461,7 +557,10 @@ class TreeStickyRowController {
         let slotTop = this.viewport.tbodyElement.scrollTop;
 
         for (let i = 0; i < maxStickyRows; ++i) {
-            const topVisibleRow = this.findTopVisibleRow(slotTop);
+            const topVisibleRow = this.findTopVisibleRow(
+                slotTop,
+                projectionState
+            );
 
             if (
                 !topVisibleRow ||
@@ -519,7 +618,7 @@ class TreeStickyRowController {
     private getProjectedRowIndex(
         rowId: RowId,
         projectionState: TreeProjectionState,
-        topVisibleRow: TableRow
+        topVisibleRow: VisibleRowReference
     ): number | undefined {
         if (topVisibleRow.id === rowId) {
             return topVisibleRow.index;
@@ -631,7 +730,7 @@ class TreeStickyRowController {
      * Current projection metadata for visible tree rows.
      */
     private getStickyCandidates(
-        topVisibleRow: TableRow,
+        topVisibleRow: VisibleRowReference,
         projectionState: TreeProjectionState
     ): StickyCandidate[] {
         let currentRowId: RowId | null | undefined = topVisibleRow.id;
@@ -683,12 +782,14 @@ class TreeStickyRowController {
     private async refresh(): Promise<void> {
         const syncRow = this.needsRowSync;
         const reflowRow = this.needsRowReflow;
+        const focusState = this.captureFocusState();
         this.needsRowSync = false;
         this.needsRowReflow = false;
 
         const candidates = this.getCurrentCandidates();
         if (!candidates.length) {
             this.clearStickyRows();
+            this.restoreFocusState(focusState);
             return;
         }
 
@@ -705,6 +806,7 @@ class TreeStickyRowController {
         }
 
         this.positionStickyRows(candidates);
+        this.restoreFocusState(focusState);
     }
 
     /**
@@ -723,7 +825,7 @@ class TreeStickyRowController {
         let stickyStackHeight = 0;
         let cumulativePushOff = 0;
 
-        this.syncStickyBodyPosition();
+        this.syncStickyBodyPosition(false);
 
         for (let i = 0, iEnd = candidates.length; i < iEnd; ++i) {
             const candidate = candidates[i];
@@ -763,6 +865,113 @@ class TreeStickyRowController {
             stickyRow.htmlElement.style.visibility = '';
 
             stickyStackHeight += stickyHeight;
+        }
+    }
+
+    /**
+     * Returns the focused tree cell coordinates when focus is within the body
+     * or sticky overlay.
+     */
+    private getActiveFocusedCellCoordinates():
+    { columnIndex: number; rowIndex: number; } | undefined {
+        const activeElement = document.activeElement;
+
+        if (!(activeElement instanceof HTMLTableCellElement)) {
+            return;
+        }
+
+        const rowElement = activeElement.parentElement;
+        if (!rowElement) {
+            return;
+        }
+
+        if (this.stickyBodyElement?.contains(activeElement)) {
+            const stickyRow = this.stickyRows.find(
+                (row): boolean => row.htmlElement === rowElement
+            );
+            const columnIndex = Array.prototype.indexOf.call(
+                rowElement.children,
+                activeElement
+            );
+
+            if (
+                !stickyRow ||
+                columnIndex < 0
+            ) {
+                return;
+            }
+
+            return {
+                columnIndex,
+                rowIndex: stickyRow.index
+            };
+        }
+
+        if (!this.viewport.tbodyElement.contains(activeElement)) {
+            return;
+        }
+
+        const cell = this.viewport.getCellFromElement(activeElement);
+        const columnIndex = cell?.column?.index;
+        const rowIndex = (cell?.row as TableRow | undefined)?.index;
+
+        if (
+            typeof columnIndex !== 'number' ||
+            typeof rowIndex !== 'number'
+        ) {
+            return;
+        }
+
+        return {
+            columnIndex,
+            rowIndex
+        };
+    }
+
+    /**
+     * Restores focus after sticky rows move between the body and overlay.
+     *
+     * @param focusState
+     * Captured focus state from before the sticky row update.
+     */
+    private restoreFocusState(focusState?: StickyFocusState): void {
+        if (
+            !focusState ||
+            !this.shouldRestoreFocusState(focusState)
+        ) {
+            return;
+        }
+
+        const stickyCell = this.stickyRows.find(
+            (row): boolean => row.index === focusState.rowIndex
+        )?.cells[focusState.columnIndex];
+
+        if (stickyCell) {
+            if (document.activeElement !== stickyCell.htmlElement) {
+                delete this.viewport.pendingFocusCursor;
+                stickyCell.htmlElement.focus({
+                    preventScroll: true
+                });
+            }
+            return;
+        }
+
+        if (!focusState.inStickyBody) {
+            return;
+        }
+
+        const viewportCell = this.viewport.rows.find(
+            (row): boolean => row.index === focusState.rowIndex
+        )?.cells[focusState.columnIndex];
+
+        if (
+            viewportCell &&
+            document.activeElement !== viewportCell.htmlElement
+        ) {
+            delete this.viewport.pendingFocusCursor;
+            viewportCell.htmlElement.focus({
+                preventScroll: true
+            });
         }
     }
 
@@ -846,9 +1055,7 @@ class TreeStickyRowController {
         );
 
         const stickyBodyElement = this.ensureStickyBody();
-        for (let i = 0, iEnd = nextStickyRows.length; i < iEnd; ++i) {
-            stickyBodyElement.appendChild(nextStickyRows[i].htmlElement);
-        }
+        this.syncStickyRowOrder(nextStickyRows, stickyBodyElement);
 
         this.syncStickyBodyPosition();
 
@@ -856,20 +1063,79 @@ class TreeStickyRowController {
     }
 
     /**
-     * Synchronizes sticky body position and dimensions with the viewport.
+     * Synchronizes sticky row DOM order without remounting unchanged rows.
+     *
+     * @param stickyRows
+     * Sticky rows in the desired DOM order.
+     *
+     * @param stickyBodyElement
+     * Sticky body hosting the rows.
      */
-    private syncStickyBodyPosition(): void {
-        const stickyBodyElement = this.ensureStickyBody();
-        const { rowsWidth, tbodyElement } = this.viewport;
-        const bodyWidth = Math.max(
-            rowsWidth || 0,
-            tbodyElement.scrollWidth,
-            tbodyElement.clientWidth
-        );
+    private syncStickyRowOrder(
+        stickyRows: TableRow[],
+        stickyBodyElement: HTMLTableSectionElement
+    ): void {
+        let expectedNode = stickyBodyElement.firstChild;
 
-        stickyBodyElement.style.top = tbodyElement.offsetTop + 'px';
-        stickyBodyElement.style.width = bodyWidth + 'px';
-        stickyBodyElement.style.height = this.getStickyRowsHeight() + 'px';
+        for (let i = 0, iEnd = stickyRows.length; i < iEnd; ++i) {
+            const rowElement = stickyRows[i].htmlElement;
+
+            if (rowElement === expectedNode) {
+                expectedNode = expectedNode?.nextSibling || null;
+                continue;
+            }
+
+            stickyBodyElement.insertBefore(rowElement, expectedNode);
+        }
+    }
+
+    /**
+     * Returns whether the previously captured focus should be restored.
+     *
+     * @param focusState
+     * Captured focus state from before the sticky row update.
+     */
+    private shouldRestoreFocusState(focusState: StickyFocusState): boolean {
+        const activeCellCoordinates = this.getActiveFocusedCellCoordinates();
+
+        if (activeCellCoordinates) {
+            return (
+                activeCellCoordinates.columnIndex === focusState.columnIndex &&
+                activeCellCoordinates.rowIndex === focusState.rowIndex
+            );
+        }
+
+        const activeElement = document.activeElement;
+
+        return (
+            activeElement === focusState.sourceElement ||
+            activeElement === document.body
+        );
+    }
+
+    /**
+     * Synchronizes sticky body position and dimensions with the viewport.
+     *
+     * @param syncDimensions
+     * Whether sticky body dimensions should be recalculated.
+     */
+    private syncStickyBodyPosition(syncDimensions: boolean = true): void {
+        const stickyBodyElement = this.ensureStickyBody();
+        const { tbodyElement } = this.viewport;
+
+        if (syncDimensions) {
+            const { rowsWidth } = this.viewport;
+            const bodyWidth = Math.max(
+                rowsWidth || 0,
+                tbodyElement.scrollWidth,
+                tbodyElement.clientWidth
+            );
+
+            stickyBodyElement.style.top = tbodyElement.offsetTop + 'px';
+            stickyBodyElement.style.width = bodyWidth + 'px';
+            stickyBodyElement.style.height = this.getStickyRowsHeight() + 'px';
+        }
+
         stickyBodyElement.style.transform = tbodyElement.scrollLeft ?
             `translateX(${-tbodyElement.scrollLeft}px)` :
             '';

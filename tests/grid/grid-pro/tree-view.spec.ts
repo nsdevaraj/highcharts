@@ -114,4 +114,76 @@ test.describe('Grid Pro - tree view', () => {
         await expect(page.locator('.hcg-tree-toggle-button'))
             .toHaveAttribute('aria-expanded', 'false');
     });
+
+    test('preserves focus when a focused tree cell becomes sticky', async ({ page }) => {
+        await loadGridPro(page);
+
+        await page.evaluate(async (): Promise<void> => {
+            const container = document.getElementById('container');
+            const rowCount = 20;
+            const ids = Array.from(
+                { length: rowCount },
+                (_, i): number => i + 1
+            );
+
+            if (!container) {
+                return;
+            }
+
+            container.style.width = '420px';
+            container.style.height = '200px';
+
+            (window as any).grid = await (window as any).Grid.grid('container', {
+                data: {
+                    columns: {
+                        id: ids,
+                        parentId: ids.map(
+                            (id): (number|null) => id === 1 ? null : 1
+                        ),
+                        name: ids.map(
+                            (id): string => id === 1 ? 'Root' : `Child ${id - 1}`
+                        )
+                    },
+                    idColumn: 'id',
+                    treeView: {
+                        treeColumn: 'name',
+                        initiallyExpanded: true
+                    }
+                },
+                rendering: {
+                    rows: {
+                        virtualization: false
+                    }
+                }
+            }, true);
+        });
+
+        const rootCell = page.locator(
+            'tr[data-row-id="1"] td[data-column-id="name"]'
+        );
+        const mainBody = page.locator(
+            'table > tbody:not(.hcg-tree-sticky-body)'
+        );
+        const stickyCell = page.locator(
+            '.hcg-tree-sticky-body tr[data-row-id="1"] td[data-column-id="name"]'
+        );
+
+        await rootCell.focus();
+        await expect(rootCell).toBeFocused();
+
+        await mainBody.evaluate((tbody): void => {
+            (tbody as HTMLElement).scrollTop = 150;
+            tbody.dispatchEvent(new Event('scroll', { bubbles: true }));
+        });
+
+        await expect(stickyCell).toBeVisible();
+        await expect(stickyCell).toBeFocused();
+
+        await mainBody.evaluate((tbody): void => {
+            (tbody as HTMLElement).scrollTop = 260;
+            tbody.dispatchEvent(new Event('scroll', { bubbles: true }));
+        });
+
+        await expect(stickyCell).toBeFocused();
+    });
 });

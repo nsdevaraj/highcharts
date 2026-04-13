@@ -708,10 +708,12 @@ class RowsVirtualizer {
                 const row = rows.find((row): boolean => row.index === rowIndex);
 
                 if (row) {
-                    row.cells[columnIndex]?.htmlElement.focus({
-                        preventScroll: true
-                    });
                     delete vp.pendingFocusCursor;
+                    vp.restoreRenderedCellFocus(
+                        row.cells[columnIndex],
+                        rowIndex,
+                        columnIndex
+                    );
 
                     if (hadPendingFocusCursor) {
                         vp.ensureRowFullyVisible(row);

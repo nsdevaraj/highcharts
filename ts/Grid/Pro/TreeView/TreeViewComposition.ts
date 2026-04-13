@@ -24,6 +24,7 @@
 import type Grid from '../../Core/Grid';
 import type { RowId } from '../../Core/Data/DataProvider';
 import type Table from '../../Core/Table/Table';
+import type { RestoreCellFocusEvent } from '../../Core/Table/Table';
 import type TableRow from '../../Core/Table/Body/TableRow';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
@@ -79,6 +80,30 @@ const treeToggleListeners = new WeakMap<Table, TreeToggleListeners>();
  */
 function getRenderedStickyRows(table: Table): TableRow[] {
     return table.treeStickyRowController?.getRenderedStickyRows() || [];
+}
+
+/**
+ * Returns a rendered sticky cell for the provided row and column index.
+ *
+ * @param table
+ * Table viewport handling tree sticky rows.
+ *
+ * @param rowIndex
+ * Target row index in the projected row order.
+ *
+ * @param columnIndex
+ * Target column index.
+ */
+function getRenderedStickyCell(
+    table: Table,
+    rowIndex: number,
+    columnIndex: number
+): TableCell | undefined {
+    const stickyRow = getRenderedStickyRows(table).find(
+        (row): boolean => row.index === rowIndex
+    );
+
+    return stickyRow?.cells[columnIndex] as TableCell | undefined;
 }
 
 /**
@@ -165,10 +190,11 @@ function focusTreeCellByRowIndex(
         return;
     }
 
-    const stickyRow = getRenderedStickyRows(table).find(
-        (row): boolean => row.index === rowIndex
+    const stickyCell = getRenderedStickyCell(
+        table,
+        rowIndex,
+        columnIndex
     );
-    const stickyCell = stickyRow?.cells[columnIndex] as TableCell | undefined;
 
     if (stickyCell) {
         delete table.pendingFocusCursor;
@@ -245,6 +271,28 @@ function handleTreeBodyNavigation(
 }
 
 /**
+ * Prevents viewport body focus restoration when the target cell is already
+ * focused in the sticky overlay.
+ *
+ * @param event
+ * Focus restoration event emitted by the viewport.
+ */
+function onTableBeforeRestoreCellFocus(
+    this: Table,
+    event: RestoreCellFocusEvent
+): void {
+    const stickyCell = getRenderedStickyCell(
+        this,
+        event.rowIndex,
+        event.columnIndex
+    );
+
+    if (stickyCell?.htmlElement === document.activeElement) {
+        event.preventDefault?.();
+    }
+}
+
+/**
  * Composes Grid Pro with TreeView projection infrastructure.
  *
  * @param GridClass
@@ -274,6 +322,11 @@ export function compose(
     addEvent(TableClass, 'beforeInit', onTableBeforeInit);
     addEvent(TableClass, 'afterInit', onTableAfterInit);
     addEvent(TableClass, 'afterReflow', onTableAfterReflow);
+    addEvent(
+        TableClass,
+        'beforeRestoreCellFocus',
+        onTableBeforeRestoreCellFocus
+    );
     addEvent(TableClass, 'getViewportTopInset', onTableGetViewportTopInset);
     addEvent(TableClass, 'afterDestroy', onTableAfterDestroy);
     addEvent(TableCellClass, 'afterRender', onAfterCellRender);
