@@ -2202,7 +2202,7 @@ const defaultOptions: DefaultOptions = {
          * @sample {highmaps} maps/tooltip/formatter/
          *         String formatting
          *
-         * Since v12.5.0, the callback also receives `ctx` as the second
+         * Since v12.6.0, the callback also receives `ctx` as the second
          * argument, so that arrow functions can access the same context as
          * regular functions using `this`.
          *
@@ -2250,7 +2250,7 @@ const defaultOptions: DefaultOptions = {
         /**
          * A callback function for formatting the HTML output for a single point
          * in the tooltip. Like the `pointFormat` string, but with more
-         * flexibility. Since v12.5.0, the callback also receives `ctx` as the
+         * flexibility. Since v12.6.0, the callback also receives `ctx` as the
          * first argument, so that arrow functions can access the same context
          * as regular functions using `this`.
          *
@@ -2268,7 +2268,7 @@ const defaultOptions: DefaultOptions = {
          * `ctx` is the tooltip context (so that arrow-functions can access the
          * same context as a normal function using `this`). Add
          * `chart.plotLeft` and `chart.plotTop` to get the full coordinates.
-         * Since v12.5.0, the callback receives `ctx`.
+         * Since v12.6.0, the callback receives `ctx`.
          *
          * To find the actual hovered `Point` instance, use
          * `this.chart.hoverPoint`. For shared or split tooltips, all the hover
