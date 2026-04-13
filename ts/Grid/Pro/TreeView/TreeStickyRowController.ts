@@ -57,22 +57,49 @@ class TreeStickyRowController {
      *
      * */
 
+    /**
+     * The viewport table instance that owns the sticky rows.
+     */
     private readonly viewport: Table;
 
+    /**
+     * Row IDs currently rendered as sticky rows.
+     */
     private activeRowIds: RowId[] = [];
 
+    /**
+     * Pending animation frame used to batch sticky row refreshes.
+     */
     private animationFrameId?: number;
 
+    /**
+     * Whether sticky rows need reflow during the next refresh.
+     */
     private needsRowReflow = false;
 
+    /**
+     * Whether sticky rows need synchronization during the next refresh.
+     */
     private needsRowSync = false;
 
+    /**
+     * Refresh token used to discard stale async work.
+     */
     private refreshToken = 0;
 
+    /**
+     * Currently rendered sticky row instances.
+     */
     private stickyRows: TableRow[] = [];
 
+    /**
+     * Detached table body used to host sticky rows.
+     */
     private stickyBodyElement?: HTMLTableSectionElement;
 
+    /**
+     * Whether the controller applied positioning to the table element.
+     */
     private ownsTablePosition = false;
 
 
@@ -82,6 +109,12 @@ class TreeStickyRowController {
      *
      * */
 
+    /**
+     * Constructs the sticky row controller.
+     *
+     * @param viewport
+     * The viewport table instance.
+     */
     constructor(viewport: Table) {
         this.viewport = viewport;
     }
@@ -100,6 +133,9 @@ class TreeStickyRowController {
         return !!this.viewport.grid.treeView?.options?.stickyParents;
     }
 
+    /**
+     * Destroys sticky rows and pending controller state.
+     */
     public destroy(): void {
         if (typeof this.animationFrameId === 'number') {
             cancelAnimationFrame(this.animationFrameId);
@@ -110,6 +146,9 @@ class TreeStickyRowController {
         this.destroyStickyBody();
     }
 
+    /**
+     * Returns the first rendered sticky row.
+     */
     public getRenderedStickyRow(): TableRow | undefined {
         if (!this.enabled) {
             return;
@@ -118,6 +157,9 @@ class TreeStickyRowController {
         return this.stickyRows[0];
     }
 
+    /**
+     * Returns the rendered sticky row instances.
+     */
     public getRenderedStickyRows(): TableRow[] {
         if (!this.enabled) {
             return [];
@@ -126,6 +168,9 @@ class TreeStickyRowController {
         return this.stickyRows;
     }
 
+    /**
+     * Returns the total height of the rendered sticky rows.
+     */
     public getStickyRowsHeight(): number {
         if (!this.enabled) {
             return 0;
@@ -141,10 +186,16 @@ class TreeStickyRowController {
         );
     }
 
+    /**
+     * Returns the sticky body container element.
+     */
     public getStickyBodyElement(): HTMLTableSectionElement {
         return this.ensureStickyBody();
     }
 
+    /**
+     * Updates sticky rows in response to viewport scrolling.
+     */
     public handleScroll(): void {
         if (!this.enabled) {
             this.clearStickyRows();
@@ -169,6 +220,15 @@ class TreeStickyRowController {
         this.scheduleRefresh(true);
     }
 
+    /**
+     * Schedules sticky row refresh on the next animation frame.
+     *
+     * @param syncRow
+     * Whether sticky rows should be synchronized with source rows.
+     *
+     * @param reflowRow
+     * Whether sticky rows should be reflowed after synchronization.
+     */
     public scheduleRefresh(
         syncRow: boolean = false,
         reflowRow: boolean = false
@@ -199,6 +259,12 @@ class TreeStickyRowController {
         });
     }
 
+    /**
+     * Checks whether current sticky rows match the candidate row IDs.
+     *
+     * @param candidates
+     * Sticky row candidates to compare with the current rendered state.
+     */
     private areSameActiveRowIds(candidates: StickyCandidate[]): boolean {
         if (this.activeRowIds.length !== candidates.length) {
             return false;
@@ -213,6 +279,9 @@ class TreeStickyRowController {
         return true;
     }
 
+    /**
+     * Clears and destroys all rendered sticky rows.
+     */
     private clearStickyRows(): void {
         ++this.refreshToken;
         this.activeRowIds.length = 0;
@@ -232,6 +301,9 @@ class TreeStickyRowController {
         this.stickyRows.length = 0;
     }
 
+    /**
+     * Destroys the sticky body container and restores table positioning.
+     */
     private destroyStickyBody(): void {
         if (this.stickyBodyElement) {
             this.stickyBodyElement.remove();
@@ -244,6 +316,9 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Ensures the sticky body container exists and is attached.
+     */
     private ensureStickyBody(): HTMLTableSectionElement {
         let stickyBodyElement = this.stickyBodyElement;
 
@@ -279,6 +354,12 @@ class TreeStickyRowController {
         return stickyBodyElement;
     }
 
+    /**
+     * Finds the first rendered row intersecting the given scroll position.
+     *
+     * @param visibleTop
+     * Scroll position within the viewport body.
+     */
     private findTopVisibleRow(visibleTop: number): TableRow | undefined {
         const { rows } = this.viewport;
 
@@ -295,6 +376,12 @@ class TreeStickyRowController {
         return rows[rows.length - 1];
     }
 
+    /**
+     * Returns the rendered or estimated height for a row.
+     *
+     * @param rowId
+     * ID of the row to measure.
+     */
     private getRowHeight(rowId: RowId): number | undefined {
         const renderedRow = this.getRenderedViewportRow(rowId);
         if (renderedRow?.htmlElement.offsetHeight) {
@@ -311,11 +398,23 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Returns the height used for a sticky row candidate.
+     *
+     * @param candidate
+     * Sticky row candidate to measure.
+     */
     private getCandidateRowHeight(candidate: StickyCandidate): number {
         return this.getRowHeight(candidate.rowId) ||
             this.viewport.rowsVirtualizer.defaultRowHeight;
     }
 
+    /**
+     * Returns the rendered or estimated top position for a candidate row.
+     *
+     * @param candidate
+     * Sticky row candidate to position.
+     */
     private getCandidateRowTop(candidate: StickyCandidate): number | undefined {
         const renderedRow = this.getRenderedViewportRow(candidate.rowId);
 
@@ -330,6 +429,9 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Returns sticky row candidates for the current viewport state.
+     */
     private getCurrentCandidates(): StickyCandidate[] {
         const projectionState = this.viewport.grid.treeView
             ?.getProjectionState();
@@ -346,6 +448,12 @@ class TreeStickyRowController {
         return this.getStackCandidates(projectionState);
     }
 
+    /**
+     * Builds the current sticky row stack from the projection state.
+     *
+     * @param projectionState
+     * Current projection metadata for visible tree rows.
+     */
     private getStackCandidates(
         projectionState: TreeProjectionState
     ): StickyCandidate[] {
@@ -396,6 +504,18 @@ class TreeStickyRowController {
         return activeCandidates;
     }
 
+    /**
+     * Returns the projected row index for a row ID.
+     *
+     * @param rowId
+     * ID of the row to resolve.
+     *
+     * @param projectionState
+     * Current projection metadata for visible tree rows.
+     *
+     * @param topVisibleRow
+     * Currently resolved top visible row in the viewport.
+     */
     private getProjectedRowIndex(
         rowId: RowId,
         projectionState: TreeProjectionState,
@@ -416,6 +536,12 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Returns the rendered top position of a viewport row.
+     *
+     * @param row
+     * Rendered viewport row to position.
+     */
     private getRowTop(row: TableRow): number {
         if (this.viewport.virtualRows) {
             return row.translateY;
@@ -424,10 +550,28 @@ class TreeStickyRowController {
         return row.htmlElement.offsetTop;
     }
 
+    /**
+     * Returns the rendered viewport row for a row ID.
+     *
+     * @param rowId
+     * ID of the row to resolve.
+     */
     private getRenderedViewportRow(rowId: RowId): TableRow | undefined {
         return this.viewport.rows.find((row): boolean => row.id === rowId);
     }
 
+    /**
+     * Returns the rendered or estimated bottom position of a row.
+     *
+     * @param rowId
+     * ID of the row to position.
+     *
+     * @param rowIndex
+     * Projected row index used for virtual estimation.
+     *
+     * @param rowHeight
+     * Optional row height hint used for virtual estimation.
+     */
     private getRowBottom(
         rowId: RowId,
         rowIndex: number,
@@ -451,6 +595,15 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Checks whether the left candidates match the right candidate prefix.
+     *
+     * @param left
+     * Currently active sticky row candidates.
+     *
+     * @param right
+     * Candidate chain resolved for the current top row.
+     */
     private hasMatchingCandidatePrefix(
         left: StickyCandidate[],
         right: StickyCandidate[]
@@ -468,6 +621,15 @@ class TreeStickyRowController {
         return true;
     }
 
+    /**
+     * Returns the expanded ancestor chain eligible for sticky rendering.
+     *
+     * @param topVisibleRow
+     * Currently resolved top visible row in the viewport.
+     *
+     * @param projectionState
+     * Current projection metadata for visible tree rows.
+     */
     private getStickyCandidates(
         topVisibleRow: TableRow,
         projectionState: TreeProjectionState
@@ -515,6 +677,9 @@ class TreeStickyRowController {
         return candidates.reverse();
     }
 
+    /**
+     * Refreshes sticky rows using the current viewport state.
+     */
     private async refresh(): Promise<void> {
         const syncRow = this.needsRowSync;
         const reflowRow = this.needsRowReflow;
@@ -542,6 +707,12 @@ class TreeStickyRowController {
         this.positionStickyRows(candidates);
     }
 
+    /**
+     * Positions rendered sticky rows within the sticky body.
+     *
+     * @param candidates
+     * Sticky row candidates to position.
+     */
     private positionStickyRows(candidates: StickyCandidate[]): void {
         if (!this.stickyRows.length) {
             return;
@@ -595,6 +766,21 @@ class TreeStickyRowController {
         }
     }
 
+    /**
+     * Synchronizes rendered sticky rows with the current candidates.
+     *
+     * @param candidates
+     * Sticky row candidates to synchronize.
+     *
+     * @param syncRow
+     * Whether sticky rows should be synchronized with source rows.
+     *
+     * @param reflowRow
+     * Whether sticky rows should be reflowed after synchronization.
+     *
+     * @param refreshToken
+     * Refresh token used to discard stale async work.
+     */
     private async syncStickyRows(
         candidates: StickyCandidate[],
         syncRow: boolean,
@@ -669,6 +855,9 @@ class TreeStickyRowController {
         return true;
     }
 
+    /**
+     * Synchronizes sticky body position and dimensions with the viewport.
+     */
     private syncStickyBodyPosition(): void {
         const stickyBodyElement = this.ensureStickyBody();
         const { rowsWidth, tbodyElement } = this.viewport;
