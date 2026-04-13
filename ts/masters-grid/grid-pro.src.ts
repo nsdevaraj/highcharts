@@ -201,10 +201,7 @@ export const {
  *
  * */
 
-const wnd = G.win as { Grid?: unknown; Highcharts?: unknown };
-if (!wnd.Grid) {
-    wnd.Grid = G;
-}
+const wnd = G.win as { Highcharts?: unknown };
 
 if (wnd.Highcharts) {
     G.CellRendererRegistry.types.sparkline.useHighcharts(wnd.Highcharts);

@@ -126,6 +126,7 @@ export const isSafari = !isChrome && userAgent.indexOf('Safari') !== -1;
 export const getClassName = (classNameKey: ClassNameKey): string =>
     classNamePrefix + rawClassNames[classNameKey];
 
+
 /* *
  *
  *  Default Export

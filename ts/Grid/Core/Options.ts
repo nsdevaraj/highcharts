@@ -246,7 +246,6 @@ export interface Options {
      * Options to control the way grid is rendered.
      */
     rendering?: RenderingSettings;
-
 }
 
 /**
