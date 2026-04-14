@@ -23,6 +23,7 @@ import type { TreeProjectionState } from './TreeViewTypes';
 
 import TableRow from '../../Core/Table/Body/TableRow.js';
 import Globals from '../../Core/Globals.js';
+import { defined } from '../../../Shared/Utilities.js';
 
 
 /* *
@@ -569,10 +570,7 @@ class TreeStickyRowController {
             }
 
             const rowTop = this.getCandidateRowTop(candidate);
-            if (
-                typeof rowTop !== 'number' ||
-                rowTop >= slotTop
-            ) {
+            if (!defined(rowTop) || rowTop >= slotTop) {
                 break;
             }
 
@@ -732,7 +730,7 @@ class TreeStickyRowController {
                     topVisibleRow
                 );
 
-                if (typeof rowIndex !== 'number') {
+                if (!defined(rowIndex)) {
                     return [];
                 }
 
@@ -895,10 +893,7 @@ class TreeStickyRowController {
         const columnIndex = cell?.column?.index;
         const rowIndex = (cell?.row as TableRow | undefined)?.index;
 
-        if (
-            typeof columnIndex !== 'number' ||
-            typeof rowIndex !== 'number'
-        ) {
+        if (!defined(columnIndex) || !defined(rowIndex)) {
             return;
         }
 
