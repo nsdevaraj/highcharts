@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import { strictEqual } from 'node:assert';
 
 import LicenseValidation, {
-    GridProLicenseValidity
+    LicenseStatus
 } from '../../../ts/Grid/Pro/License/LicenseValidation.js';
 
 const REF = new Date(Date.UTC(2026, 3, 13));
@@ -15,35 +15,35 @@ describe('Grid Pro license validation', () => {
     it('Valid key', () => {
         strictEqual(
             LicenseValidation.getStatus(KEY_ANNUAL_VALID, REF),
-            GridProLicenseValidity.VALID
+            LicenseStatus.VALID
         );
     });
 
     it('Annual expired key', () => {
         strictEqual(
             LicenseValidation.getStatus(KEY_ANNUAL_EXPIRED, REF),
-            GridProLicenseValidity.EXPIRED
+            LicenseStatus.EXPIRED
         );
     });
 
     it('Perpetual license past support end', () => {
         strictEqual(
             LicenseValidation.getStatus(KEY_PERPETUAL_SUPPORT_ENDED, REF),
-            GridProLicenseValidity.EXPIRED
+            LicenseStatus.EXPIRED
         );
     });
 
     it('Missing key', () => {
         strictEqual(
             LicenseValidation.getStatus(void 0, REF),
-            GridProLicenseValidity.MISSING
+            LicenseStatus.MISSING
         );
     });
 
     it('Invalid key (malformed)', () => {
         strictEqual(
             LicenseValidation.getStatus('not-a-grid-key', REF),
-            GridProLicenseValidity.INVALID
+            LicenseStatus.INVALID
         );
     });
 });

@@ -27,7 +27,6 @@ import Globals from '../../../Core/Globals.js';
 import {
     defined,
     isNumber,
-    isObject,
     isString
 } from '../../../Shared/Utilities.js';
 
@@ -59,13 +58,13 @@ const GRID_KEY_WILDCARD_DOMAINS = [
  * */
 
 /**
- * Result of {@link getStatus} for a Grid Key string.
+ * Result of status for a Grid Key string.
  * @internal
  */
-export enum GridProLicenseValidity {
+export enum LicenseStatus {
     VALID = 'valid',
-    MISSING = 'missing',
     INVALID = 'invalid',
+    MISSING = 'missing',
     EXPIRED = 'expired'
 }
 
@@ -95,7 +94,7 @@ class LicenseValidation {
     private static licenseError = false;
 
     /**
-     * Last `gridKey` passed to {@link validate}; same value again → skip work.
+     * Flag for validation of license key.
      * @internal
      */
     private static verifiedLicenseKey: string | undefined;
@@ -112,7 +111,7 @@ class LicenseValidation {
      * upper base-36.
      * @internal
      *
-     * @param integrityPayload16 Segments 1–4 joined, no hyphens (16 chars).
+     * @param integrityPayload16 segments 1–4 joined, no hyphens (16 chars).
      */
     public static calculateChecksum(integrityPayload16: string): string {
         let sum = 0;
@@ -134,13 +133,9 @@ class LicenseValidation {
      * `A–Z`/`0–9`).
      * @internal
      *
-     * @param key Raw key.
+     * @param key raw key.
      *
-     * @returns Segment 4, decoded `endDate`, and whether segment 5 matches
-     * {@link calculateChecksum}. `null` if structural rules fail; if the layout is
-     * valid but segment 5 is wrong, returns an object with `checksumMatches: false`.
-     *
-     * @see getStatus
+     * @returns expiry segment, end date, and checksum matches.
      */
     private static parseKey(
         key: string
@@ -200,7 +195,6 @@ class LicenseValidation {
      * @internal
      *
      * @param key Grid Key (optional).
-     *
      * @param now Expiry reference; default today (UTC day).
      *
      * @returns Status enum value for `key` at `now`.
@@ -208,27 +202,27 @@ class LicenseValidation {
     public static getStatus(
         key?: string,
         now: Date = new Date()
-    ): GridProLicenseValidity {
+    ): LicenseStatus {
 
         // Check if the key is a string and not empty.
         if (!isString(key)) {
-            return GridProLicenseValidity.MISSING;
+            return LicenseStatus.MISSING;
         }
 
         const x = this.parseKey(key);
 
         // Check if the key is valid and the checksum matches.
         if (!x || !x.checksumMatches) {
-            return GridProLicenseValidity.INVALID;
+            return LicenseStatus.INVALID;
         }
 
         // Check if the key is expired.
         if (this.isExpired(x.endDate, now)) {
-            return GridProLicenseValidity.EXPIRED;
+            return LicenseStatus.EXPIRED;
         }
 
         // Valid key.
-        return GridProLicenseValidity.VALID;
+        return LicenseStatus.VALID;
     }
 
     /**
@@ -236,7 +230,6 @@ class LicenseValidation {
      * @internal
      *
      * @param end Parsed license end date.
-     *
      * @param now Defaults to `new Date()`.
      */
     public static isExpired(end: Date, now: Date = new Date()): boolean {
@@ -278,18 +271,16 @@ class LicenseValidation {
      * @param grid Grid instance
      */
     public static validate(grid: Grid): void {
-        if (this.isWhitelistedURL()) {
-            return;
-        }
 
-        const options = grid.options;
-        const gridKey = isObject(options) && isString(options.gridKey) ?
-            options.gridKey :
-            void 0;
+        const gridKey = isString(grid.options?.gridKey) ?
+            grid.options?.gridKey : void 0;
 
         if (
-            defined(this.verifiedLicenseKey) &&
-            gridKey === this.verifiedLicenseKey
+            this.isWhitelistedURL() ||
+            (
+                defined(this.verifiedLicenseKey) &&
+                gridKey === this.verifiedLicenseKey
+            )
         ) {
             return;
         }
@@ -299,29 +290,32 @@ class LicenseValidation {
         const status = this.getStatus(gridKey);
 
         if (
-            status !== GridProLicenseValidity.VALID &&
-            !this.licenseError
+            status === LicenseStatus.VALID ||
+            this.licenseError
         ) {
-            let statusPhrase: string;
-            switch (status) {
-                case GridProLicenseValidity.MISSING:
-                    statusPhrase = 'missing a valid Grid Key.';
-                    break;
-                case GridProLicenseValidity.EXPIRED:
-                    statusPhrase = 'using an expired Grid Key.';
-                    break;
-                default:
-                    statusPhrase = 'using an invalid Grid Key.';
-                    break;
-            }
-            const message = (
-                'Highcharts Grid Pro is ' + statusPhrase + ' ' +
-                'Please visit ' + GRID_KEY_DOC + ' for more details.'
-            );
-            // eslint-disable-next-line no-console
-            console.error(message);
-            this.licenseError = true;
+            return;
         }
+
+        let statusMsg: string;
+
+        switch (status) {
+            case LicenseStatus.MISSING:
+                statusMsg = 'missing a valid Grid Key.';
+                break;
+            case LicenseStatus.EXPIRED:
+                statusMsg = 'using an expired Grid Key.';
+                break;
+            default:
+                statusMsg = 'using an invalid Grid Key.';
+                break;
+        }
+        const message = (
+            'Highcharts Grid Pro is ' + statusMsg + ' ' +
+            'Please visit ' + GRID_KEY_DOC + ' for more details.'
+        );
+        // eslint-disable-next-line no-console
+        console.warn(message);
+        this.licenseError = true;
     }
 }
 
