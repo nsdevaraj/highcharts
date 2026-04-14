@@ -114,7 +114,7 @@ test.describe('Column Header Toolbar', () => {
         await page.setViewportSize({ width: 800, height: 600 });
 
         const weightMenuButton = page.locator(
-            'th[data-column-id="weight"] .hcg-header-cell-menu-icon .hcg-button'
+            'th[data-column-id="weight"] .hcg-header-cell-menu-icon button'
         );
 
         await expect(weightMenuButton).toHaveAttribute(
