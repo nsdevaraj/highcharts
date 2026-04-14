@@ -3775,7 +3775,9 @@ class Axis {
             clipOffset = chart.clipOffset,
             directionFactor = [-1, 1, 1, -1][side];
 
-        let showAxis,
+        let tickRotCorr = axis.tickRotCorr || { x: 0, y: 0 },
+            absTickRotCorrX = 0,
+            showAxis,
             titleOffset = 0,
             titleOffsetOption,
             titleMargin = 0,
@@ -3799,6 +3801,8 @@ class Axis {
             });
 
             axis.renderUnsquish();
+            tickRotCorr = axis.tickRotCorr;
+            absTickRotCorrX = Math.abs(tickRotCorr.x);
 
             // Left side must be align: right and right side must
             // have align: left for labels
@@ -3827,7 +3831,7 @@ class Axis {
                 labelOffset *= axis.staggerLines;
             }
             if (!horiz && isNumber(axis.labelRotation)) {
-                labelOffset -= Math.abs(axis.tickRotCorr.x);
+                labelOffset -= absTickRotCorrX;
             }
             axis.labelOffset = labelOffset * (axis.opposite ? -1 : 1);
 
@@ -3869,11 +3873,10 @@ class Axis {
             axisOffset[side] ? axisOffset[side] + (options.margin || 0) : 0
         );
 
-        axis.tickRotCorr = axis.tickRotCorr || { x: 0, y: 0 }; // Polar
         if (side === 0) {
             lineHeightCorrection = -axis.labelMetrics().h;
         } else if (side === 2) {
-            lineHeightCorrection = axis.tickRotCorr.y;
+            lineHeightCorrection = tickRotCorr.y;
         } else {
             lineHeightCorrection = 0;
         }
@@ -3886,14 +3889,12 @@ class Axis {
                 horiz ?
                     pick(
                         labelOptions.y,
-                        axis.tickRotCorr.y +
-                            directionFactor * labelOptions.distance
+                        tickRotCorr.y + directionFactor * labelOptions.distance
                     ) :
                     pick(
                         labelOptions.x,
                         directionFactor * (
-                            labelOptions.distance -
-                            Math.abs(axis.tickRotCorr.x)
+                            labelOptions.distance - absTickRotCorrX
                         )
                     )
             );
@@ -3903,7 +3904,7 @@ class Axis {
                 axis.labelAlign === 'center' &&
                 isNumber(axis.labelRotation)
             ) {
-                labelOffsetPadded += Math.abs(axis.tickRotCorr.x);
+                labelOffsetPadded += absTickRotCorrX;
             }
         }
 
