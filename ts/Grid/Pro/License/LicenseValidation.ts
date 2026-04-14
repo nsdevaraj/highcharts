@@ -88,17 +88,10 @@ class LicenseValidation {
      * */
 
     /**
-     * Flag for emitted error on this page.
-     * @internal
-     */
-    private static licenseError = false;
-
-    /**
      * Flag for validation of license key.
      * @internal
      */
-    private static verifiedLicenseKey: string | undefined;
-
+    private static hasValidatedLicenseKey = false;
 
     /* *
      *
@@ -256,11 +249,11 @@ class LicenseValidation {
         if (!defined(win.location)) {
             return false;
         }
-        const h = win.location.hostname.toLowerCase();
+        const host = win.location.hostname.toLowerCase();
 
         // Support subdomains
         return GRID_KEY_WILDCARD_DOMAINS.some(
-            (domain): boolean => h === domain || h.endsWith('.' + domain)
+            (domain): boolean => host === domain || host.endsWith('.' + domain)
         );
     }
 
@@ -271,28 +264,28 @@ class LicenseValidation {
      * @param grid Grid instance
      */
     public static validate(grid: Grid): void {
-
-        const gridKey = isString(grid.options?.gridKey) ?
-            grid.options?.gridKey : void 0;
+        const userOptions = grid.userOptions;
+        const options = grid.options;
+        const userGridKey = defined(userOptions?.gridKey) ?
+            userOptions.gridKey : void 0;
+        const optionsGridKey = defined(options?.gridKey) ?
+            options.gridKey : void 0;
 
         if (
             this.isWhitelistedURL() ||
             (
-                defined(this.verifiedLicenseKey) &&
-                gridKey === this.verifiedLicenseKey
+                this.hasValidatedLicenseKey &&
+                userGridKey === optionsGridKey
             )
         ) {
             return;
         }
 
-        this.verifiedLicenseKey = gridKey;
+        const status = this.getStatus(optionsGridKey);
 
-        const status = this.getStatus(gridKey);
+        this.hasValidatedLicenseKey = true;
 
-        if (
-            status === LicenseStatus.VALID ||
-            this.licenseError
-        ) {
+        if (status === LicenseStatus.VALID) {
             return;
         }
 
@@ -313,9 +306,9 @@ class LicenseValidation {
             'Highcharts Grid Pro is ' + statusMsg + ' ' +
             'Please visit ' + GRID_KEY_DOC + ' for more details.'
         );
+
         // eslint-disable-next-line no-console
         console.warn(message);
-        this.licenseError = true;
     }
 }
 
