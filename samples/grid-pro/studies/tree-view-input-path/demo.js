@@ -54,7 +54,7 @@ const grid = Grid.grid('container', {
                 type: 'path'
             },
             treeColumn: 'name',
-            initiallyExpanded: true
+            expandedRowIds: 'all'
         }
     },
     columnDefaults: {

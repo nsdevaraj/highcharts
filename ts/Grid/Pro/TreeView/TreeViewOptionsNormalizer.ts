@@ -21,8 +21,8 @@
  *
  * */
 
-import type { RowId } from '../../Core/Data/DataProvider';
 import type {
+    TreeExpandedRowIds,
     TreeViewOptions
 } from './TreeViewTypes';
 
@@ -53,8 +53,7 @@ export type NormalizedTreeInputOptions = (
 export interface NormalizedTreeViewOptions {
     input: NormalizedTreeInputOptions;
     treeColumn?: string;
-    initiallyExpanded: boolean;
-    expandedRowIds: RowId[];
+    expandedRowIds: TreeExpandedRowIds;
 }
 
 const defaultOptions: NormalizedTreeViewOptions = {
@@ -62,7 +61,6 @@ const defaultOptions: NormalizedTreeViewOptions = {
         type: 'parentId',
         parentIdColumn: 'parentId'
     },
-    initiallyExpanded: false,
     expandedRowIds: []
 };
 
@@ -90,6 +88,7 @@ export function normalizeTreeViewOptions(
     }
 
     const mergedOptions = merge(defaultOptions, treeView);
+    const expandedRowIds = mergedOptions.expandedRowIds;
     const normalizedInput: NormalizedTreeInputOptions = (
         mergedOptions.input.type === 'path' ?
             merge(
@@ -112,6 +111,10 @@ export function normalizeTreeViewOptions(
     return {
         ...mergedOptions,
         input: normalizedInput,
-        expandedRowIds: mergedOptions.expandedRowIds.slice()
+        expandedRowIds: (
+            expandedRowIds === 'all' ?
+                'all' :
+                expandedRowIds.slice()
+        )
     };
 }

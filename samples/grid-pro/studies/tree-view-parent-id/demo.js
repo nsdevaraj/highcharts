@@ -35,7 +35,7 @@ const grid = Grid.grid('container', {
         idColumn: 'id',
         treeView: {
             treeColumn: 'name',
-            initiallyExpanded: true
+            expandedRowIds: 'all'
         }
     },
     columnDefaults: {

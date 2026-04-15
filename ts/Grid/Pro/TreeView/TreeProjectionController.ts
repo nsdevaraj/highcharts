@@ -549,7 +549,10 @@ class TreeProjectionController {
         }
 
         const seedKey = TreeProjectionController.getExpansionSeedKey(options);
-        const explicitExpanded = new Set<RowId>(options.expandedRowIds);
+        const expandAll = options.expandedRowIds === 'all';
+        const explicitExpanded = expandAll ?
+            void 0 :
+            new Set<RowId>(options.expandedRowIds);
 
         if (this.expansionStateSeedKey !== seedKey) {
             this.expansionStateSeedKey = seedKey;
@@ -560,7 +563,7 @@ class TreeProjectionController {
                     continue;
                 }
 
-                if (options.initiallyExpanded || explicitExpanded.has(nodeId)) {
+                if (expandAll || explicitExpanded?.has(nodeId)) {
                     this.setRowMetaExpanded(nodeId, true);
                 }
             }
@@ -1053,9 +1056,11 @@ class TreeProjectionController {
     private static getExpansionSeedKey(
         options: NormalizedTreeViewOptions
     ): string {
-        const parts = [
-            options.initiallyExpanded ? '1' : '0'
-        ];
+        if (options.expandedRowIds === 'all') {
+            return 'all';
+        }
+
+        const parts: string[] = [];
 
         for (
             let i = 0,

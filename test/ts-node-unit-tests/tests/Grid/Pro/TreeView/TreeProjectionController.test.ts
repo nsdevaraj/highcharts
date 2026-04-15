@@ -54,7 +54,7 @@ describe('TreeProjectionController', () => {
                 },
                 idColumn: 'id',
                 treeView: {
-                    initiallyExpanded: true,
+                    expandedRowIds: 'all',
                     treeColumn: 'name'
                 }
             }

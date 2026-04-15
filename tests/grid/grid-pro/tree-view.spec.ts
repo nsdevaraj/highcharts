@@ -65,6 +65,37 @@ test.describe('Grid Pro - tree view', () => {
         ]);
     });
 
+    test('seeds explicit expandedRowIds without expanding every branch', async ({ page }) => {
+        await loadGridPro(page);
+
+        await page.evaluate(async (): Promise<void> => {
+            (window as any).grid = await (window as any).Grid.grid('container', {
+                data: {
+                    columns: {
+                        id: [1, 2, 3, 4],
+                        parentId: [null, 1, 1, 2],
+                        name: ['Root', 'Sales', 'Marketing', 'EMEA']
+                    },
+                    idColumn: 'id',
+                    treeView: {
+                        expandedRowIds: [1],
+                        treeColumn: 'name'
+                    }
+                },
+                rendering: {
+                    rows: {
+                        virtualization: false
+                    }
+                }
+            }, true);
+        });
+
+        await expect(page.locator('tbody .hcg-row')).toHaveCount(3);
+        expect(await getVisibleRowIds(page)).toStrictEqual(['1', '2', '3']);
+        await expect(page.locator('[data-hcg-tree-toggle]').nth(1))
+            .toHaveAttribute('aria-expanded', 'false');
+    });
+
     test('keeps generated path parents addressable after pagination', async ({ page }) => {
         await loadGridPro(page);
 
@@ -82,7 +113,7 @@ test.describe('Grid Pro - tree view', () => {
                             type: 'path'
                         },
                         treeColumn: 'name',
-                        initiallyExpanded: true
+                        expandedRowIds: 'all'
                     }
                 },
                 pagination: {
