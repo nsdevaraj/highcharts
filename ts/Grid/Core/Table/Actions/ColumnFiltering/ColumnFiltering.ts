@@ -184,7 +184,11 @@ class ColumnFiltering {
     public renderFilteringContent(container: HTMLElement): void {
         const column = this.column;
         const columnType = column.dataType;
-        if (!column.options.filtering?.enabled) {
+        if (
+            !column.viewport.grid.columnPolicy.isColumnFilteringEnabled(
+                column.id
+            )
+        ) {
             return;
         }
 
@@ -358,7 +362,6 @@ class ColumnFiltering {
         } else {
             this.filterInput.type = 'text';
             this.filterInput.classList.add(
-                Globals.getClassName('icon'),
                 Globals.getClassName('iconSearch')
             );
         }
