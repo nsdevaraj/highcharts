@@ -56,12 +56,15 @@ export interface NormalizedTreeViewOptions {
     expandedRowIds: TreeExpandedRowIds;
 }
 
-const defaultOptions: NormalizedTreeViewOptions = {
-    input: {
-        type: 'parentId',
-        parentIdColumn: 'parentId'
-    },
-    expandedRowIds: []
+const defaultParentIdInput: NormalizedTreeInputParentIdOptions = {
+    type: 'parentId',
+    parentIdColumn: 'parentId'
+};
+
+const defaultPathInput: NormalizedTreeInputPathOptions = {
+    type: 'path',
+    pathColumn: 'path',
+    separator: '/'
 };
 
 
@@ -87,33 +90,19 @@ export function normalizeTreeViewOptions(
         return;
     }
 
-    const mergedOptions = merge(defaultOptions, treeView);
-    const expandedRowIds = mergedOptions.expandedRowIds;
+    const expandedRowIds: TreeExpandedRowIds = treeView.expandedRowIds ?? [];
     const normalizedInput: NormalizedTreeInputOptions = (
-        mergedOptions.input.type === 'path' ?
-            merge(
-                {
-                    type: 'path',
-                    pathColumn: 'path',
-                    separator: '/'
-                },
-                mergedOptions.input
-            ) :
-            merge(
-                {
-                    type: 'parentId',
-                    parentIdColumn: 'parentId'
-                },
-                mergedOptions.input
-            )
+        treeView.input?.type === 'path' ?
+            merge(defaultPathInput, treeView.input) :
+            merge(defaultParentIdInput, treeView.input)
     );
 
     return {
-        ...mergedOptions,
         input: normalizedInput,
+        treeColumn: treeView.treeColumn,
         expandedRowIds: (
             expandedRowIds === 'all' ?
-                'all' :
+                expandedRowIds :
                 expandedRowIds.slice()
         )
     };
