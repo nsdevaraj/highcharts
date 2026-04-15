@@ -637,6 +637,12 @@ class TreeProjectionController {
         const rootIdSet = new Set<RowId>();
         const childrenByParent = new Map<RowId, RowId[]>();
         const childSetByParent = new Map<RowId, Set<RowId>>();
+        const sourceOrderById = new Map<RowId, number>();
+        const inheritedOrderById = new Map<RowId, number>();
+
+        for (let i = 0, iEnd = index.rowOrder.length; i < iEnd; ++i) {
+            sourceOrderById.set(index.rowOrder[i], i);
+        }
 
         const addRoot = (nodeId: RowId): void => {
             if (!rootIdSet.has(nodeId)) {
@@ -666,12 +672,65 @@ class TreeProjectionController {
             }
         };
 
+        const setInheritedOrder = (nodeId: RowId, order: number): void => {
+            if (rowIndexById.has(nodeId)) {
+                return;
+            }
+
+            const currentOrder = inheritedOrderById.get(nodeId);
+            if (
+                typeof currentOrder !== 'number' ||
+                order < currentOrder
+            ) {
+                inheritedOrderById.set(nodeId, order);
+            }
+        };
+
+        const getNodeOrder = (nodeId: RowId): number => {
+            const rowIndex = rowIndexById.get(nodeId);
+            if (typeof rowIndex === 'number') {
+                return rowIndex;
+            }
+
+            return inheritedOrderById.get(nodeId) ??
+                Number.POSITIVE_INFINITY;
+        };
+
+        const compareNodeOrder = (a: RowId, b: RowId): number => {
+            const aOrder = getNodeOrder(a);
+            const bOrder = getNodeOrder(b);
+
+            if (aOrder !== bOrder) {
+                return aOrder - bOrder;
+            }
+
+            const aSourceOrder = sourceOrderById.get(a) ??
+                Number.POSITIVE_INFINITY;
+            const bSourceOrder = sourceOrderById.get(b) ??
+                Number.POSITIVE_INFINITY;
+
+            if (aSourceOrder !== bSourceOrder) {
+                return aSourceOrder - bSourceOrder;
+            }
+
+            const aId = String(a);
+            const bId = String(b);
+
+            return (
+                aId < bId ? -1 :
+                    aId > bId ? 1 :
+                        0
+            );
+        };
+
         const injectedAncestorIds = new Set<RowId>();
 
         for (let i = 0, iEnd = visibleRowIds.length; i < iEnd; ++i) {
             let currentId: RowId | null = visibleRowIds[i];
 
             while (currentId !== null) {
+                setInheritedOrder(currentId, i);
+
                 const currentNode = index.nodes.get(currentId);
                 if (!currentNode) {
                     break;
@@ -700,6 +759,12 @@ class TreeProjectionController {
                 addChild(parentId, currentId);
                 currentId = parentId;
             }
+        }
+
+        rootIds.sort(compareNodeOrder);
+
+        for (const children of childrenByParent.values()) {
+            children.sort(compareNodeOrder);
         }
 
         const projectedRowIds: RowId[] = [];

@@ -994,7 +994,7 @@ function onAfterCellRender(this: TableCell): void {
         const toggleButton = document.createElement('button');
         toggleButton.type = 'button';
         toggleButton.className = (
-            Globals.getClassName('button') +
+            Globals.getClassName('icon') +
             ' ' +
             Globals.classNamePrefix +
             'tree-toggle-button'

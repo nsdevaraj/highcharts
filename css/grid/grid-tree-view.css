@@ -35,14 +35,12 @@
 }
 
 .hcg-tree-toggle-button {
-    --ig-button-padding: 0;
-    --ig-button-border-width: 0;
-    --ig-button-border-color: transparent;
-    --ig-button-background: transparent;
-    --ig-button-hover-background: color-mix(in srgb, currentcolor 12%, transparent);
-    --ig-button-hover-border-color: transparent;
-    --ig-button-selected-background: transparent;
-    --ig-button-selected-border-color: transparent;
+    --ig-icon-padding: 0;
+    --ig-icon-border-width: 0;
+    --ig-icon-border-color: transparent;
+    --ig-icon-background: transparent;
+    --ig-icon-hover-background-source: currentcolor;
+    --ig-icon-hover-border-color: transparent;
 
     width: var(--hcg-tree-toggle-hit-area-size);
     height: var(--hcg-tree-toggle-hit-area-size);
