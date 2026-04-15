@@ -316,7 +316,34 @@ class HTMLElement extends SVGElement {
             styles.overflow = 'hidden';
             styles.whiteSpace = 'nowrap';
         }
-        if (styles?.lineClamp) {
+
+        // Clean up sticky side-effects when lineClamp is explicitly removed
+        // (set to 0) or contradicted by a forced nowrap (#22961)
+        if (
+            (styles && 'lineClamp' in styles && !styles.lineClamp) ||
+            (styles?.whiteSpace === 'nowrap' && this.styles.lineClamp)
+        ) {
+            if (this.element && this.element.style) {
+                this.element.style.removeProperty('-webkit-line-clamp');
+                this.element.style.removeProperty('-webkit-box-orient');
+                // Only clear display if it's currently the injected webkit-box
+                if (this.element.style.display === '-webkit-box') {
+                    this.element.style.removeProperty('display');
+                }
+            }
+
+            if (this.styles) {
+                delete this.styles.lineClamp;
+                if (this.styles.display === '-webkit-box') {
+                    delete this.styles.display;
+                }
+            }
+
+            if (styles && 'lineClamp' in styles) {
+                delete styles.lineClamp;
+            }
+
+        } else if (styles?.lineClamp) {
             styles.display = '-webkit-box';
             styles.WebkitLineClamp = styles.lineClamp;
             styles.WebkitBoxOrient = 'vertical';
