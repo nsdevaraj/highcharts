@@ -31,15 +31,14 @@ import Globals from '../../Core/Globals.js';
  * */
 
 export const classNames = {
-    cellWrapper: Globals.classNamePrefix + 'tree-cell-wrapper',
-    toggleContainer: Globals.classNamePrefix + 'tree-toggle-container',
-    toggleButton: Globals.classNamePrefix + 'tree-toggle-button',
+    tree: Globals.classNamePrefix + 'tree',
+    toggle: Globals.classNamePrefix + 'tree-toggle',
     toggleIcon: Globals.classNamePrefix + 'tree-toggle-icon',
-    valueContainer: Globals.classNamePrefix + 'tree-value-container'
+    value: Globals.classNamePrefix + 'tree-value'
 } as const;
 
 export const cssVariables = {
-    depth: '--hcg-tree-depth'
+    depth: '--ig-tree-depth'
 } as const;
 
 

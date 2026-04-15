@@ -413,23 +413,19 @@ function onAfterCellRender(this: TableCell): void {
 
     const cellElement = this.htmlElement;
     const wrapper = document.createElement('div');
-    wrapper.className = TreeViewGlobals.classNames.cellWrapper;
+    wrapper.className = TreeViewGlobals.classNames.tree;
     wrapper.style.setProperty(
         TreeViewGlobals.cssVariables.depth,
         String(rowState.depth)
     );
 
     const toggleContainer = document.createElement('span');
-    toggleContainer.className = TreeViewGlobals.classNames.toggleContainer;
+    toggleContainer.className = TreeViewGlobals.classNames.toggle;
 
     if (rowState.hasChildren) {
         const toggleButton = document.createElement('button');
         toggleButton.type = 'button';
-        toggleButton.className = (
-            Globals.getClassName('icon') +
-            ' ' +
-            TreeViewGlobals.classNames.toggleButton
-        );
+        toggleButton.className = Globals.getClassName('icon');
         toggleButton.setAttribute(
             'aria-label',
             rowState.isExpanded ? 'Collapse row' : 'Expand row'
@@ -453,7 +449,7 @@ function onAfterCellRender(this: TableCell): void {
     }
 
     const valueContainer = document.createElement('span');
-    valueContainer.className = TreeViewGlobals.classNames.valueContainer;
+    valueContainer.className = TreeViewGlobals.classNames.value;
 
     while (cellElement.firstChild) {
         valueContainer.appendChild(cellElement.firstChild);

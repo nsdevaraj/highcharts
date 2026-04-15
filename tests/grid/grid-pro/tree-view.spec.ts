@@ -51,11 +51,11 @@ test.describe('Grid Pro - tree view', () => {
         await expect(page.locator('tbody .hcg-row')).toHaveCount(1);
         expect(await getVisibleRowIds(page)).toStrictEqual(['1']);
 
-        await page.locator('.hcg-tree-toggle-button').first().click();
+        await page.locator('[data-hcg-tree-toggle]').first().click();
         await expect(page.locator('tbody .hcg-row')).toHaveCount(3);
         expect(await getVisibleRowIds(page)).toStrictEqual(['1', '2', '3']);
 
-        await page.locator('.hcg-tree-toggle-button').nth(1).click();
+        await page.locator('[data-hcg-tree-toggle]').nth(1).click();
         await expect(page.locator('tbody .hcg-row')).toHaveCount(4);
         expect(await getVisibleRowIds(page)).toStrictEqual([
             '1',
@@ -105,13 +105,13 @@ test.describe('Grid Pro - tree view', () => {
             '2'
         ]);
 
-        await page.locator('.hcg-tree-toggle-button').first().click();
+        await page.locator('[data-hcg-tree-toggle]').first().click();
 
         await expect(page.locator('tbody .hcg-row')).toHaveCount(1);
         expect(await getVisibleRowIds(page)).toStrictEqual([
             '__hcg_tree_path__:B'
         ]);
-        await expect(page.locator('.hcg-tree-toggle-button'))
+        await expect(page.locator('[data-hcg-tree-toggle]'))
             .toHaveAttribute('aria-expanded', 'false');
     });
 });

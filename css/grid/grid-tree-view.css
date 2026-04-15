@@ -2,13 +2,10 @@
 
 /* Grid Pro TreeView styles */
 
-.hcg-tree-cell-wrapper {
-    --hcg-tree-indent-size: 16px;
-    --hcg-tree-toggle-gap: 5px;
-    --hcg-tree-toggle-slot-size: 20px;
-    --hcg-tree-toggle-hit-area-size: 22px;
-    --hcg-tree-toggle-icon-size: 11px;
-    --hcg-tree-toggle-icon-stroke-width: 1.6;
+.hcg-tree {
+    --ig-tree-indent-size: 16px;
+    --ig-tree-toggle-gap: 5px;
+    --ig-tree-toggle-slot-size: 20px;
 
     position: relative;
     display: flex;
@@ -16,63 +13,36 @@
     min-width: 0;
     padding-left:
         calc(
-            (var(--hcg-tree-depth, 0) * var(--hcg-tree-indent-size)) +
-            var(--hcg-tree-toggle-slot-size) +
-            var(--hcg-tree-toggle-gap)
+            (var(--ig-tree-depth, 0) * var(--ig-tree-indent-size)) +
+            var(--ig-tree-toggle-slot-size) +
+            var(--ig-tree-toggle-gap)
         );
 }
 
-.hcg-tree-toggle-container {
-    position: absolute;
-    top: 50%;
-    left: calc(var(--hcg-tree-depth, 0) * var(--hcg-tree-indent-size));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--hcg-tree-toggle-slot-size);
-    height: var(--hcg-tree-toggle-slot-size);
-    transform: translateY(calc(-50% + 1px));
-}
+.hcg-tree {
+    .hcg-tree-toggle {
+        position: absolute;
+        top: 50%;
+        left: calc(var(--ig-tree-depth, 0) * var(--ig-tree-indent-size));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--ig-tree-toggle-slot-size);
+        height: var(--ig-tree-toggle-slot-size);
+        transform: translateY(calc(-50% + 1px));
 
-.hcg-tree-toggle-button {
-    --ig-icon-padding: 0;
-    --ig-icon-border-width: 0;
-    --ig-icon-border-color: transparent;
-    --ig-icon-background: transparent;
-    --ig-icon-hover-background-source: currentcolor;
-    --ig-icon-hover-border-color: transparent;
+        .hcg-tree-toggle-icon {
+            transition: transform 120ms ease;
+            transform-origin: center;
+        }
 
-    width: var(--hcg-tree-toggle-hit-area-size);
-    height: var(--hcg-tree-toggle-hit-area-size);
-    min-height: var(--hcg-tree-toggle-hit-area-size);
-    min-width: var(--hcg-tree-toggle-hit-area-size);
-    padding: 0;
-    line-height: 1;
-    border-radius: 4px;
-    opacity: 0.72;
-}
+        .hcg-icon[aria-expanded="true"] > .hcg-tree-toggle-icon {
+            transform: rotate(90deg);
+        }
+    }
 
-.hcg-tree-toggle-button:hover:not(:disabled),
-.hcg-tree-toggle-button:focus-visible {
-    opacity: 1;
-}
-
-.hcg-container .hcg-tree-toggle-button > svg.hcg-tree-toggle-icon {
-    width: var(--hcg-tree-toggle-icon-size);
-    height: var(--hcg-tree-toggle-icon-size);
-    transition: transform 120ms ease;
-    transform-origin: center;
-}
-
-.hcg-container .hcg-tree-toggle-button > svg.hcg-tree-toggle-icon path {
-    stroke-width: var(--hcg-tree-toggle-icon-stroke-width);
-}
-
-.hcg-tree-toggle-button[aria-expanded="true"] .hcg-tree-toggle-icon {
-    transform: rotate(90deg);
-}
-
-.hcg-tree-value-container {
-    flex: 1 1 auto;
-    min-width: 0;
+    .hcg-tree-value {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
 }

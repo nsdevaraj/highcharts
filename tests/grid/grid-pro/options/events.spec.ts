@@ -51,7 +51,7 @@ test.describe('Grid Pro - tree view events', () => {
     });
 
     test('beforeTreeRowToggle / afterTreeRowToggle', async ({ page }) => {
-        const treeToggleButton = page.locator('.hcg-tree-toggle-button').first();
+        const treeToggleButton = page.locator('[data-hcg-tree-toggle]').first();
         const rows = page.locator('tbody .hcg-row');
 
         await treeToggleButton.click();
@@ -68,7 +68,7 @@ test.describe('Grid Pro - tree view events', () => {
     });
 
     test('beforeTreeRowToggle can cancel toggle', async ({ page }) => {
-        const treeToggleButton = page.locator('.hcg-tree-toggle-button').first();
+        const treeToggleButton = page.locator('[data-hcg-tree-toggle]').first();
         const rows = page.locator('tbody .hcg-row');
 
         await treeToggleButton.click();
