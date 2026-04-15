@@ -53,7 +53,7 @@
         --ig-icon-hover-border-color: var(--hcg-header-icon-hover-border-color, var(--hcg-icon-hover-border-color, var(--hcg-header-icon-border-color, var(--ig-icon-hover-border-color-base))));
     }
 
-    tbody td {
+    tbody :where(.hcg-cell) {
         --ig-icon-background: var(--hcg-cell-icon-background, var(--ig-icon-background-base));
         --ig-icon-color: var(--hcg-cell-icon-color, var(--ig-icon-color-base));
         --ig-icon-border-width: var(--hcg-cell-icon-border-width, var(--ig-icon-border-width-base));

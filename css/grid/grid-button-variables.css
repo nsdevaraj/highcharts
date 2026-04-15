@@ -37,7 +37,7 @@
     --ig-button-selected-border-color: var(--hcg-button-selected-border-color, var(--ig-button-selected-border-color-base));
     --ig-button-focus-ring: 0 0 0 var(--ig-focus-ring-width) var(--ig-focus-ring-color);
 
-    tbody td {
+    tbody :where(.hcg-cell) {
         --ig-button-background: var(--hcg-cell-button-background, var(--ig-button-background-base));
         --ig-button-color: var(--hcg-cell-button-color, var(--ig-button-color-base));
         --ig-button-border-width: var(--hcg-cell-button-border-width, var(--ig-button-border-width-base));
