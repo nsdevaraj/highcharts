@@ -34,6 +34,7 @@ import type {
 
 import Globals from '../../Core/Globals.js';
 import TreeProjectionController from './TreeProjectionController.js';
+import TreeViewGlobals from './TreeViewGlobals.js';
 import { createGridIcon } from '../../Core/UI/SvgIcons.js';
 import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
 
@@ -412,16 +413,14 @@ function onAfterCellRender(this: TableCell): void {
 
     const cellElement = this.htmlElement;
     const wrapper = document.createElement('div');
-    wrapper.className = Globals.classNamePrefix + 'tree-cell-wrapper';
+    wrapper.className = TreeViewGlobals.classNames.cellWrapper;
     wrapper.style.setProperty(
-        '--hcg-tree-depth',
+        TreeViewGlobals.cssVariables.depth,
         String(rowState.depth)
     );
 
     const toggleContainer = document.createElement('span');
-    toggleContainer.className = (
-        Globals.classNamePrefix + 'tree-toggle-container'
-    );
+    toggleContainer.className = TreeViewGlobals.classNames.toggleContainer;
 
     if (rowState.hasChildren) {
         const toggleButton = document.createElement('button');
@@ -429,8 +428,7 @@ function onAfterCellRender(this: TableCell): void {
         toggleButton.className = (
             Globals.getClassName('icon') +
             ' ' +
-            Globals.classNamePrefix +
-            'tree-toggle-button'
+            TreeViewGlobals.classNames.toggleButton
         );
         toggleButton.setAttribute(
             'aria-label',
@@ -447,9 +445,7 @@ function onAfterCellRender(this: TableCell): void {
             'chevronRight',
             grid.options?.rendering?.icons
         );
-        toggleIcon.classList.add(
-            Globals.classNamePrefix + 'tree-toggle-icon'
-        );
+        toggleIcon.classList.add(TreeViewGlobals.classNames.toggleIcon);
         toggleIcon.setAttribute('aria-hidden', 'true');
         toggleButton.appendChild(toggleIcon);
 
@@ -457,7 +453,7 @@ function onAfterCellRender(this: TableCell): void {
     }
 
     const valueContainer = document.createElement('span');
-    valueContainer.className = Globals.classNamePrefix + 'tree-value-container';
+    valueContainer.className = TreeViewGlobals.classNames.valueContainer;
 
     while (cellElement.firstChild) {
         valueContainer.appendChild(cellElement.firstChild);
