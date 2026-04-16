@@ -23,6 +23,7 @@ import type { TreeProjectionState } from './TreeViewTypes';
 
 import TableRow from '../../Core/Table/Body/TableRow.js';
 import Globals from '../../Core/Globals.js';
+import TreeViewGlobals from './TreeViewGlobals.js';
 import { defined } from '../../../Shared/Utilities.js';
 
 
@@ -51,8 +52,6 @@ type StickyFocusState = {
     sourceElement: HTMLTableCellElement;
 };
 
-const stickyRowClassName = Globals.classNamePrefix + 'tree-sticky-row';
-const stickyBodyClassName = Globals.classNamePrefix + 'tree-sticky-body';
 const rowsContentNowrapClassName =
     Globals.getClassName('rowsContentNowrap');
 const maxStickyRows = 10;
@@ -333,6 +332,7 @@ class TreeStickyRowController {
 
         if (this.stickyBodyElement) {
             this.stickyBodyElement.style.height = '0';
+            this.syncStickyBodyClasses(this.stickyBodyElement);
         }
 
         if (!this.stickyRows.length) {
@@ -373,7 +373,7 @@ class TreeStickyRowController {
         }
 
         stickyBodyElement = document.createElement('tbody');
-        stickyBodyElement.className = stickyBodyClassName;
+        stickyBodyElement.className = TreeViewGlobals.classNames.tbodySticky;
         this.viewport.tableElement.insertBefore(
             stickyBodyElement,
             this.viewport.tbodyElement
@@ -402,6 +402,10 @@ class TreeStickyRowController {
     private syncStickyBodyClasses(
         stickyBodyElement: HTMLTableSectionElement
     ): void {
+        stickyBodyElement.classList.toggle(
+            TreeViewGlobals.classNames.tbodyStickyActive,
+            this.activeRowIds.length > 0
+        );
         stickyBodyElement.classList.toggle(
             rowsContentNowrapClassName,
             this.viewport.tbodyElement.classList.contains(
@@ -866,6 +870,31 @@ class TreeStickyRowController {
 
             stickyStackHeight += stickyHeight;
         }
+
+        this.syncStickyBodyRenderedHeight();
+    }
+
+    /**
+     * Syncs sticky body height to the rendered bottom of the sticky row stack.
+     */
+    private syncStickyBodyRenderedHeight(): void {
+        const stickyBodyElement = this.stickyBodyElement;
+
+        if (!stickyBodyElement || !this.stickyRows.length) {
+            return;
+        }
+
+        const { defaultRowHeight } = this.viewport.rowsVirtualizer;
+        let height = 0;
+
+        for (let i = 0, iEnd = this.stickyRows.length; i < iEnd; ++i) {
+            const row = this.stickyRows[i];
+            const rowHeight = row.htmlElement.offsetHeight || defaultRowHeight;
+
+            height = Math.max(height, row.translateY + rowHeight);
+        }
+
+        stickyBodyElement.style.height = Math.ceil(height) + 'px';
     }
 
     /**
@@ -1036,7 +1065,9 @@ class TreeStickyRowController {
                 stickyRow.reflow();
             }
 
-            stickyRow.htmlElement.classList.add(stickyRowClassName);
+            stickyRow.htmlElement.classList.add(
+                TreeViewGlobals.classNames.rowSticky
+            );
             stickyRow.htmlElement.style.position = 'relative';
             stickyRow.htmlElement.style.top = '';
             stickyRow.htmlElement.style.left = '';
@@ -1053,6 +1084,7 @@ class TreeStickyRowController {
 
         const stickyBodyElement = this.ensureStickyBody();
         this.syncStickyRowOrder(nextStickyRows, stickyBodyElement);
+        this.syncStickyBodyClasses(stickyBodyElement);
 
         this.syncStickyBodyPosition();
 

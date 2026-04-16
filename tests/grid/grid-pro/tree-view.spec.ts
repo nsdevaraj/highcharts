@@ -48,10 +48,10 @@ async function getRenderedTreeRowTop(
     return page.evaluate((targetRowId): number | null => {
         const row = (
             document.querySelector<HTMLTableRowElement>(
-                `.hcg-tree-sticky-body tr[data-row-id="${targetRowId}"]`
+                `.hcg-tbody-sticky tr[data-row-id="${targetRowId}"]`
             ) ||
             document.querySelector<HTMLTableRowElement>(
-                `table > tbody:not(.hcg-tree-sticky-body) tr[data-row-id="${targetRowId}"]`
+                `table > tbody:not(.hcg-tbody-sticky) tr[data-row-id="${targetRowId}"]`
             )
         );
 
@@ -238,10 +238,10 @@ test.describe('Grid Pro - tree view', () => {
             'tr[data-row-id="1"] td[data-column-id="name"]'
         );
         const mainBody = page.locator(
-            'table > tbody:not(.hcg-tree-sticky-body)'
+            'table > tbody:not(.hcg-tbody-sticky)'
         );
         const stickyCell = page.locator(
-            '.hcg-tree-sticky-body tr[data-row-id="1"] td[data-column-id="name"]'
+            '.hcg-tbody-sticky tr[data-row-id="1"] td[data-column-id="name"]'
         );
 
         await rootCell.focus();
@@ -313,7 +313,7 @@ test.describe('Grid Pro - tree view', () => {
         await constrainGridBodyHeight(page, 200);
 
         const mainBody = page.locator(
-            'table > tbody:not(.hcg-tree-sticky-body)'
+            'table > tbody:not(.hcg-tbody-sticky)'
         );
         const targetCell = page.locator(
             'tr[data-row-id="5"] td[data-column-id="name"]'
@@ -394,7 +394,7 @@ test.describe('Grid Pro - tree view', () => {
         await constrainGridBodyHeight(page, 200);
 
         const mainBody = page.locator(
-            'table > tbody:not(.hcg-tree-sticky-body)'
+            'table > tbody:not(.hcg-tbody-sticky)'
         );
         const targetCell = page.locator(
             'tr[data-row-id="5"] td[data-column-id="name"]'
@@ -474,10 +474,10 @@ test.describe('Grid Pro - tree view', () => {
         await constrainGridBodyHeight(page, 200);
 
         const mainBody = page.locator(
-            'table > tbody:not(.hcg-tree-sticky-body)'
+            'table > tbody:not(.hcg-tbody-sticky)'
         );
         const stickyToggleButton = page.locator(
-            '.hcg-tree-sticky-body tr[data-row-id="1"] [data-hcg-tree-toggle]'
+            '.hcg-tbody-sticky tr[data-row-id="1"] [data-hcg-tree-toggle]'
         );
 
         await expect.poll(async () => mainBody.evaluate(
