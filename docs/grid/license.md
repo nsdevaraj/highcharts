@@ -10,7 +10,7 @@ Grid Lite does not use a Grid Key. If you only use [Grid Lite](https://www.highc
 
 ## When you need a Grid Key
 
-The **Grid Key** as required whenever **Grid Pro** loads: staging and production, all need `gridKey` so the deployment matches your license.
+The **Grid Key** is required whenever **Grid Pro** loads: staging and production, all need `gridKey` so the deployment matches your license.
 On **`localhost`** that check is skipped, so you can run Grid Pro locally without configuring a key.
 
 ## How to set the Grid Key
