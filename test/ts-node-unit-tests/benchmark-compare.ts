@@ -75,11 +75,11 @@ function getOutliers (array: number[], Q1:number, Q3: number){
     return array.filter(r => r < Q1 - 1.5 * IQR || r > Q3 + 1.5 * IQR);
 }
 
-function getBenchmarkTitle (testField: string): string {
-    return basename(testField, '.bench.ts').replace(/-/g, ' ');
-}
-
 function getMedian (values: number[]): number | undefined {
+    if (!values.length) {
+        return;
+    }
+
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
 
@@ -87,7 +87,8 @@ function getMedian (values: number[]): number | undefined {
 }
 
 async function compare (base: BenchResults, actual: BenchResults){
-    const benchmarkTitle = getBenchmarkTitle(actual[0].test);
+    const chartId = basename(actual[0].test, '.bench.ts');
+    const benchmarkTitle = chartId.replace(/-/g, ' ');
 
     console.log(`Comparing ${benchmarkTitle}`);
 
@@ -250,9 +251,9 @@ ${benchSummaryMd}
 
     await appendFile(
         join(TMP_FILE_PATH, 'report.html'), `
-        <div id="${benchmarkTitle}"></div>
+        <div id="${chartId}"></div>
         <script type="text/javascript">
-        Highcharts.chart("${benchmarkTitle}", ${JSON.stringify(chartConfig(benchmarkTitle, series))});
+        Highcharts.chart("${chartId}", ${JSON.stringify(chartConfig(benchmarkTitle, series))});
         </script>`
     );
 }
