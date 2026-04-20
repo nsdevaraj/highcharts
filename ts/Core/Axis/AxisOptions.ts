@@ -164,7 +164,7 @@ export interface AxisCrosshairLabelOptions {
     /**
      * Formatter function for the label text.
      *
-     * Since v12.5.0, the callback also receives `ctx` as the second argument,
+     * Since v12.6.0, the callback also receives `ctx` as the second argument,
      * so that arrow functions can access the same context as regular functions
      * using `this`.
      *
@@ -570,7 +570,7 @@ export interface AxisLabelOptions {
      * Callback JavaScript function to format the label. The value
      * is given by `this.value`. Additional properties for `this` are
      * `axis`, `chart`, `isFirst`, `isLast` and `text` which holds the
-     * value of the default formatter. Since v12.5.0, the callback also
+     * value of the default formatter. Since v12.6.0, the callback also
      * receives `ctx` as the first argument, so that arrow functions can
      * access the same context as regular functions using `this`.
      *
