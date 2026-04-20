@@ -217,8 +217,14 @@ abstract class Cell {
 
         const getVerticalPos = (): number => {
             if ((row as TableRow).index !== void 0) {
-                return vp.getRenderedRows()
+                const renderedRowIndex = vp.getRenderedRows()
                     .indexOf(row as TableRow);
+
+                if (renderedRowIndex !== -1) {
+                    return renderedRowIndex;
+                }
+
+                return (row as TableRow).index - (vp.rows[0]?.index ?? 0);
             }
 
             const level = (row as unknown as HeaderRow).level;
@@ -248,9 +254,6 @@ abstract class Cell {
 
             const { header } = vp;
             const localRowIndex = getVerticalPos();
-            if (localRowIndex < 0) {
-                return;
-            }
             const nextVerticalDir = localRowIndex + dir[0];
 
             if (nextVerticalDir < 0 && header) {
