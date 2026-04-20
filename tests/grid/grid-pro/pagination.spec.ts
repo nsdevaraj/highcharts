@@ -161,26 +161,26 @@ test.describe('Pagination', () => {
             ).map((el): string => (el.textContent || '').trim());
 
             const beforePin = {
-                top: grid.viewport.pinnedTopRows.length,
+                top: grid.viewport.rowPinningView.getRows('top').length,
                 scrollable: grid.viewport.rows.length,
-                bottom: grid.viewport.pinnedBottomRows.length
+                bottom: grid.viewport.rowPinningView.getRows('bottom').length
             };
 
             await grid.rowPinning.pin(0, 'top');
 
             const afterTopPin = {
-                top: grid.viewport.pinnedTopRows.length,
+                top: grid.viewport.rowPinningView.getRows('top').length,
                 scrollable: grid.viewport.rows.length,
-                bottom: grid.viewport.pinnedBottomRows.length,
+                bottom: grid.viewport.rowPinningView.getRows('bottom').length,
                 scrollableIds: getScrollableIds()
             };
 
             await grid.rowPinning.pin(1, 'bottom');
 
             const afterBottomPin = {
-                top: grid.viewport.pinnedTopRows.length,
+                top: grid.viewport.rowPinningView.getRows('top').length,
                 scrollable: grid.viewport.rows.length,
-                bottom: grid.viewport.pinnedBottomRows.length
+                bottom: grid.viewport.rowPinningView.getRows('bottom').length
             };
 
             return {

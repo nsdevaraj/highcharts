@@ -69,7 +69,7 @@ class PinnedTableCell extends TableCell {
                         rowId: string|number,
                         columnId: string,
                         value: DataTableCellType,
-                        sourceRow: typeof this.row,
+                        sourceRow: PinnedTableRow,
                         sourceColumnId?: string
                     ): Promise<void>;
                 };

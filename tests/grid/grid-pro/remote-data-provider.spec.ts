@@ -212,7 +212,7 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll(
+                vp.rowPinningView.pinnedTopTbodyElement.querySelectorAll(
                     'tr[data-row-id]'
                 ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
@@ -284,7 +284,7 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll(
+                vp.rowPinningView.pinnedTopTbodyElement.querySelectorAll(
                     'tr[data-row-id]'
                 ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
@@ -364,7 +364,7 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll(
+                vp.rowPinningView.pinnedTopTbodyElement.querySelectorAll(
                     'tr[data-row-id]'
                 ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));
@@ -453,7 +453,7 @@ test.describe('RemoteDataProvider', () => {
                 await tick();
             };
             const getPinnedTopIds = (): number[] => Array.from(
-                vp.pinnedTopTbodyElement.querySelectorAll(
+                vp.rowPinningView.pinnedTopTbodyElement.querySelectorAll(
                     'tr[data-row-id]'
                 ) as NodeListOf<HTMLElement>
             ).map((row): number => Number(row.getAttribute('data-row-id')));

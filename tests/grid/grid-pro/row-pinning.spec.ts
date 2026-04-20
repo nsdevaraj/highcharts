@@ -174,7 +174,8 @@ test.describe('Grid Pro row pinning', () => {
             });
 
             const before = Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => el.textContent?.trim());
@@ -191,7 +192,8 @@ test.describe('Grid Pro row pinning', () => {
             });
 
             const after = Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => el.textContent?.trim());
@@ -224,8 +226,10 @@ test.describe('Grid Pro row pinning', () => {
                 }
             });
 
-            const topTbody = grid.viewport.pinnedTopTbodyElement;
-            const bottomTbody = grid.viewport.pinnedBottomTbodyElement;
+            const topTbody = grid.viewport.rowPinningView
+                .pinnedTopTbodyElement;
+            const bottomTbody = grid.viewport.rowPinningView
+                .pinnedBottomTbodyElement;
 
             return {
                 topMaxHeight: topTbody.style.maxHeight,
@@ -289,14 +293,15 @@ test.describe('Grid Pro row pinning', () => {
 
             await grid.rowPinning.pin('ROW-010', 'top');
 
-            const topRow = grid.viewport.getRenderedPinnedRowById(
-                'ROW-010',
-                'top'
-            );
+            const topRow = grid.viewport.rowPinningView
+                .getRenderedPinnedRowById(
+                    'ROW-010',
+                    'top'
+                );
             const scrollRow = grid.viewport.getRenderedRows().find((
-                row: { id: string; pinnedSection?: string }
+                row: { id: string; bodySectionId?: string }
             ) => (
-                row.id === 'ROW-010' && !row.pinnedSection
+                row.id === 'ROW-010' && !row.bodySectionId
             ));
 
             return {
@@ -324,10 +329,11 @@ test.describe('Grid Pro row pinning', () => {
 
             await grid.rowPinning.pin('ROW-020', 'bottom');
 
-            const bottomRow = grid.viewport.getRenderedPinnedRowById(
-                'ROW-020',
-                'bottom'
-            );
+            const bottomRow = grid.viewport.rowPinningView
+                .getRenderedPinnedRowById(
+                    'ROW-020',
+                    'bottom'
+                );
 
             return {
                 bottomDescription: (
@@ -384,13 +390,15 @@ test.describe('Grid Pro row pinning', () => {
     test('Disabling pinning UI preserves config and runtime pinning API', async ({ page }) => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
-            const getPinnedIds = (section: 'top'|'bottom'): string[] => Array.from(
-                (
-                    section === 'top' ?
-                        grid.viewport.pinnedTopTbodyElement :
-                        grid.viewport.pinnedBottomTbodyElement
-                ).querySelectorAll('td[data-column-id="id"]')
-            ).map((el: Element) => (el.textContent || '').trim());
+            const getPinnedIds = (section: 'top'|'bottom'): string[] => {
+                const tbody = (section === 'top' ?
+                    grid.viewport.rowPinningView.pinnedTopTbodyElement :
+                    grid.viewport.rowPinningView.pinnedBottomTbodyElement
+                ) as HTMLElement;
+                return Array.from(
+                    tbody.querySelectorAll('td[data-column-id="id"]')
+                ).map((el: Element) => (el.textContent || '').trim());
+            };
 
             await grid.update({
                 rendering: {
@@ -407,16 +415,19 @@ test.describe('Grid Pro row pinning', () => {
                 }
             });
 
+            const vp = grid.viewport;
+
             const afterDisable = {
                 pinned: grid.rowPinning.getPinnedRows(),
                 topConnected: (
-                    grid.viewport.pinnedTopTbodyElement.parentElement ===
-                    grid.viewport.tableElement
+                    vp.rowPinningView.pinnedTopTbodyElement.parentElement ===
+                    vp.tableElement
                 ),
                 topRenderedIds: getPinnedIds('top'),
                 bottomConnected: (
-                    grid.viewport.pinnedBottomTbodyElement.parentElement ===
-                    grid.viewport.tableElement
+                    vp.rowPinningView
+                        .pinnedBottomTbodyElement.parentElement ===
+                    vp.tableElement
                 ),
                 bottomRenderedIds: getPinnedIds('bottom')
             };
@@ -430,13 +441,14 @@ test.describe('Grid Pro row pinning', () => {
                 afterRuntimeCalls: {
                     pinned: grid.rowPinning.getPinnedRows(),
                     topConnected: (
-                        grid.viewport.pinnedTopTbodyElement.parentElement ===
-                        grid.viewport.tableElement
+                        vp.rowPinningView.pinnedTopTbodyElement
+                            .parentElement === vp.tableElement
                     ),
                     topRenderedIds: getPinnedIds('top'),
                     bottomConnected: (
-                        grid.viewport.pinnedBottomTbodyElement.parentElement ===
-                        grid.viewport.tableElement
+                        vp.rowPinningView
+                            .pinnedBottomTbodyElement.parentElement ===
+                        vp.tableElement
                     ),
                     bottomRenderedIds: getPinnedIds('bottom')
                 }
@@ -485,7 +497,8 @@ test.describe('Grid Pro row pinning', () => {
             const grid = (window as any).grid;
 
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -695,12 +708,13 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
             const getScrollableIds = (): string[] => Array.from(
-                grid.viewport.tbodyElement.querySelectorAll(
+                (grid.viewport.tbodyElement as HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -776,7 +790,8 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -820,7 +835,8 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -866,7 +882,8 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -1078,12 +1095,13 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
             const getScrollableIds = (): string[] => Array.from(
-                grid.viewport.tbodyElement.querySelectorAll(
+                (grid.viewport.tbodyElement as HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -1149,8 +1167,8 @@ test.describe('Grid Pro row pinning', () => {
 
             return {
                 error,
-                topRows: grid.viewport.pinnedTopRows.length,
-                bottomRows: grid.viewport.pinnedBottomRows.length,
+                topRows: grid.viewport.rowPinningView.getRows('top').length,
+                bottomRows: grid.viewport.rowPinningView.getRows('bottom').length,
                 scrollableRows: grid.viewport.rows.length
             };
         });
@@ -1165,7 +1183,8 @@ test.describe('Grid Pro row pinning', () => {
         const state = await page.evaluate(async () => {
             const grid = (window as any).grid;
             const getPinnedTopIds = (): string[] => Array.from(
-                grid.viewport.pinnedTopTbodyElement.querySelectorAll(
+                (grid.viewport.rowPinningView.pinnedTopTbodyElement as
+                HTMLElement).querySelectorAll(
                     'td[data-column-id="id"]'
                 )
             ).map((el: Element) => (el.textContent || '').trim());
@@ -1200,7 +1219,7 @@ test.describe('Grid Pro row pinning', () => {
                 after: {
                     pinning: grid.rowPinning.getPinnedRows(),
                     pinnedTop: getPinnedTopIds(),
-                    topRows: grid.viewport.pinnedTopRows.length
+                    topRows: grid.viewport.rowPinningView.getRows('top').length
                 }
             };
         });
@@ -1230,8 +1249,8 @@ test.describe('Grid Pro row pinning', () => {
 
             return {
                 pinning: grid.rowPinning.getPinnedRows(),
-                topRows: grid.viewport.pinnedTopRows.length,
-                bottomRows: grid.viewport.pinnedBottomRows.length
+                topRows: grid.viewport.rowPinningView.getRows('top').length,
+                bottomRows: grid.viewport.rowPinningView.getRows('bottom').length
             };
         });
 

@@ -894,6 +894,12 @@ class Table {
         this.tbodyElement.scrollTop = meta.scrollTop;
         this.tbodyElement.scrollLeft = meta.scrollLeft;
 
+        this.header?.scrollHorizontally(meta.scrollLeft);
+        fireEvent(this, 'bodyScroll', {
+            scrollLeft: meta.scrollLeft,
+            scrollTop: meta.scrollTop
+        });
+
         if (meta.focusCursor) {
             this.focusCellFromCursor(meta.focusCursor);
         }
@@ -949,13 +955,17 @@ class Table {
      */
     public getRenderedRows(): TableRow[] {
         return [
-            ...this.bodySections
-                .filter((section): boolean => section.position === 'before')
-                .flatMap((section): TableRow[] => section.getRows()),
+            ...([] as TableRow[]).concat(
+                ...this.bodySections
+                    .filter((section): boolean => section.position === 'before')
+                    .map((section): TableRow[] => section.getRows())
+            ),
             ...this.rows,
-            ...this.bodySections
-                .filter((section): boolean => section.position === 'after')
-                .flatMap((section): TableRow[] => section.getRows())
+            ...([] as TableRow[]).concat(
+                ...this.bodySections
+                    .filter((section): boolean => section.position === 'after')
+                    .map((section): TableRow[] => section.getRows())
+            )
         ];
     }
 
