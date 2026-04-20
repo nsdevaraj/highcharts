@@ -38,6 +38,7 @@ const {
 
 declare module '../Core/Chart/ChartBase'{
     interface ChartBase {
+        applyingHighContrastTheme?: boolean;
         highContrastModeActive?: boolean;
     }
 }
@@ -101,50 +102,55 @@ function setHighContrastTheme(
     // disabled. For now, the user will have to reload the page.
 
     chart.highContrastModeActive = true;
+    chart.applyingHighContrastTheme = true;
 
-    // Apply theme to chart
-    const theme: AnyRecord = (
-        chart.options.accessibility.highContrastTheme
-    );
+    try {
+        // Apply theme to chart
+        const theme: AnyRecord = (
+            chart.options.accessibility.highContrastTheme
+        );
 
-    chart.update(theme, false);
+        chart.update(theme, false);
 
-    const hasCustomColors = theme.colors?.length > 1;
+        const hasCustomColors = theme.colors?.length > 1;
 
-    // Force series colors (plotOptions is not enough)
-    chart.series.forEach(function (s): void {
-        const plotOpts = theme.plotOptions[s.type] || {};
+        // Force series colors (plotOptions is not enough)
+        chart.series.forEach(function (s): void {
+            const plotOpts = theme.plotOptions[s.type] || {};
 
-        const fillColor = hasCustomColors && s.colorIndex !== void 0 ?
-            theme.colors[s.colorIndex] :
-            plotOpts.color || 'window';
+            const fillColor = hasCustomColors && s.colorIndex !== void 0 ?
+                theme.colors[s.colorIndex] :
+                plotOpts.color || 'window';
 
-        const seriesOptions: Partial<SeriesOptions> = {
-            color: plotOpts.color || 'windowText',
-            colors: hasCustomColors ?
-                theme.colors : [plotOpts.color || 'windowText'],
-            borderColor: plotOpts.borderColor || 'window',
-            fillColor
-        };
+            const seriesOptions: Partial<SeriesOptions> = {
+                color: plotOpts.color || 'windowText',
+                colors: hasCustomColors ?
+                    theme.colors : [plotOpts.color || 'windowText'],
+                borderColor: plotOpts.borderColor || 'window',
+                fillColor
+            };
 
-        s.update(seriesOptions, false);
+            s.update(seriesOptions, false);
 
-        if (s.points) {
-            // Force point colors if existing
-            s.points.forEach(function (p): void {
-                if (p.options && p.options.color) {
-                    p.update({
-                        color: plotOpts.color || 'windowText',
-                        borderColor: plotOpts.borderColor || 'window'
-                    }, false);
-                }
-            });
-        }
-    });
+            if (s.points) {
+                // Force point colors if existing
+                s.points.forEach(function (p): void {
+                    if (p.options && p.options.color) {
+                        p.update({
+                            color: plotOpts.color || 'windowText',
+                            borderColor: plotOpts.borderColor || 'window'
+                        }, false);
+                    }
+                });
+            }
+        });
 
-    // The redraw for each series and after is required for 3D pie
-    // (workaround)
-    chart.redraw();
+        // The redraw for each series and after is required for 3D pie
+        // (workaround)
+        chart.redraw();
+    } finally {
+        delete chart.applyingHighContrastTheme;
+    }
 }
 
 /* *
