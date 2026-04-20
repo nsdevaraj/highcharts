@@ -91,7 +91,6 @@
     "samples/data/maps/us-small.js",
     "samples/data/maps/world.js",
 
-    "node_modules/@highcharts/connectors-morningstar/connectors-morningstar.js",
 
     "samples/data/usdeur.js",
     "samples/data/ohlc.js",
