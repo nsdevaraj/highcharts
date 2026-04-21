@@ -31,6 +31,16 @@ import type { SeriesTypeOptions } from '../../Core/Series/SeriesType';
 
 declare module '../../Core/Axis/AxisOptions' {
     interface AxisOptions {
+        /**
+         * Maximum range which can be set using the navigator's handles.
+         * Opposite of [xAxis.minRange](#xAxis.minRange).
+         *
+         * @sample {highstock} stock/navigator/maxrange/
+         *         Defined max and min range
+         *
+         * @since     6.0.0
+         * @product   highstock gantt
+         */
         maxRange?: number;
     }
 }
