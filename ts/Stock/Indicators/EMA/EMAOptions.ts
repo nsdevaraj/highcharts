@@ -26,7 +26,7 @@ import type {
  * Exponential moving average indicator (EMA). This series requires the
  * `linkedTo` option to be set.
  *
- * @sample stock/indicators/ema
+ * @sample {highstock} stock/indicators/ema
  * Exponential moving average indicator
  *
  * @extends      plotOptions.sma

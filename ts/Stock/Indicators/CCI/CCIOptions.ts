@@ -26,7 +26,7 @@ import type {
  * Commodity Channel Index (CCI). This series requires `linkedTo` option to
  * be set.
  *
- * @sample stock/indicators/cci
+ * @sample {highstock} stock/indicators/cci
  *         CCI indicator
  *
  * @extends      plotOptions.sma
