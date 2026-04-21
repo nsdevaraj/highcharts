@@ -54,16 +54,20 @@ export interface AroonOptions extends SMAOptions, MultipleLinesComposition.Indic
 
     /**
      * Parameters used in calculation of aroon series points.
-     *
-     * @excluding index
      */
     params?: AroonParamsOptions;
 }
 
 export interface AroonParamsOptions extends SMAParamsOptions {
-    index?: undefined;
-
     period?: number;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    index?: undefined;
 }
 
 /* *

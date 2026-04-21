@@ -64,9 +64,6 @@ export interface SupertrendOptions extends SMAOptions {
      * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
      */
     fallingTrendColor?: ColorType;
-    /**
-     * @excluding index
-     */
     params?: SupertrendParamsOptions;
     /**
      * Color of the Supertrend series line that is beneath the main series.
@@ -80,7 +77,6 @@ export interface SupertrendOptions extends SMAOptions {
 }
 
 export interface SupertrendParamsOptions extends SMAParamsOptions {
-    index?: undefined;
     /**
      * Multiplier for Supertrend Indicator.
      */
@@ -91,6 +87,14 @@ export interface SupertrendParamsOptions extends SMAParamsOptions {
      * for the indicator calculations.
      */
     period?: number;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    index?: undefined;
 }
 
 export interface SupertrendLinkedParentPointObject extends LinePoint {

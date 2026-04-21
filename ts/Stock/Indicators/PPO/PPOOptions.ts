@@ -42,14 +42,10 @@ import type {
  * @interface Highcharts.PPOOptions
  */
 export interface PPOOptions extends EMAOptions {
-    /**
-     * @excluding period
-     */
     params?: PPOParamsOptions;
 }
 
 export interface PPOParamsOptions extends EMAParamsOptions {
-    period?: undefined;
     /**
      * Periods for Percentage Price Oscillator calculations.
      *
@@ -57,6 +53,14 @@ export interface PPOParamsOptions extends EMAParamsOptions {
      * @default [12, 26]
      */
     periods?: Array<number>;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    period?: undefined;
 }
 /* *
  *

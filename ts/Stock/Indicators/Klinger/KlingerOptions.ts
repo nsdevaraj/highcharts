@@ -41,8 +41,6 @@ import type {
 export interface KlingerOptions extends SMAOptions {
     /**
      * Parameters used in calculation of Klinger Oscillator.
-     *
-     * @excluding index, period
      */
     params?: KlingerParamsOptions;
 
@@ -57,10 +55,6 @@ export interface KlingerSignalOptions {
 }
 
 export interface KlingerParamsOptions extends SMAParamsOptions {
-    index?: undefined;
-
-    period?: undefined;
-
     /**
      * The fast period for indicator calculations.
      */
@@ -81,6 +75,16 @@ export interface KlingerParamsOptions extends SMAParamsOptions {
      * indiator calculation.
      */
     volumeSeriesID?: string;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    index?: undefined;
+
+    period?: undefined;
 }
 
 /* *

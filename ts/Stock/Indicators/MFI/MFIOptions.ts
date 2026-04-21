@@ -43,10 +43,6 @@ export interface MFIOptions extends SMAOptions {
 
 export interface MFIParamsOptions extends SMAParamsOptions {
     /**
-     * @excluding index
-     */
-    index?: undefined;
-    /**
      * The id of volume series which is mandatory.
      * For example using OHLC data, volumeSeriesID='volume' means
      * the indicator will be calculated using OHLC and volume values.
@@ -56,6 +52,14 @@ export interface MFIParamsOptions extends SMAParamsOptions {
      * Number of maximum decimals that are used in MFI calculations.
      */
     decimals?: number;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    index?: undefined;
 }
 
 /* *

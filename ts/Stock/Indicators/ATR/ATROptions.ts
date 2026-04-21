@@ -38,13 +38,16 @@ import type {
  * @interface Highcharts.ATROptions
  */
 export interface ATROptions extends SMAOptions {
-    /**
-     * @excluding index
-     */
     params?: ATRParamsOptions;
 }
 
 export interface ATRParamsOptions extends SMAParamsOptions {
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
     index?: undefined;
 }
 

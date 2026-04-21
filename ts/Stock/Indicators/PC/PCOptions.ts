@@ -61,6 +61,12 @@ export interface PCOptions extends SMAOptions, MultipleLinesComposition.Indicato
 }
 
 export interface PCParamsOptions extends SMAParamsOptions {
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
     index?: undefined;
 }
 

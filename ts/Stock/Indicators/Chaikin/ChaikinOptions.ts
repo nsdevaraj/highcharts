@@ -44,15 +44,11 @@ export interface ChaikinOptions extends EMAOptions {
     /**
      * Parameters used in calculation of Chaikin Oscillator
      * series points.
-     *
-     * @excluding index
      */
     params?: ChaikinParamsOptions;
 }
 
 export interface ChaikinParamsOptions extends EMAParamsOptions {
-    index?: undefined;
-
     /**
      * The id of volume series which is mandatory.
      * For example using OHLC data, volumeSeriesID='volume' means
@@ -74,6 +70,14 @@ export interface ChaikinParamsOptions extends EMAParamsOptions {
      * @default [3, 10]
      */
     periods?: Array<number>;
+
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
+    index?: undefined;
 }
 
 /* *

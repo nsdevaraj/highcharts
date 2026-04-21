@@ -43,6 +43,12 @@ export interface NATROptions extends SMAOptions {
 }
 
 export interface NATRParamsOptions extends SMAParamsOptions {
+    /* *
+     *
+     *  Excluded
+     *
+     * */
+
     index?: undefined;
 }
 
