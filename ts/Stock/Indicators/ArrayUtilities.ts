@@ -57,6 +57,9 @@ function getArrayExtremes<T extends Array<number>>(
  *
  * */
 
+/**
+ * @internal
+ */
 namespace ArrayUtilities {
 
     /** 0: min, 1: max */
