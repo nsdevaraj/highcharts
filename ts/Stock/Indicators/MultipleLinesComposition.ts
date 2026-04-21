@@ -38,7 +38,6 @@ import { error } from '../../Core/Utilities.js';
  *
  * */
 
-/** @internal */
 namespace MultipleLinesComposition {
 
     /* *
@@ -47,6 +46,9 @@ namespace MultipleLinesComposition {
      *
      * */
 
+    /**
+     * @internal
+     */
     export declare class IndicatorComposition extends SMAIndicator {
         areaLinesNames: Array<string>;
         linesApiNames: Array<string>;
@@ -423,5 +425,4 @@ namespace MultipleLinesComposition {
  *
  * */
 
-/** @internal */
 export default MultipleLinesComposition;
