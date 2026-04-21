@@ -91,7 +91,6 @@
     "samples/data/maps/us-small.js",
     "samples/data/maps/world.js",
 
-
     "samples/data/usdeur.js",
     "samples/data/ohlc.js",
     "samples/data/three-series-1000-points.js",

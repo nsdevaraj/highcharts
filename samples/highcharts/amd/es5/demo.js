@@ -1,3 +1,4 @@
+/* eslint-disable node/no-extraneous-require */
 require.config({
     paths: {
         'highcharts/highcharts': 'https://code.highcharts.com/es5/highcharts',
