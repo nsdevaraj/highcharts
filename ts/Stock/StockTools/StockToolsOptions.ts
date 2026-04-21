@@ -76,15 +76,11 @@ export interface StockToolsGuiDefinitionsButtonOptions {
 
     /**
      * Element type for the button.
-     *
-     * @type {'span'|'button'}
      */
     elementType?: 'span'|'button';
 
     /**
      * A predefined background symbol for the button.
-     *
-     * @type {string}
      */
     symbol?: string;
 }
@@ -140,8 +136,6 @@ export interface StockToolsGuiOptions {
     /**
      * An array of strings pointing to config options for the toolbar items.
      * Each name refers to a unique key from the definitions object.
-     *
-     * @type {Array<string>}
      */
     buttons?: Array<string>;
 
@@ -163,8 +157,6 @@ export interface StockToolsGuiOptions {
 
     /**
      * A full path to the icons location. Icons are stored as SVG files.
-     *
-     * @type {string}
      */
     iconsURL?: string;
 

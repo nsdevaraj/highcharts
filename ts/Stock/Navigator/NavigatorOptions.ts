@@ -53,7 +53,6 @@ declare module '../../Core/Options'{
          * out on parts of the data as well as panning across the dataset.
          *
          * @product      highstock gantt
-         * @optionparent navigator
          */
         navigator?: NavigatorOptions;
     }
@@ -77,15 +76,11 @@ export interface NavigatorHandlesOptions {
 
     /**
      * The fill for the handle.
-     *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
      */
     backgroundColor?: ColorType;
 
     /**
      * The stroke for the handle border and the stripes inside.
-     *
-     * @type {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
      */
     borderColor?: ColorType;
 
@@ -126,7 +121,6 @@ export interface NavigatorHandlesOptions {
      *         Styled handles
      *
      * @since     6.0.0
-     * @apioption navigator.handles.lineWidth
      */
     lineWidth?: number;
 
@@ -146,7 +140,6 @@ export interface NavigatorHandlesOptions {
      * @sample {highstock} stock/navigator/styled-handles/
      *         Styled handles
      *
-     * @type    {Array<string>}
      * @default ["navigator-handle", "navigator-handle"]
      * @since   6.0.0
      */
@@ -180,7 +173,6 @@ export interface BaseNavigatorOptions {
      * @sample {highstock} stock/navigator/maskfill/
      *         Blue, semi transparent mask
      *
-     * @type    {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
      * @default rgba(102,133,194,0.3)
      */
     maskFill?: ColorType;
@@ -219,7 +211,6 @@ export interface BaseNavigatorOptions {
      * @sample {highstock} stock/navigator/outline/
      *         2px blue outline
      *
-     * @type    {Highcharts.ColorString|Highcharts.GradientColorObject|Highcharts.PatternObject}
      * @default #cccccc
      */
     outlineColor?: ColorType;
@@ -233,8 +224,6 @@ export interface BaseNavigatorOptions {
      *
      * @sample {highstock} stock/navigator/outline/
      *         2px blue outline
-     *
-     * @type {number}
      */
     outlineWidth?: number;
 
@@ -268,8 +257,6 @@ export interface BaseNavigatorOptions {
      *         Using a separate data set for the navigator
      * @sample {highstock} stock/navigator/series/
      *         A green navigator series
-     *
-     * @type {*|Array<*>|Highcharts.SeriesOptionsType|Array<Highcharts.SeriesOptionsType>}
      */
     series?: SeriesTypeOptions;
 
@@ -340,9 +327,7 @@ export interface NavigatorOptions extends BaseNavigatorOptions {
      * @sample {highstock} stock/demo/lazy-loading/
      *         Set to false with async data loading
      *
-     * @type      {boolean}
      * @default   true
-     * @apioption navigator.adaptToUpdatedData
      */
     adaptToUpdatedData?: boolean;
 
@@ -356,9 +341,7 @@ export interface NavigatorOptions extends BaseNavigatorOptions {
      * @see [series.showInNavigator](#plotOptions.series.showInNavigator)
      *
      * @deprecated
-     * @type      {number|string}
      * @default   0
-     * @apioption navigator.baseSeries
      */
     baseSeries?: (number|string);
 
@@ -368,9 +351,7 @@ export interface NavigatorOptions extends BaseNavigatorOptions {
      * @sample {highstock} stock/navigator/enabled/
      *         Disable the navigator
      *
-     * @type      {boolean}
      * @default   true
-     * @apioption navigator.enabled
      */
     enabled?: boolean;
 
@@ -389,10 +370,8 @@ export interface NavigatorOptions extends BaseNavigatorOptions {
      * When the chart is inverted, whether to draw the navigator on the
      * opposite side.
      *
-     * @type      {boolean}
      * @default   false
      * @since     5.0.8
-     * @apioption navigator.opposite
      */
     opposite?: boolean;
 
@@ -401,12 +380,10 @@ export interface NavigatorOptions extends BaseNavigatorOptions {
      * points. If `undefined`, the navigator sticks to the axis maximum only
      * if it was already at the maximum prior to adding points.
      *
-     * @type      {boolean}
      * @default   undefined
      * @since 10.2.1
      * @sample {highstock} stock/navigator/sticktomax-false/
      * stickToMax set to false
-     * @apioption navigator.stickToMax
      */
     stickToMax?: boolean;
 
