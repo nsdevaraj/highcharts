@@ -101,6 +101,9 @@
                     const countries = this.series[0],
                         capitals = this.series[1];
 
+                    // Sort by latitude to make the entrance nice and smooth
+                    newData.sort((a, b) => a[1] - b[1]);
+
                     for (const elem of newData) {
                         await getTemp(elem, countries, capitals)
                             .catch(() => {
