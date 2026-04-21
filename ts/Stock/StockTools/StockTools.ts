@@ -97,7 +97,7 @@ export interface YAxisPositions {
  * */
 
 /**
- * @private
+ * @internal
  */
 function compose(
     NavigationBindingsClass: typeof NavigationBindings
@@ -131,7 +131,7 @@ function compose(
  * Get current positions for all yAxes. If new axis does not have position,
  * returned is default height and last available top place.
  *
- * @private
+ * @internal
  * @function Highcharts.NavigationBindings#getYAxisPositions
  *
  * @param {Array<Highcharts.Axis>} yAxes
@@ -161,7 +161,7 @@ function navigationGetYAxisPositions(
         previousAxisHeight: number,
         removedHeight: number,
         removedTop: number;
-    /** @private */
+    /** @internal */
     function isPercentage(prop: number | string | undefined): boolean {
         return defined(prop) && !isNumber(prop) && (prop.match('%') as any);
     }
@@ -237,7 +237,7 @@ function navigationGetYAxisPositions(
  * axes in the navigator. Because indicator can be removed with it's yAxis
  * in the middle of yAxis array, we need to bind closest yAxes back.
  *
- * @private
+ * @internal
  * @function Highcharts.NavigationBindings#getYAxisResizers
  *
  * @param {Array<Highcharts.Axis>} yAxes
@@ -283,7 +283,7 @@ function navigationGetYAxisResizers(
  * Utility to modify calculated positions according to the remaining/needed
  * space. Later, these positions are used in `yAxis.update({ top, height })`
  *
- * @private
+ * @internal
  * @function Highcharts.NavigationBindings#recalculateYAxisPositions
  * @param {Array<Highcharts.Dictionary<number>>} positions
  * Default positions of all yAxes.
@@ -331,7 +331,7 @@ function navigationRecalculateYAxisPositions(
  * If axis is removed, the current plot area stretches to fit into 100%
  * of the plot area.
  *
- * @private
+ * @internal
  */
 function navigationResizeYAxes(
     this: NavigationBindings,

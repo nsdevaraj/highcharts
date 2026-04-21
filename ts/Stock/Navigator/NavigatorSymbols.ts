@@ -32,7 +32,7 @@ import { relativeLength } from '../../Shared/Utilities.js';
 
 /**
  * Draw one of the handles on the side of the zoomed range in the navigator.
- * @private
+ * @internal
  */
 function navigatorHandle(
     _x: number,

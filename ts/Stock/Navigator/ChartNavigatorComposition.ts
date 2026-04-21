@@ -77,7 +77,7 @@ let NavigatorConstructor: typeof Navigator;
  * */
 
 /**
- * @private
+ * @internal
  */
 function compose(
     ChartClass: typeof Chart,
@@ -101,7 +101,7 @@ function compose(
 
 /**
  * Handle adding new series.
- * @private
+ * @internal
  */
 function onChartAfterAddSeries(
     this: Chart
@@ -117,7 +117,7 @@ function onChartAfterAddSeries(
  * final top position of the navigator once the height of the chart, including
  * the legend, is determined. #367. We can't use Chart.getMargins, because
  * labels offsets are not calculated yet.
- * @private
+ * @internal
  */
 function onChartAfterSetChartSize(
     this: Chart
@@ -194,7 +194,7 @@ function onChartAfterSetChartSize(
 
 /**
  * Initialize navigator, if no scrolling exists yet.
- * @private
+ * @internal
  */
 function onChartAfterUpdate(
     this: Chart,
@@ -217,7 +217,7 @@ function onChartAfterUpdate(
 
 /**
  * Initialize navigator for stock charts
- * @private
+ * @internal
  */
 function onChartBeforeRender(
     this: Chart
@@ -236,7 +236,7 @@ function onChartBeforeRender(
  * For Stock charts. For x only zooming, do not to create the zoom button
  * because X axis zooming is already allowed by the Navigator and Range
  * selector. (#9285)
- * @private
+ * @internal
  */
 function onChartBeforeShowResetZoom(
     this: Chart
@@ -257,7 +257,7 @@ function onChartBeforeShowResetZoom(
 }
 
 /**
- * @private
+ * @internal
  */
 function onChartCallback(
     chart: Chart
@@ -273,7 +273,7 @@ function onChartCallback(
 
 /**
  * Merge options, if no scrolling exists yet
- * @private
+ * @internal
  */
 function onChartUpdate(
     this: Chart,

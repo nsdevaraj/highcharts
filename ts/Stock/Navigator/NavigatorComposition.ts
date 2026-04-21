@@ -69,7 +69,7 @@ declare module '../../Core/Series/SeriesBase' {
  * */
 
 /**
- * @private
+ * @internal
  */
 function compose(
     ChartClass: typeof Chart,
@@ -91,7 +91,7 @@ function compose(
 
 /**
  * Handle updating series
- * @private
+ * @internal
  */
 function onSeriesAfterUpdate(
     this: Series
