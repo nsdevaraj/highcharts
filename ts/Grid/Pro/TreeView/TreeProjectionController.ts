@@ -209,13 +209,12 @@ class TreeProjectionController {
     ): Promise<boolean> {
         const options = this.options;
         const projectionState = this.projectionStateCache;
-
         if (!options || !projectionState) {
             return false;
         }
 
         const rowState = projectionState.rowsById.get(rowId);
-        if (!rowState || !rowState.hasChildren) {
+        if (!rowState?.hasChildren) {
             return false;
         }
 
