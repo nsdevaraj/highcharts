@@ -2,7 +2,9 @@
 Highcharts.chart('container', {
 
     chart: {
-        type: 'solidgauge'
+        type: 'solidgauge',
+        width: 300
+
     },
 
     credits: {
