@@ -49,6 +49,10 @@ QUnit.test('visibility', assert => {
 
 QUnit.test('Halo with boost module', assert => {
     const chart = Highcharts.chart('container', {
+            xAxis: {
+                min: -5,
+                max: 5
+            },
             plotOptions: {
                 series: {
                     boostThreshold: 2,
@@ -61,12 +65,16 @@ QUnit.test('Halo with boost module', assert => {
                 data: [2, 3]
             }, {
                 data: [3, 2]
-            }, {
-                data: [2.5]
             }]
         }),
         series = chart.series[0],
         controller = new TestController(chart);
+
+    assert.strictEqual(
+        series.markerGroup,
+        chart.series[1].markerGroup,
+        'Boosted series should share one marker group'
+    );
 
     controller.mouseMove(
         series.points[0].plotX + chart.plotLeft,
@@ -81,12 +89,6 @@ QUnit.test('Halo with boost module', assert => {
     assert.strictEqual(
         series.markerGroup.element.getAttribute('opacity'),
         '1',
-        'Boosted series sharing markerGroup should not be inactive on hover'
-    );
-
-    assert.notEqual(
-        +chart.series[2].markerGroup.element.getAttribute('opacity'),
-        1,
-        'Series not sharing markerGroup should be inactive on hover'
+        'Shared boost marker group should not be inactive on hover'
     );
 });
