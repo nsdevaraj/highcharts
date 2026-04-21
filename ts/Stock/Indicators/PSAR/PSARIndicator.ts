@@ -179,7 +179,7 @@ function getPSAR(
 /**
  * The Parabolic SAR series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.psar
  *

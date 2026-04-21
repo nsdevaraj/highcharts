@@ -37,7 +37,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The Williams %R series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.williamsr
  *

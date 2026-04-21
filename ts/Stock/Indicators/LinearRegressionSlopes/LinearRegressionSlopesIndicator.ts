@@ -39,7 +39,7 @@ import { extend, merge } from '../../../Shared/Utilities.js';
 /**
  * The Linear Regression Slope series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.linearRegressionSlope
  *

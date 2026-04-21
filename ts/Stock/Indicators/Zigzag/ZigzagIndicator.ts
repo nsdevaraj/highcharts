@@ -39,7 +39,7 @@ import { extend, merge } from '../../../Shared/Utilities.js';
 /**
  * The Zig Zag series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.zigzag
  *

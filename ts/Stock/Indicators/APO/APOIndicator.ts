@@ -38,7 +38,7 @@ import { error } from '../../../Core/Utilities.js';
 /**
  * The APO series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.apo
  *

@@ -41,7 +41,7 @@ import { defined, extend, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The Pivot Points series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.pivotpoints
  *

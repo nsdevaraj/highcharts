@@ -46,7 +46,7 @@ import { error } from '../../../Core/Utilities.js';
 /**
  * The Klinger oscillator series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.klinger
  *

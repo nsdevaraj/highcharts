@@ -49,7 +49,7 @@ import {
 /**
  * The Directional Movement Index (DMI) series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.dmi
  *

@@ -37,7 +37,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The Price Envelopes series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.priceenvelopes
  *

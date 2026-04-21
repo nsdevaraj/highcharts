@@ -37,9 +37,7 @@ import { isArray, merge } from '../../../Shared/Utilities.js';
  * */
 
 // Utils:
-/**
- * @private
- */
+/** @internal */
 function accumulateAverage(
     points: Array<[number, (number|Array<number>)]>,
     xVal: Array<number>,
@@ -53,9 +51,7 @@ function accumulateAverage(
     points.push([xValue, yValue]);
 }
 
-/**
- * @private
- */
+/** @internal */
 function weightedSumArray(
     array: Array<[(number|null), (number|Array<number>)]>,
     pLen: number
@@ -76,9 +72,7 @@ function weightedSumArray(
         })[1] as any) / denominator;
 }
 
-/**
- * @private
- */
+/** @internal */
 function populateAverage(
     points: Array<[number, (number|Array<number>)]>,
     xVal: Array<number>,
@@ -103,7 +97,7 @@ function populateAverage(
 /**
  * The SMA series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.wma
  *

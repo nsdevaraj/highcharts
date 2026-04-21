@@ -61,7 +61,7 @@ interface MACDZonesObject {
 /**
  * The MACD series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.macd
  *

@@ -36,7 +36,7 @@ import { correctFloat, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The TEMA series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.tema
  *

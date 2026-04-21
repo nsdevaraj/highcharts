@@ -38,7 +38,7 @@ import { error } from '../../../Core/Utilities.js';
 /**
  * The AD series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.ad
  *

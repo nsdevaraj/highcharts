@@ -38,9 +38,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
  * */
 
 // Utils:
-/**
- * @private
- */
+/** @internal */
 function getStandardDeviation(
     arr: Array<Array<number>>,
     index: number,
@@ -72,7 +70,7 @@ function getStandardDeviation(
 /**
  * Bollinger Bands series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.bb
  *

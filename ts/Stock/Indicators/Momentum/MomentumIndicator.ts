@@ -30,9 +30,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
  *
  * */
 
-/**
- * @private
- */
+/** @internal */
 function populateAverage(
     xVal: Array<number>,
     yVal: Array<Array<number>>,
@@ -55,7 +53,7 @@ function populateAverage(
 /**
  * The Momentum series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.momentum
  *

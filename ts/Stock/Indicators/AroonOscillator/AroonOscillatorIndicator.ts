@@ -38,7 +38,7 @@ import { extend, merge } from '../../../Shared/Utilities.js';
 /**
  * The Aroon Oscillator series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.aroonoscillator
  *

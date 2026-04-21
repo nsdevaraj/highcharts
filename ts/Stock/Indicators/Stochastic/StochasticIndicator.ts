@@ -38,7 +38,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The Stochastic series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.stochastic
  *

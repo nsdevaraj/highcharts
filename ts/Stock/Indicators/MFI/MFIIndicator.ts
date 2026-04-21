@@ -82,7 +82,7 @@ function calculateRawMoneyFlow(typicalPrice: number, volume: number): number {
 /**
  * The MFI series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.mfi
  *

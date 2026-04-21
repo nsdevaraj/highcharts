@@ -31,7 +31,7 @@ import { correctFloat, merge } from '../../../Shared/Utilities.js';
 /**
  * The TRIX series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.trix
  *

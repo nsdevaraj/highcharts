@@ -38,7 +38,7 @@ const {
 /**
  * The NATR series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.natr
  *

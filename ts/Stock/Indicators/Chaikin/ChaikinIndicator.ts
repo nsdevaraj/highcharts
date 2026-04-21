@@ -39,7 +39,7 @@ import { error } from '../../../Core/Utilities.js';
 /**
  * The Chaikin series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.chaikin
  *

@@ -42,9 +42,7 @@ import {
 
 // Utils:
 
-/**
- * @private
- */
+/** @internal */
 function accumulatePoints(
     sum: number,
     yVal: (Array<number> | Array<Array<number>>),
@@ -72,7 +70,7 @@ function accumulatePoints(
 /**
  * The DPO series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.dpo
  *

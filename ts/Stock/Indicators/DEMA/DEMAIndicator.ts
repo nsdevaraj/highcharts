@@ -38,7 +38,7 @@ import { correctFloat, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The DEMA series Type
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.dema
  *

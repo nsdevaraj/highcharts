@@ -36,7 +36,7 @@ import { extend, isArray, merge } from '../../../Shared/Utilities.js';
 /**
  * The Trend line series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.trendline
  *

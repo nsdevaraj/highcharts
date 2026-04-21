@@ -21,7 +21,7 @@
 /**
  * Get extremes of array filled by OHLC data.
  *
- * @private
+ * @internal
  *
  * @param {Array<Array<number>>} arr
  * Array of OHLC points (arrays).

@@ -40,7 +40,7 @@ import { error } from '../../../Core/Utilities.js';
 /**
  * The OBV series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.obv
  *

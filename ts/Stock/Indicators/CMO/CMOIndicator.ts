@@ -34,7 +34,7 @@ import { isNumber, merge } from '../../../Shared/Utilities.js';
 /**
  * The CMO series type.
  *
- * @private
+ * @internal
  * @class
  * @name Highcharts.seriesTypes.cmo
  *

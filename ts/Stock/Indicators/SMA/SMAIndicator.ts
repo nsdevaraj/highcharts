@@ -62,7 +62,7 @@ interface CalculateOnObject {
  *
  * Return the parent series values in the legacy two-dimensional yData
  * format
- * @private
+ * @internal
  */
 const tableToMultiYData = <TLinkedSeries extends LineSeriesType>(
     series: TLinkedSeries,
@@ -98,7 +98,7 @@ const tableToMultiYData = <TLinkedSeries extends LineSeriesType>(
 /**
  * The SMA series type.
  *
- * @private
+ * @internal
  */
 class SMAIndicator extends LineSeries {
 
@@ -222,9 +222,7 @@ class SMAIndicator extends LineSeries {
      *
      * */
 
-    /**
-     * @private
-     */
+    /** @internal */
     public destroy(): void {
         this.dataEventsToUnbind.forEach(function (
             unbinder: Function
@@ -234,9 +232,7 @@ class SMAIndicator extends LineSeries {
         super.destroy.apply(this, arguments);
     }
 
-    /**
-     * @private
-     */
+    /** @internal */
     public getName(): string {
         const params: Array<string> = [];
         let name = this.name;
@@ -260,9 +256,7 @@ class SMAIndicator extends LineSeries {
         return name;
     }
 
-    /**
-     * @private
-     */
+    /** @internal */
     public getValues<TLinkedSeries extends LineSeriesType>(
         series: TLinkedSeries&IndicatorLinkedSeriesBase,
         params: SMAParamsOptions
@@ -318,9 +312,7 @@ class SMAIndicator extends LineSeries {
         } as IndicatorValuesObject<TLinkedSeries>;
     }
 
-    /**
-     * @private
-     */
+    /** @internal */
     public init(
         chart: Chart,
         options: SMAOptions
@@ -416,9 +408,7 @@ class SMAIndicator extends LineSeries {
         indicator.eventsToUnbind.push(linkedSeriesUnbiner);
     }
 
-    /**
-     * @private
-     */
+    /** @internal */
     public recalculateValues(): void {
         const croppedDataValues = [],
             indicator = this,
@@ -577,9 +567,7 @@ class SMAIndicator extends LineSeries {
 
     }
 
-    /**
-     * @private
-     */
+    /** @internal */
     public processData(): (boolean|undefined) {
         const series = this,
             compareToMain = series.options.compareToMain,
