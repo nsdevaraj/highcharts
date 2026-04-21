@@ -115,6 +115,7 @@ extend(LinearRegressionSlopesIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         linearregressionslope: typeof LinearRegressionSlopesIndicator;

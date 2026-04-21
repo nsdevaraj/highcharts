@@ -417,6 +417,7 @@ interface PSARIndicator {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         psar: typeof PSARIndicator;

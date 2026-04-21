@@ -278,6 +278,7 @@ namespace PriceEnvelopesIndicator {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         priceenvelopes: typeof PriceEnvelopesIndicator;

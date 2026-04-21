@@ -178,6 +178,7 @@ extend(SlowStochasticIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         slowstochastic: typeof SlowStochasticIndicator;

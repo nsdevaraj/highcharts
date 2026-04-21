@@ -221,6 +221,7 @@ interface EMAIndicator {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         ema: typeof EMAIndicator;

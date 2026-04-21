@@ -207,6 +207,7 @@ extend(ROCIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         roc: typeof ROCIndicator;

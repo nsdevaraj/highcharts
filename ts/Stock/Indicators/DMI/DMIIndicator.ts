@@ -377,6 +377,7 @@ MultipleLinesComposition.compose(DMIIndicator);
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         dmi: typeof DMIIndicator;

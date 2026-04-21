@@ -190,6 +190,7 @@ extend(APOIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         apo: typeof APOIndicator;

@@ -284,6 +284,7 @@ extend(ZigzagIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         zigzag: typeof ZigzagIndicator;

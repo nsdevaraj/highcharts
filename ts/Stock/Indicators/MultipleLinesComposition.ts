@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-Highcharts
 /* *
  *
  *  (c) 2010-2026 Highsoft AS

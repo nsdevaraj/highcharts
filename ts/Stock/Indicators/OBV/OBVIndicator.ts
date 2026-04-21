@@ -207,6 +207,7 @@ extend(OBVIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         obv: typeof OBVIndicator;

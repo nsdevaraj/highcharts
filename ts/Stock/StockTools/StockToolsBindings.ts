@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-Highcharts
 /* *
  *
  *  Events generator for Stock tools

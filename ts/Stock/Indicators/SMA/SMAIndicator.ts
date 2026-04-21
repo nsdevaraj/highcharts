@@ -621,6 +621,7 @@ extend(SMAIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         sma: typeof SMAIndicator;

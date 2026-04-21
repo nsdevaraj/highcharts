@@ -116,6 +116,7 @@ extend(LinearRegressionInterceptIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         linearregressionintercept: typeof LinearRegressionInterceptIndicator;

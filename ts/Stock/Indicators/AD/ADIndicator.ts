@@ -212,6 +212,7 @@ extend(ADIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         ad: typeof ADIndicator;

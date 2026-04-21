@@ -242,6 +242,7 @@ MultipleLinesComposition.compose(AroonIndicator);
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         aroon: typeof AroonIndicator;

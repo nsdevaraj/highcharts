@@ -217,6 +217,7 @@ MultipleLinesComposition.compose(PCIndicator);
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         pc: typeof PCIndicator;

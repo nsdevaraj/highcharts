@@ -300,6 +300,7 @@ namespace TEMAIndicator {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         tema: typeof TEMAIndicator;

@@ -212,6 +212,7 @@ extend(DisparityIndexIndicator.prototype, {
  *
  * */
 
+/** @internal */
 declare module '../../../Core/Series/SeriesType' {
     interface SeriesTypeRegistry {
         disparityindex: typeof DisparityIndexIndicator;
