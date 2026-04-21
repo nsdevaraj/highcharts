@@ -217,6 +217,7 @@ class WMAIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface WMAIndicator {
     pointClass: typeof WMAPoint;
 }

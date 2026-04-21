@@ -596,6 +596,7 @@ class SMAIndicator extends LineSeries {
  *
  * */
 
+
 interface SMAIndicator extends IndicatorBase {
     calculateOn: CalculateOnObject;
     hasDerivedData: boolean;

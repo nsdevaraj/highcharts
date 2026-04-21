@@ -659,6 +659,7 @@ class SupertrendIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface SupertrendIndicator {
     nameBase: string;
     nameComponents: Array<string>;

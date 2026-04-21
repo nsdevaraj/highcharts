@@ -166,6 +166,7 @@ class WilliamsRIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface WilliamsRIndicator {
     nameBase: string;
     pointClass: typeof WilliamsRPoint;

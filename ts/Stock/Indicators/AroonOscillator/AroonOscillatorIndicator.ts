@@ -136,6 +136,7 @@ class AroonOscillatorIndicator extends AroonIndicator {
  *
  * */
 
+/** @internal */
 interface AroonOscillatorIndicator extends MultipleLinesComposition.IndicatorComposition {
     nameBase: string;
     pointArrayMap: Array<keyof AroonOscillatorPoint>;

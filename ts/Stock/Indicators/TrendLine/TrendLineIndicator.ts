@@ -168,6 +168,7 @@ class TrendLineIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface TrendLineIndicator {
     nameBase: string;
     nameComponents: Array<string>|undefined;

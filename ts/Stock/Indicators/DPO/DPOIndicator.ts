@@ -203,6 +203,7 @@ class DPOIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface DPOIndicator {
     nameBase: string;
 }

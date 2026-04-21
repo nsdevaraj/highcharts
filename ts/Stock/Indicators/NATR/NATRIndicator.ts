@@ -126,6 +126,7 @@ class NATRIndicator extends ATRIndicator {
  *
  * */
 
+/** @internal */
 interface NATRIndicator {
     pointClass: typeof NATRPoint;
 }

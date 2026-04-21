@@ -194,6 +194,7 @@ class ChaikinIndicator extends EMAIndicator {
  *
  * */
 
+/** @internal */
 interface ChaikinIndicator {
     nameBase: string;
     nameComponents: Array<string>;

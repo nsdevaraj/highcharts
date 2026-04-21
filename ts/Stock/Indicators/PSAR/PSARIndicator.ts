@@ -406,6 +406,7 @@ class PSARIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface PSARIndicator {
     pointClass: typeof PSARPoint;
     nameComponents: Array<string>|undefined;

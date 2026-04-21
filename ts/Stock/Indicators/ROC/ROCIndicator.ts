@@ -192,6 +192,7 @@ class ROCIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface ROCIndicator {
     nameBase: string;
     pointClass: typeof ROCPoint;

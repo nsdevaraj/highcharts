@@ -120,6 +120,7 @@ class LinearRegressionAngleIndicator extends LinearRegressionIndicator {
  *
  * */
 
+/** @internal */
 interface LinearRegressionAngleIndicator {
     pointClass: typeof LinearRegressionAnglePoint;
     nameBase: string;

@@ -365,6 +365,7 @@ class LinearRegressionIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface LinearRegressionIndicator {
     pointClass: typeof LinearRegressionPoint;
     nameBase: string;

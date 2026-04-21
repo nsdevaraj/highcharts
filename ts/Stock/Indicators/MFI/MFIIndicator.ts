@@ -256,6 +256,7 @@ class MFIIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface MFIIndicator {
     nameBase: string;
     pointClass: typeof MFIPoint;

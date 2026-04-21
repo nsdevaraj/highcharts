@@ -196,6 +196,7 @@ class ADIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface ADIndicator {
     pointClass: typeof ADPoint;
     nameComponents: Array<string>;

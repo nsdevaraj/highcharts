@@ -211,6 +211,7 @@ class EMAIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface EMAIndicator {
     pointClass: typeof EMAPoint;
 }

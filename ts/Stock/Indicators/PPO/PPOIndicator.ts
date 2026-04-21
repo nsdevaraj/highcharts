@@ -179,6 +179,7 @@ class PPOIndicator extends EMAIndicator {
  *
  * */
 
+/** @internal */
 interface PPOIndicator {
     nameBase: string;
     nameComponents: Array<string>;

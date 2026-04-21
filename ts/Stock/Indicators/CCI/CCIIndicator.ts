@@ -186,6 +186,7 @@ class CCIIndicator extends SMAIndicator {
  *
  * */
 
+/** @internal */
 interface CCIIndicator {
     pointClass: typeof CCIPoint;
 }

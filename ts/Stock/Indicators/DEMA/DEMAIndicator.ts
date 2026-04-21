@@ -214,6 +214,7 @@ class DEMAIndicator extends EMAIndicator {
  *
  * */
 
+/** @internal */
 interface DEMAIndicator {
     pointClass: typeof DEMAPoint;
 }
