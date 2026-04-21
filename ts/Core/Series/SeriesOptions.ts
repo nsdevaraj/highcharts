@@ -193,6 +193,10 @@ export interface SeriesEventsOptions {
  *
  * @param {Highcharts.SeriesAfterAnimateEventObject} event
  *        Event arguments.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesAfterAnimateCallbackFunction =
     EventCallback<Series, SeriesAfterAnimateEventObject>;
@@ -221,6 +225,10 @@ export interface SeriesAfterAnimateEventObject {
  *
  * @param {Highcharts.SeriesClickEventObject} event
  *        Event arguments.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesClickCallbackFunction =
     EventCallback<Series, SeriesClickEventObject>;
@@ -241,11 +249,17 @@ export interface SeriesClickEventObject {
  * Gets fired when the series is hidden after chart generation time, either by
  * clicking the legend item or by calling `.hide()`.
  *
+ * @callback Highcharts.SeriesHideCallbackFunction
+ *
  * @param {Highcharts.Series} this
  *        The series where the event occurred.
  *
  * @param {global.Event} event
  *        The event that occurred.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesHideCallbackFunction = EventCallback<Series, Event>;
 
@@ -259,6 +273,10 @@ export type SeriesHideCallbackFunction = EventCallback<Series, Event>;
  *
  * @param {global.PointerEvent} event
  *        Event that occurred.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesMouseOutCallbackFunction =
     EventCallback<Series, PointerEvent>;
@@ -273,6 +291,10 @@ export type SeriesMouseOutCallbackFunction =
  *
  * @param {global.PointerEvent} event
  *        Event that occurred.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesMouseOverCallbackFunction =
     EventCallback<Series, PointerEvent>;
@@ -288,6 +310,10 @@ export type SeriesMouseOverCallbackFunction =
  *
  * @param {global.Event} event
  *        Event that occurred.
+ *
+ * @param {Highcharts.Series} [ctx]
+ *        Since v12.6.0, the series context passed as an extra argument for
+ *        arrow functions.
  */
 export type SeriesShowCallbackFunction = EventCallback<Series, Event>;
 
