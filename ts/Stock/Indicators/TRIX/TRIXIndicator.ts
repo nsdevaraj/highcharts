@@ -107,6 +107,7 @@ class TRIXIndicator extends TEMAIndicator {
  *
  * */
 
+/** @internal */
 interface TRIXIndicator {
     pointClass: typeof TRIXPoint;
 }
