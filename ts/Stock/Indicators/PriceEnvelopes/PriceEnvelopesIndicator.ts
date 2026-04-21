@@ -264,6 +264,7 @@ MultipleLinesComposition.compose(PriceEnvelopesIndicator);
  *
  * */
 
+/** @internal */
 namespace PriceEnvelopesIndicator {
     export interface GappedExtensionObject {
         options?: GappedExtensionOptions;

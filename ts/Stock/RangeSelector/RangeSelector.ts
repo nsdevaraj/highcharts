@@ -65,6 +65,7 @@ import {
  *
  * */
 
+/** @internal */
 declare module '../../Core/Axis/AxisBase' {
     interface AxisBase {
         newMax?: number;
@@ -72,6 +73,7 @@ declare module '../../Core/Axis/AxisBase' {
     }
 }
 
+/** @internal */
 declare module '../../Core/Chart/ChartBase'{
     interface ChartBase {
         extraBottomMargin?: boolean;
@@ -81,6 +83,7 @@ declare module '../../Core/Chart/ChartBase'{
     }
 }
 
+/** @internal */
 declare module './RangeSelectorOptions' {
     export interface RangeSelectorButtonOptions {
         _offsetMax?: number;
@@ -2251,6 +2254,7 @@ class RangeSelector {
  *
  * */
 
+/** @internal */
 interface RangeSelector {
     inputTypeFormats: Record<string, string>;
 }
@@ -2273,6 +2277,7 @@ extend(RangeSelector.prototype, {
  *
  * */
 
+/** @internal */
 namespace RangeSelector {
     export interface InputElements {
         dateBox: SVGElement;
@@ -2291,6 +2296,7 @@ namespace RangeSelector {
  *
  * */
 
+/** @internal */
 export default RangeSelector;
 
 /* *

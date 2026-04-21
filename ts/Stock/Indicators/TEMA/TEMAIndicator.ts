@@ -267,6 +267,7 @@ class TEMAIndicator extends EMAIndicator {
  *
  * */
 
+/** @internal */
 interface TEMAIndicator {
     pointClass: typeof TEMAPoint;
 }
@@ -277,6 +278,7 @@ interface TEMAIndicator {
  *
  * */
 
+/** @internal */
 namespace TEMAIndicator {
 
     /* *
