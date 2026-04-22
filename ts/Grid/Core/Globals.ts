@@ -37,7 +37,6 @@ export type ClassNameKey = keyof typeof rawClassNames;
 export const classNamePrefix: string = 'hcg-';
 export const version = '@product.version@';
 export const buildDate = '@product.date@';
-
 export const rawClassNames = {
     container: 'container',
     tableElement: 'table',

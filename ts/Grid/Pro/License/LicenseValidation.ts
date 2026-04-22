@@ -190,8 +190,9 @@ class LicenseValidation {
      * **Annual:** calendar check against the current date (`new Date()`).
      * **Perpetual:** the date in the key is the end of the support window;
      *   the bundle may be used for releases **on or before** that date. The
-     *   comparison uses this bundle’s build date, see
-     *   `getGridBuildDate`.
+     *   reference day is only `getGridBuildDate()` from `Globals.buildDate`
+     *   (`YYYY-MM-DD` in a built bundle). If that value is not set, the
+     *   status is `EXPIRED` (no date substitution).
      *
      * @param key Grid Key (optional).
      * @returns License status value for `key`.
@@ -212,7 +213,6 @@ class LicenseValidation {
 
         const isPerpetual = x.expirySegment[0] === 'P';
         const ref = isPerpetual ? this.getGridBuildDate() : new Date();
-
         // Expired: annual vs today, or perpetual build vs support end.
         if (this.isExpired(x.endDate, ref)) {
             return LicenseStatus.EXPIRED;
@@ -226,17 +226,17 @@ class LicenseValidation {
      * Build date of this bundle (`Grid/Core/Globals` `buildDate` as
      * `YYYY-MM-DD` in production).
      * @internal
-     * @returns UTC start-of-day for that `buildDate`, or `new Date()` when
-     *   the string is not a `YYYY-MM-DD` placeholder (e.g. unbuilt).
+     * @returns UTC start-of-day for the `buildDate` string, or `undefined` if
+     *   it is not a `YYYY-MM-DD` value. Perpetual license checks do not
+     *   substitute a fallback `Date` when this is missing.
      */
-    public static getGridBuildDate(): Date {
+    public static getGridBuildDate(): Date | undefined {
         const raw = Globals.buildDate;
         if (isString(raw) && /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(raw)) {
             const n = raw.split('-').map(Number);
             return new Date(Date.UTC(n[0], n[1] - 1, n[2]));
         }
-        // Placeholder or unknown (e.g. unbuilt); fall back to today.
-        return new Date();
+        return void 0;
     }
 
     /**
