@@ -1,4 +1,7 @@
 /* eslint-disable node/no-extraneous-require */
+// @TODO: Remove this eslint-disable once #179 is merged and released in
+// connectors-morningstar repository.
+
 require.config({
     paths: {
         'highcharts/highcharts': 'https://code.highcharts.com/es5/highcharts',
