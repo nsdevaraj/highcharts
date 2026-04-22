@@ -23,7 +23,7 @@
  * */
 
 import type Grid from '../../Core/Grid';
-import Globals from '../../../Core/Globals.js';
+import Globals from '../../Core/Globals.js';
 import {
     defined,
     isNumber,
@@ -104,6 +104,7 @@ class LicenseValidation {
      * @internal
      *
      * @param integrityPayload16 segments 1–4 joined, no hyphens (16 chars).
+     * @returns Four upper-case base-36 checksum characters.
      */
     public static calculateChecksum(integrityPayload16: string): string {
         let sum = 0;
@@ -183,18 +184,19 @@ class LicenseValidation {
     }
 
     /**
-     * License status from key shape, checksum, and expiry vs UTC day of `now`.
+     * License status from key shape, checksum, and expiry.
      * @internal
      *
-     * @param key Grid Key (optional).
-     * @param now Expiry reference; default today (UTC day).
+     * **Annual:** calendar check against the current date (`new Date()`).
+     * **Perpetual:** the date in the key is the end of the support window;
+     *   the bundle may be used for releases **on or before** that date. The
+     *   comparison uses this bundle’s build date, see
+     *   `getGridBuildDate`.
      *
-     * @returns Status enum value for `key` at `now`.
+     * @param key Grid Key (optional).
+     * @returns License status value for `key`.
      */
-    public static getStatus(
-        key?: string,
-        now: Date = new Date()
-    ): LicenseStatus {
+    public static getStatus(key?: string): LicenseStatus {
 
         // Check if the key is a string and not empty.
         if (!isString(key)) {
@@ -208,8 +210,11 @@ class LicenseValidation {
             return LicenseStatus.INVALID;
         }
 
-        // Check if the key is expired.
-        if (this.isExpired(x.endDate, now)) {
+        const isPerpetual = x.expirySegment[0] === 'P';
+        const ref = isPerpetual ? this.getGridBuildDate() : new Date();
+
+        // Expired: annual vs today, or perpetual build vs support end.
+        if (this.isExpired(x.endDate, ref)) {
             return LicenseStatus.EXPIRED;
         }
 
@@ -218,11 +223,29 @@ class LicenseValidation {
     }
 
     /**
+     * Build date of this bundle (`Grid/Core/Globals` `buildDate` as
+     * `YYYY-MM-DD` in production).
+     * @internal
+     * @returns UTC start-of-day for that `buildDate`, or `new Date()` when
+     *   the string is not a `YYYY-MM-DD` placeholder (e.g. unbuilt).
+     */
+    public static getGridBuildDate(): Date {
+        const raw = Globals.buildDate;
+        if (isString(raw) && /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(raw)) {
+            const n = raw.split('-').map(Number);
+            return new Date(Date.UTC(n[0], n[1] - 1, n[2]));
+        }
+        // Placeholder or unknown (e.g. unbuilt); fall back to today.
+        return new Date();
+    }
+
+    /**
      * True when `now` (UTC date) is strictly after `end` (UTC date).
      * @internal
      *
      * @param end Parsed license end date.
      * @param now Defaults to `new Date()`.
+     * @returns True if the `now` UTC calendar day is strictly after `end`.
      */
     public static isExpired(end: Date, now: Date = new Date()): boolean {
         const y = now.getUTCFullYear(),
@@ -242,6 +265,7 @@ class LicenseValidation {
     /**
      * Lowercased `window.location.hostname` when a location exists.
      * @internal
+     * @returns Lowercased host, or `undefined` when `location` is missing.
      */
     private static getPageHostname(): string | undefined {
         const { win } = Globals;
@@ -254,6 +278,7 @@ class LicenseValidation {
     /**
      * True for typical local dev hostnames.
      * @internal
+     * @returns True for `localhost` and common loopback hostnames.
      */
     public static isLocalhostURL(): boolean {
         const host = this.getPageHostname();
@@ -271,6 +296,8 @@ class LicenseValidation {
     /**
      * Checks if domain is whitelisted (including subdomains).
      * @internal
+     * @returns True if the current host matches a whitelisted domain (or
+     *   subdomain).
      */
     public static isWhitelistedURL(): boolean {
         const host = this.getPageHostname();
