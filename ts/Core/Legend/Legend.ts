@@ -676,7 +676,7 @@ class Legend {
 
         if (alignAttr) {
             translateY = alignAttr.translateY;
-            this.allItems.forEach(function (item): void {
+            this.allItems.forEach(function (this: Legend, item): void {
                 const checkbox = item.checkbox;
                 let top;
 
@@ -1145,7 +1145,7 @@ class Legend {
             boxes: Array<BoxObject> = [],
             alignLeft = this.options.align === 'left';
 
-        this.allItems.forEach(function (item): void {
+        this.allItems.forEach(function (this: Legend, item): void {
             let lastPoint: (Point|undefined),
                 height: number,
                 useFirstPoint = alignLeft,
@@ -1675,6 +1675,7 @@ class Legend {
                 text: currentPage + '/' + pageCount
             });
             [this.down, this.downTracker].forEach(function (
+                this: Legend,
                 elem: (SVGElement|undefined)
             ): void {
                 (elem as any).attr({
