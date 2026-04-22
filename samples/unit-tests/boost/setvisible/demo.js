@@ -63,17 +63,9 @@ QUnit.test(
     'Shared boost marker group stays visible for hovered series, (#23338)',
     function (assert) {
         const chart = Highcharts.chart('container', {
-            boost: {
-                enabled: true,
-                allowForce: true
-            },
             plotOptions: {
                 series: {
-                    boostThreshold: 1,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle'
-                    }
+                    boostThreshold: 1
                 }
             },
             series: [{
