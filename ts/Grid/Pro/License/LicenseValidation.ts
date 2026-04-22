@@ -43,7 +43,6 @@ const GRID_KEY_DOC = 'https://www.highcharts.com/docs/grid/grid-key';
 
 /** Hostnames (exact or `*.domain`) where a Grid Key is not required. */
 const GRID_KEY_WILDCARD_DOMAINS = [
-    'localhost',
     'highcharts.com',
     'jsfiddle.net',
     'stackblitz.com',
@@ -241,15 +240,43 @@ class LicenseValidation {
     }
 
     /**
+     * Lowercased `window.location.hostname` when a location exists.
+     * @internal
+     */
+    private static getPageHostname(): string | undefined {
+        const { win } = Globals;
+        if (!defined(win.location)) {
+            return void 0;
+        }
+        return win.location.hostname.toLowerCase();
+    }
+
+    /**
+     * True for typical local dev hostnames.
+     * @internal
+     */
+    public static isLocalhostURL(): boolean {
+        const host = this.getPageHostname();
+        if (!defined(host)) {
+            return false;
+        }
+        return (
+            host === 'localhost' ||
+            host === '127.0.0.1' ||
+            host === '[::1]' ||
+            host === '::1'
+        );
+    }
+
+    /**
      * Checks if domain is whitelisted (including subdomains).
      * @internal
      */
     public static isWhitelistedURL(): boolean {
-        const { win } = Globals;
-        if (!defined(win.location)) {
+        const host = this.getPageHostname();
+        if (!defined(host)) {
             return false;
         }
-        const host = win.location.hostname.toLowerCase();
 
         // Support subdomains
         return GRID_KEY_WILDCARD_DOMAINS.some(
@@ -302,13 +329,15 @@ class LicenseValidation {
                 statusMsg = 'using an invalid Grid Key.';
                 break;
         }
-        const message = (
-            'Highcharts Grid Pro is ' + statusMsg + ' ' +
-            'Please visit ' + GRID_KEY_DOC + ' for more details.'
-        );
 
-        // eslint-disable-next-line no-console
-        console.warn(message);
+
+        /* eslint-disable no-console */
+        const log = this.isLocalhostURL() ? console.warn : console.error;
+        log('***************************************************');
+        log('Highcharts Grid Pro is ' + statusMsg);
+        log('Please visit ' + GRID_KEY_DOC + ' for more details.');
+        log('***************************************************');
+        /* eslint-enable no-console */
     }
 }
 
