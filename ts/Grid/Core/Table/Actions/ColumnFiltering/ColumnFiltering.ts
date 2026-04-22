@@ -229,7 +229,7 @@ class ColumnFiltering {
             'ArrowUp': -1
         }[e.key];
 
-        if (direction) {
+        if (direction && contentOrder.length) {
             e.preventDefault();
             const currentIndex = contentOrder.indexOf(e.target as HTMLElement);
             const n = contentOrder.length;
