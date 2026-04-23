@@ -46,8 +46,6 @@ import { Palette } from '../../Core/Color/Palettes.js';
  *
  * @product highstock gantt
  * @optionparent scrollbar
- *
- * @internal
  */
 const ScrollbarDefaults: ScrollbarOptions = {
 
