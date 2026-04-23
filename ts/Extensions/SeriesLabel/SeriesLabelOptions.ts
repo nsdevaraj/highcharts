@@ -114,10 +114,10 @@ export interface SeriesLabelOptions {
      */
     style?: CSSObject & {
         /** @default '0.8em' */
-        fontSize: CSSObject['fontSize'];
+        fontSize?: CSSObject['fontSize'];
 
         /** @default 'bold' */
-        fontWeight: CSSObject['fontWeight'];
+        fontWeight?: CSSObject['fontWeight'];
     };
 
     /**

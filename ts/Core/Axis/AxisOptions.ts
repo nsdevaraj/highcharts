@@ -705,16 +705,16 @@ export interface AxisLabelOptions {
      */
     style: CSSObject & {
         /** @default ${palette.neutralColor80} */
-        color: CSSObject['color'];
+        color?: CSSObject['color'];
 
         /** @default 'default' */
-        cursor: CSSObject['cursor'];
+        cursor?: CSSObject['cursor'];
 
         /** @default '0.8em' */
-        fontSize: CSSObject['fontSize'];
+        fontSize?: CSSObject['fontSize'];
 
         /** @default 'ellipsis' */
-        textOverflow: CSSObject['textOverflow'];
+        textOverflow?: CSSObject['textOverflow'];
     };
 
     /**

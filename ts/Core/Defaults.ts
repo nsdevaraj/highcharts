@@ -2963,8 +2963,8 @@ const defaultOptions: DefaultOptions = {
          */
         position: {
             align: 'right',
-            x: -10,
             verticalAlign: 'bottom',
+            x: -10,
             y: -5
         },
 

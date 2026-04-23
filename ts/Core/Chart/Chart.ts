@@ -4748,10 +4748,6 @@ namespace Chart {
          *
          * @sample {highcharts} highcharts/credits/position-left/
          *         Left aligned
-         * @sample {highcharts} highcharts/credits/position-left/
-         *         Left aligned
-         * @sample {highmaps} maps/credits/customized/
-         *         Left aligned
          * @sample {highmaps} maps/credits/customized/
          *         Left aligned
          *
@@ -4767,7 +4763,7 @@ namespace Chart {
             /** @default -10 */
             x?: AlignObject['x'];
 
-            /** @default 5 */
+            /** @default -5 */
             y?: AlignObject['y'];
         };
 

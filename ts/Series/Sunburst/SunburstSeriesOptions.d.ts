@@ -45,7 +45,7 @@ export interface SunburstDataLabelOptions extends DataLabelOptions {
     style?: DataLabelOptions['style'] & {
         /** @default 'ellipsis' */
         textOverflow?: Required<DataLabelOptions>['style']['textOverflow'];
-    }
+    };
 }
 
 export type SunburstDataLabelRotationValue = (

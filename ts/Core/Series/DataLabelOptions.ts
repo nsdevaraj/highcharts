@@ -495,7 +495,7 @@ export interface DataLabelOptions {
      * @since 4.1.0
      */
     style?: CSSObject & {
-        /** @default 'contrast */
+        /** @default 'contrast' */
         color?: CSSObject['color'];
 
         /** @default '0.7em' */
