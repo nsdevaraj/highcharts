@@ -685,6 +685,8 @@ class SankeySeries extends ColumnSeries {
                 }),
                 zIndex: void 0
             };
+            // Delete so it doesn't override anything on merge.
+            delete node.dlOptions.zIndex;
 
             // Pass test in drawPoints
             node.plotX = 1;
