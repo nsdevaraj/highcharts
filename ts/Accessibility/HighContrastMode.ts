@@ -36,10 +36,14 @@ const {
  *
  * */
 
+interface HighContrastState {
+    active?: boolean;
+    applying?: boolean;
+}
+
 declare module '../Core/Chart/ChartBase'{
     interface ChartBase {
-        applyingHighContrastTheme?: boolean;
-        highContrastModeActive?: boolean;
+        highContrastState?: HighContrastState;
     }
 }
 
@@ -101,8 +105,12 @@ function setHighContrastTheme(
     // storing the old state so that we can reset the theme if HC mode is
     // disabled. For now, the user will have to reload the page.
 
-    chart.highContrastModeActive = true;
-    chart.applyingHighContrastTheme = true;
+    const highContrastState = chart.highContrastState || (
+        chart.highContrastState = {}
+    );
+
+    highContrastState.active = true;
+    highContrastState.applying = true;
 
     try {
         // Apply theme to chart
@@ -149,7 +157,7 @@ function setHighContrastTheme(
         // (workaround)
         chart.redraw();
     } finally {
-        delete chart.applyingHighContrastTheme;
+        delete highContrastState.applying;
     }
 }
 

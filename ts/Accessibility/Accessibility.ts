@@ -252,9 +252,9 @@ class Accessibility {
         // Reapply after updates while HC mode is active, but avoid recursion
         // while the theme itself is being applied through chart.update.
         if (
-            !chart.applyingHighContrastTheme &&
+            !chart.highContrastState?.applying &&
             a11yOptions.highContrastMode !== false && (
-                chart.highContrastModeActive ||
+                chart.highContrastState?.active ||
                 whcm.isHighContrastModeActive() ||
                 a11yOptions.highContrastMode === true
             )
