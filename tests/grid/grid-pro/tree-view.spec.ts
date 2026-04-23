@@ -23,6 +23,20 @@ async function getVisibleRowIds(page: Page): Promise<Array<string | null>> {
     );
 }
 
+async function getTreeColumnValues(
+    page: Page,
+    columnId: string
+): Promise<string[]> {
+    return page
+        .locator(
+            `tbody .hcg-row td[data-column-id="${columnId}"] ` +
+            '.hcg-tree-value'
+        )
+        .evaluateAll((elements): string[] =>
+            elements.map((element): string => element.textContent || '')
+        );
+}
+
 async function constrainGridBodyHeight(
     page: Page,
     height: number
@@ -188,6 +202,54 @@ test.describe('Grid Pro - tree view', () => {
         ]);
         await expect(page.locator('[data-hcg-tree-toggle]'))
             .toHaveAttribute('aria-expanded', 'false');
+    });
+
+    test('renders path tree column values as current path segments', async ({ page }) => {
+        await loadGridPro(page);
+
+        await page.evaluate(async (): Promise<void> => {
+            (window as any).grid = await (window as any).Grid.grid('container', {
+                data: {
+                    columns: {
+                        id: [1, 2, 3],
+                        path: [
+                            'Sales/EMEA',
+                            'Marketing/Demand Gen/ABM',
+                            'Engineering/Frontend/Platform'
+                        ]
+                    },
+                    idColumn: 'id',
+                    treeView: {
+                        input: {
+                            type: 'path',
+                            showFullPath: false
+                        },
+                        treeColumn: 'path',
+                        expandedRowIds: 'all'
+                    }
+                },
+                rendering: {
+                    rows: {
+                        virtualization: false
+                    }
+                }
+            }, true);
+        });
+
+        await expect(page.locator('tbody .hcg-row')).toHaveCount(8);
+        expect(await getTreeColumnValues(page, 'path')).toStrictEqual([
+            'Sales',
+            'EMEA',
+            'Marketing',
+            'Demand Gen',
+            'ABM',
+            'Engineering',
+            'Frontend',
+            'Platform'
+        ]);
+        await expect(
+            page.locator('tr[data-row-id="2"] td[data-column-id="path"]')
+        ).toHaveAttribute('data-value', 'Marketing/Demand Gen/ABM');
     });
 
     test('preserves focus when a focused tree cell becomes sticky', async ({ page }) => {

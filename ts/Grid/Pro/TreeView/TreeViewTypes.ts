@@ -117,6 +117,17 @@ export interface TreeInputPathOptions {
      * @default '/'
      */
     separator?: string;
+
+    /**
+     * Defines how path values are rendered when the path column is used as
+     * the tree column.
+     *
+     * If `true`, renders complete paths. If `false`, renders only
+     * the current path segment (leaf node name).
+     *
+     * @default false
+     */
+    showFullPath?: boolean;
 }
 
 /**

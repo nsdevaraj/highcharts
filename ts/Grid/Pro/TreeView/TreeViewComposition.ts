@@ -29,6 +29,9 @@ import type TableRow from '../../Core/Table/Body/TableRow';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
 import type {
+    NormalizedTreeViewOptions
+} from './TreeViewOptionsNormalizer';
+import type {
     AfterTreeRowToggleEvent,
     BeforeTreeRowToggleEvent,
     TreeRowToggleTriggerEvent
@@ -39,7 +42,7 @@ import TreeProjectionController from './TreeProjectionController.js';
 import TreeStickyRowController from './TreeStickyRowController.js';
 import TreeViewGlobals from './TreeViewGlobals.js';
 import { createGridIcon } from '../../Core/UI/SvgIcons.js';
-import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
+import { addEvent, defined, pushUnique } from '../../../Shared/Utilities.js';
 import { waitForAnimationFrame } from '../../Core/GridUtils.js';
 
 
@@ -373,6 +376,42 @@ function getTreeToggleContext(
         isExpanded: rowState.isExpanded,
         rowId
     };
+}
+
+/**
+ * Returns the path segment that should be rendered in the tree column.
+ *
+ * @param value
+ * Raw cell value.
+ *
+ * @param columnId
+ * Rendered column ID.
+ *
+ * @param options
+ * Normalized Tree View options.
+ */
+function getPathSegmentDisplayValue(
+    value: unknown,
+    columnId: string,
+    options: NormalizedTreeViewOptions
+): string | undefined {
+    const input = options.input;
+
+    if (
+        input.type !== 'path' ||
+        input.showFullPath ||
+        columnId !== input.pathColumn ||
+        typeof value !== 'string'
+    ) {
+        return;
+    }
+
+    const separatorIndex = value.lastIndexOf(input.separator);
+    if (separatorIndex < 0) {
+        return value;
+    }
+
+    return value.slice(separatorIndex + input.separator.length);
 }
 
 /**
@@ -929,8 +968,23 @@ function onAfterCellRender(this: TableCell): void {
     const valueContainer = document.createElement('span');
     valueContainer.className = TreeViewGlobals.classNames.value;
 
-    while (cellElement.firstChild) {
-        valueContainer.appendChild(cellElement.firstChild);
+    const pathDisplayValue = getPathSegmentDisplayValue(
+        this.value,
+        this.column.id,
+        options
+    );
+
+    if (
+        !defined(this.column.options.cells?.format) &&
+        !defined(this.column.options.cells?.formatter) &&
+        defined(pathDisplayValue)
+    ) {
+        cellElement.textContent = '';
+        valueContainer.textContent = pathDisplayValue;
+    } else {
+        while (cellElement.firstChild) {
+            valueContainer.appendChild(cellElement.firstChild);
+        }
     }
 
     wrapper.appendChild(toggleContainer);

@@ -43,6 +43,7 @@ export interface NormalizedTreeInputPathOptions {
     type: 'path';
     pathColumn: string;
     separator: string;
+    showFullPath: boolean;
 }
 
 export type NormalizedTreeInputOptions = (
@@ -65,7 +66,8 @@ const defaultParentIdInput: NormalizedTreeInputParentIdOptions = {
 const defaultPathInput: NormalizedTreeInputPathOptions = {
     type: 'path',
     pathColumn: 'path',
-    separator: '/'
+    separator: '/',
+    showFullPath: false
 };
 
 
