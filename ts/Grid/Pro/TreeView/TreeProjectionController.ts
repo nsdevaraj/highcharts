@@ -1185,26 +1185,18 @@ class TreeProjectionController {
         const hasParentIdColumn = !!columns[parentIdColumn];
         const hasPathColumn = !!columns[pathColumn];
 
-        if (hasParentIdColumn && hasPathColumn) {
-            throw new Error(
-                'TreeView: Could not autodetect input type because both ' +
-                `"${parentIdColumn}" and "${pathColumn}" ` +
-                'columns exist. Set `data.treeView.input.type` explicitly.'
-            );
+        if (hasPathColumn) {
+            return {
+                type: 'path',
+                pathColumn,
+                separator
+            };
         }
 
         if (hasParentIdColumn) {
             return {
                 type: 'parentId',
                 parentIdColumn
-            };
-        }
-
-        if (hasPathColumn) {
-            return {
-                type: 'path',
-                pathColumn,
-                separator
             };
         }
 

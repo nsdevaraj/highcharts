@@ -175,29 +175,22 @@ test.describe('Grid Pro - tree view', () => {
         ]);
     });
 
-    test('logs when input autodetection is ambiguous', async ({ page }) => {
+    test('prefers path input when both dataset columns exist', async ({ page }) => {
         await loadGridPro(page);
 
-        const consoleErrors: string[] = [];
-
-        page.on('console', (msg): void => {
-            if (msg.type() === 'error') {
-                consoleErrors.push(msg.text());
-            }
-        });
-
         await page.evaluate(async (): Promise<void> => {
-            await (window as any).Grid.grid('container', {
+            (window as any).grid = await (window as any).Grid.grid('container', {
                 data: {
                     columns: {
-                        id: [1, 2],
-                        parentId: [null, 1],
-                        path: ['A', 'A/a'],
-                        name: ['Root', 'Child']
+                        id: [1, 2, 3],
+                        parentId: [null, 1, 1],
+                        path: ['A/a', 'A/b', 'B/c'],
+                        name: ['a', 'b', 'c']
                     },
                     idColumn: 'id',
                     treeView: {
-                        treeColumn: 'name'
+                        treeColumn: 'name',
+                        expandedRowIds: 'all'
                     }
                 },
                 rendering: {
@@ -208,25 +201,14 @@ test.describe('Grid Pro - tree view', () => {
             }, true);
         });
 
-        await expect.poll(
-            (): string | null => {
-                for (let i = 0, iEnd = consoleErrors.length; i < iEnd; ++i) {
-                    if (
-                        consoleErrors[i].includes(
-                            'TreeView: Could not autodetect input type'
-                        )
-                    ) {
-                        return consoleErrors[i];
-                    }
-                }
-
-                return null;
-            }
-        ).toBe(
-            'TreeView: Could not autodetect input type because both ' +
-            '"parentId" and "path" columns exist. Set ' +
-            '`data.treeView.input.type` explicitly.'
-        );
+        await expect(page.locator('tbody .hcg-row')).toHaveCount(5);
+        expect(await getVisibleRowIds(page)).toStrictEqual([
+            '__hcg_tree_path__:A',
+            '1',
+            '2',
+            '__hcg_tree_path__:B',
+            '3'
+        ]);
     });
 
     test('keeps generated path parents addressable after pagination', async ({ page }) => {
