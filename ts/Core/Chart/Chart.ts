@@ -2936,7 +2936,7 @@ class Chart {
                 labels.enabled &&
                 axis.series.length &&
                 axis.coll !== 'colorAxis' &&
-                !chart.polar
+                !axis.isRadial // Gauges and polar chart (#24526)
             ) {
 
                 expectedSpace = options.tickLength;
