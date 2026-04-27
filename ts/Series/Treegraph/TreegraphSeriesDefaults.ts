@@ -266,7 +266,11 @@ const TreegraphSeriesDefaults = {
          * @since 10.3.0
          */
         linkTextPath: {
+            /**
+             * @default { startOffset: '50%' }
+             */
             attributes: {
+                /** @ignore */
                 startOffset: '50%'
             }
         },

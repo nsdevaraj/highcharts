@@ -193,7 +193,7 @@ const NetworkgraphSeriesDefaults: NetworkgraphSeriesOptions = {
          * **Note:** Only SVG-based renderer supports this option. Setting
          * `useHTML` to true will disable this option.
          *
-         * @extends plotOptions.networkgraph.dataLabels.textPath
+         * @extends plotOptions.series.dataLabels.textPath
          * @since   7.1.0
          */
         linkTextPath: {

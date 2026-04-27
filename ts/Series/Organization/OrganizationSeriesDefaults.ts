@@ -265,9 +265,18 @@ const OrganizationSeriesDefaults: OrganizationSeriesOptions = {
 
         useHTML: true,
 
+        /**
+         * @extends plotOptions.series.dataLabels.textPath
+         */
         linkTextPath: {
+            /**
+             * @default { startOffset: '95%', textAnchor: 'end' }
+             */
             attributes: {
+                /** @ignore */
                 startOffset: '95%',
+
+                /** @ignore */
                 textAnchor: 'end'
             }
         }

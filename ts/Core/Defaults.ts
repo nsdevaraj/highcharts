@@ -3016,7 +3016,7 @@ const defaultTime = new Time(defaultOptions.time, defaultOptions.lang);
  * @return {Highcharts.Options}
  * Default options.
  */
-function getOptions(): DefaultOptions {
+export function getOptions(): DefaultOptions {
     return defaultOptions;
 }
 

@@ -189,7 +189,7 @@ const PackedBubbleSeriesDefaults: PackedBubbleSeriesOptions = {
              *
              * @type      {Highcharts.SVGAttributes}
              * @since     7.1.0
-             * @apioption plotOptions.packedbubble.dataLabels.attributes
+             * @apioption plotOptions.packedbubble.dataLabels.parentNodeTextPath.attributes
              */
 
             /**

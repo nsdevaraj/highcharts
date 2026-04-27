@@ -17,10 +17,7 @@
 
 import type ColorType from '../../Core/Color/ColorType';
 import type CSSObject from '../../Core/Renderer/CSSObject';
-import type {
-    DataLabelOptions,
-    DataLabelTextPathOptions
-} from '../../Core/Series/DataLabelOptions';
+import type { DataLabelOptions } from '../../Core/Series/DataLabelOptions';
 import type Point from '../../Core/Series/Point';
 import type { PointMarkerOptions } from '../../Core/Series/PointOptions';
 import type { SymbolKey } from '../../Core/Renderer/SVG/SymbolType';
@@ -111,7 +108,7 @@ export interface TreegraphDataLabelFormatterContext {
 export interface TreegraphDataLabelOptions extends DataLabelOptions {
     linkFormat?: string;
     linkFormatter: TreegraphDataLabelsFormatterCallbackFunction;
-    linkTextPath?: DataLabelTextPathOptions;
+    linkTextPath?: DataLabelOptions['textPath'];
 }
 
 export interface TreegraphSeriesLevelOptions extends TreemapSeriesLevelOptions {

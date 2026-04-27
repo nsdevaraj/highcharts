@@ -293,11 +293,7 @@ export interface AxisCrosshairOptions {
      * The pixel width of the crosshair. Defaults to 1 for numeric or
      * datetime axes, and for one category width for category axes.
      *
-     * @sample {highcharts} highcharts/xaxis/crosshair-customized/
-     *         Customized crosshairs
-     * @sample {highstock} highcharts/xaxis/crosshair-customized/
-     *         Customized crosshairs
-     * @sample {highmaps} highcharts/xaxis/crosshair-customized/
+     * @sample {highcharts|highstock|highmaps} highcharts/xaxis/crosshair-customized/
      *         Customized crosshairs
      *
      * @default 1

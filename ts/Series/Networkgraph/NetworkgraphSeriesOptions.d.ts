@@ -19,10 +19,7 @@
 
 import type ColorType from '../../Core/Color/ColorType';
 import type DashStyleValue from '../../Core/Renderer/DashStyleValue';
-import type {
-    DataLabelOptions,
-    DataLabelTextPathOptions
-} from '../../Core/Series/DataLabelOptions';
+import type { DataLabelOptions } from '../../Core/Series/DataLabelOptions';
 import type { EventCallback } from '../../Core/Callback';
 import type {
     NetworkgraphDataOptions,
@@ -69,7 +66,7 @@ export interface NetworkgraphDataLabelsOptions
     formatter?: NetworkgraphDataLabelsFormatterCallbackFunction;
     linkFormat?: string;
     linkFormatter?: NetworkgraphDataLabelsFormatterCallbackFunction;
-    linkTextPath?: DataLabelTextPathOptions;
+    linkTextPath?: DataLabelOptions['textPath'];
 }
 
 /**
