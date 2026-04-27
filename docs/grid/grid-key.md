@@ -1,8 +1,9 @@
 ---
-sidebar_label: "Grid Key (Grid Pro)"
+tags: ["grid-pro"]
+sidebar_label: "Grid Key"
 ---
 
-# Grid Key (Grid Pro)
+# Grid Key
 
 **Highcharts Grid Pro** is a commercial product. In the browser, the library checks for a valid **Grid Key** on hosts where a license applies.
 
