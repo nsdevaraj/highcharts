@@ -139,32 +139,23 @@ QUnit.test(
             }]
         });
 
-        const labelElement = chart.xAxis[0].ticks[0].label.element;
+        const label = chart.xAxis[0].ticks[0].label;
 
-        // 1. Shrink the chart to force the axis to squish the labels
-        chart.setSize(300);
+        label.css({
+            width: '100px',
+            lineClamp: 1
+        });
 
-        console.log(labelElement.style.display);
+        const clampedHeight = label.element.offsetHeight;
 
-        assert.strictEqual(
-            labelElement.style.display,
-            '-webkit-box',
-            'Sanity check: display: -webkit-box should be applied when narrow.'
-        );
+        chart.setSize(900, false);
 
-        // 2. Widen the chart back up to trigger the bug cleanup logic
-        chart.setSize(900);
-
-        assert.notStrictEqual(
-            labelElement.style.display,
-            '-webkit-box',
-            'The display: -webkit-box style should be completely removed.'
-        );
+        const unwrappedHeight = label.element.offsetHeight;
 
         assert.ok(
-            !labelElement.style.webkitLineClamp &&
-            !labelElement.style.WebkitLineClamp,
-            'The -webkit-line-clamp style should be completely removed.'
+            unwrappedHeight > clampedHeight,
+            '#22961: The label bounding box height should increase ' +
+            'significantly when the line-clamp is disabled.'
         );
     }
 );

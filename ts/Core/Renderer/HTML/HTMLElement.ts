@@ -319,37 +319,14 @@ class HTMLElement extends SVGElement {
 
         // Clean up sticky side-effects when lineClamp is explicitly removed
         // (set to 0) or contradicted by a forced nowrap (#22961)
-        if (
-            (styles && 'lineClamp' in styles && !styles.lineClamp) ||
-            (styles?.whiteSpace === 'nowrap' && this.styles.lineClamp)
-        ) {
-            const { style } = this.element;
-            if (this.element?.style) {
-                style.removeProperty('-webkit-line-clamp');
-                style.removeProperty('-webkit-box-orient');
-                // Only clear display if it's currently the injected webkit-box
-                if (style.display === '-webkit-box') {
-                    style.removeProperty('display');
-                }
-            }
-
-            const thisStyles = this.styles;
-            if (thisStyles) {
-                delete thisStyles.lineClamp;
-                if (thisStyles.display === '-webkit-box') {
-                    delete thisStyles.display;
-                }
-            }
-
-            if (styles && 'lineClamp' in styles) {
-                delete styles.lineClamp;
-            }
-
-        } else if (styles?.lineClamp) {
+        if (styles?.lineClamp) {
             styles.display = '-webkit-box';
             styles.WebkitLineClamp = styles.lineClamp;
             styles.WebkitBoxOrient = 'vertical';
             styles.overflow = 'hidden';
+        } else if (styles?.lineClamp === 0) {
+            // Disable the clamp by breaking the -webkit-box context
+            styles.display = 'inline-block';
         }
 
         // SVG natively supports setting font size as numbers. With HTML, the
