@@ -122,6 +122,7 @@ module.exports = {
         'Grid': [
             'grid/general',
             'grid/installation',
+            'grid/grid-key',
             'grid/understanding-grid',
             {
                 'Columns': [
