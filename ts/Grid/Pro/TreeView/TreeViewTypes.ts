@@ -44,7 +44,10 @@ export interface TreeViewOptions {
     /**
      * Input format definition used to build the tree index.
      *
-     * @default { type: 'parentId' }
+     * When omitted, TreeView auto-detects the standard `parentId` or `path`
+     * columns and prefers `path` when both exist. For custom input
+     * definitions, set
+     * `data.treeView.input.type` explicitly.
      */
     input?: TreeInputOptions;
 
@@ -102,7 +105,7 @@ export interface TreeInputParentIdOptions {
     /**
      * Type of the tree input.
      */
-    type?: 'parentId';
+    type: 'parentId';
 
     /**
      * Column ID containing parent row IDs.
@@ -132,6 +135,17 @@ export interface TreeInputPathOptions {
      * @default '/'
      */
     separator?: TreeInputPathSeparator;
+
+    /**
+     * Defines how path values are rendered when the path column is used as
+     * the tree column.
+     *
+     * If `true`, renders complete paths. If `false`, renders only
+     * the current path segment (leaf node name).
+     *
+     * @default false
+     */
+    showFullPath?: boolean;
 }
 
 /**
