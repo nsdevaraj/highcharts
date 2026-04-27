@@ -560,7 +560,6 @@ const PieSeriesDefaults: PieSeriesOptions = {
      *         Black border
      *
      * @type    {Highcharts.ColorType}
-     * @default ${palette.backgroundColor}
      * @product highcharts highmaps
      */
     borderColor: Palette.backgroundColor,

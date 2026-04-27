@@ -699,7 +699,19 @@ export interface AxisLabelOptions {
      * @sample {highcharts} highcharts/xaxis/labels-style/
      *         Red X axis labels
      */
-    style: CSSObject;
+    style: CSSObject & {
+        /** @default ${palette.neutralColor80} */
+        color?: CSSObject['color'];
+
+        /** @default 'default' */
+        cursor?: CSSObject['cursor'];
+
+        /** @default '0.8em' */
+        fontSize?: CSSObject['fontSize'];
+
+        /** @default 'ellipsis' */
+        textOverflow?: CSSObject['textOverflow'];
+    };
 
     /**
      * Whether to [use HTML](https://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting#html)
@@ -2068,7 +2080,13 @@ export interface AxisTitleOptions {
      * @sample {highcharts} highcharts/css/axis/
      *         Styled mode
      */
-    style: CSSObject;
+    style: CSSObject & {
+        /** @default ${palette.neutralColor60} */
+        color?: CSSObject['color'];
+
+        /** @default '0.8em' */
+        fontSize?: CSSObject['fontSize'];
+    };
 
     /**
      * The actual text of the axis title. It can contain basic HTML tags

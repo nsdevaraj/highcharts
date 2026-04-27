@@ -1,7 +1,7 @@
 /* *
  *
  *  (c) 2010-2026 Highsoft AS
- *  Author: Paweł Lysy Grzegorz Blachliński
+ *  Authors: Paweł Lysy, Grzegorz Blachliński
  *
  *  A commercial license may be required depending on use.
  *  See www.highcharts.com/license
@@ -123,8 +123,6 @@ export interface TreegraphSeriesLevelOptions extends TreemapSeriesLevelOptions {
  * The best examples of the dataStructures, which best reflect this chart
  * are e.g. genealogy tree or directory structure.
  *
- * TODO change back the demo path
- *
  * @sample highcharts/demo/treegraph-chart
  *         Treegraph Chart
  *
@@ -141,11 +139,8 @@ export interface TreegraphSeriesLevelOptions extends TreemapSeriesLevelOptions {
  *            zones
  *
  * @product highcharts
- *
  * @since 10.3.0
- *
  * @requires modules/treemap
- *
  * @requires modules/treegraph
  */
 export interface TreegraphSeriesOptions extends TreemapSeriesOptions {

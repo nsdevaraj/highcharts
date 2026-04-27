@@ -363,6 +363,7 @@ const SankeySeriesDefaults: PlotOptionsOf<SankeySeries> = {
              * Animation when not hovering over the marker.
              *
              * @type      {boolean|Partial<Highcharts.AnimationOptionsObject>}
+             * @default   { duration: 50 }
              * @apioption plotOptions.series.states.inactive.animation
              */
             animation: {

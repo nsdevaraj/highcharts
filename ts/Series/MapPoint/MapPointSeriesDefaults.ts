@@ -55,7 +55,6 @@ const MapPointSeriesDefaults: MapPointSeriesOptions = {
         },
         overflow: false as any,
         style: {
-            /** @internal */
             color: Palette.neutralColor100
         }
     },

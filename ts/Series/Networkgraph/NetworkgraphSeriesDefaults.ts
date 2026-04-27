@@ -81,6 +81,7 @@ const NetworkgraphSeriesDefaults: NetworkgraphSeriesOptions = {
                 /**
                  * Animation when not hovering over the node.
                  *
+                 * @default { duration: 50 }
                  * @type {boolean|Partial<Highcharts.AnimationOptionsObject>}
                  */
                 animation: {
@@ -106,6 +107,7 @@ const NetworkgraphSeriesDefaults: NetworkgraphSeriesOptions = {
             /**
              * Animation when not hovering over the node.
              *
+             * @default { duration: 50 }
              * @type {boolean|Partial<Highcharts.AnimationOptionsObject>}
              */
             animation: {

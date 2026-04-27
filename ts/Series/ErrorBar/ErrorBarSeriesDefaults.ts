@@ -55,7 +55,6 @@ const ErrorBarSeriesDefaults: ErrorBarSeriesOptions = {
      *         Error bar styling
      *
      * @type    {Highcharts.ColorType}
-     * @default #000000
      * @since   3.0
      * @product highcharts
      */

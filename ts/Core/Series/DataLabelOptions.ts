@@ -484,9 +484,22 @@ export interface DataLabelOptions {
      * @sample {highmaps} maps/demo/color-axis/
      *         Bold labels
      *
+     * @default { color: 'contrast', fontSize: '0.7em', fontWeight: 'bold', textOutline: '1px contrast' }
      * @since 4.1.0
      */
-    style?: CSSObject;
+    style?: CSSObject & {
+        /** @default 'contrast' */
+        color?: CSSObject['color'];
+
+        /** @default '0.7em' */
+        fontSize?: CSSObject['fontSize'];
+
+        /** @default 'bold' */
+        fontWeight?: CSSObject['fontWeight'];
+
+        /** @default '1px contrast' */
+        textOutline?: CSSObject['textOutline'];
+    };
 
     /**
      * Whether to

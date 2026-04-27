@@ -181,13 +181,9 @@ const TimelineSeriesDefaults: TimelineSeriesOptions = {
         },
 
         style: {
-            /** @internal */
             textOutline: 'none',
-            /** @internal */
             fontWeight: 'normal',
-            /** @internal */
             fontSize: '0.8em',
-            /** @internal */
             textAlign: 'left'
         },
 

@@ -243,7 +243,6 @@ const SunburstSeriesDefaults: SunburstSeriesOptions = {
         rotationMode: 'circular',
 
         style: {
-            /** @internal */
             textOverflow: 'ellipsis'
         }
 
