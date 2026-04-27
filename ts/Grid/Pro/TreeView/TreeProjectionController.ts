@@ -1192,7 +1192,8 @@ class TreeProjectionController {
             return {
                 type: 'path',
                 pathColumn,
-                separator
+                separator,
+                showFullPath: false
             };
         }
 

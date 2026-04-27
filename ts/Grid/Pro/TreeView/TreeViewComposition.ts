@@ -29,7 +29,7 @@ import type TableRow from '../../Core/Table/Body/TableRow';
 import type TableCell from '../../Core/Table/Body/TableCell';
 import type { TreeViewOptions } from './TreeViewTypes';
 import type {
-    NormalizedTreeViewOptions
+    ResolvedTreeViewOptions
 } from './TreeViewOptionsNormalizer';
 import type {
     AfterTreeRowToggleEvent,
@@ -393,7 +393,7 @@ function getTreeToggleContext(
 function getPathSegmentDisplayValue(
     value: unknown,
     columnId: string,
-    options: NormalizedTreeViewOptions
+    options: ResolvedTreeViewOptions
 ): string | undefined {
     const input = options.input;
 
