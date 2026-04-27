@@ -22,6 +22,7 @@
  * */
 
 import type {
+    TreeInputPathSeparator,
     TreeExpandedRowIds,
     TreeViewOptions
 } from './TreeViewTypes';
@@ -42,7 +43,7 @@ export interface NormalizedTreeInputParentIdOptions {
 export interface NormalizedTreeInputPathOptions {
     type: 'path';
     pathColumn: string;
-    separator: string;
+    separator: TreeInputPathSeparator;
     showFullPath: boolean;
 }
 

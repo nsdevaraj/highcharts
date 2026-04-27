@@ -50,9 +50,8 @@ import {
 import {
     hasDataTableProvider
 } from '../../Core/Data/DataProvider.js';
-import {
-    normalizeTreeViewOptions
-} from './TreeViewOptionsNormalizer.js';
+import { normalizeTreeViewOptions } from './TreeViewOptionsNormalizer.js';
+import { isDeepEqual } from '../../Core/GridUtils.js';
 import { defined, fireEvent } from '../../../Shared/Utilities.js';
 
 
@@ -92,7 +91,7 @@ class TreeProjectionController {
         table: DataTable;
         versionTag: string;
         idColumn: string;
-        inputCacheKey: string;
+        input: NormalizedTreeInputOptions;
     };
 
 
@@ -169,16 +168,11 @@ class TreeProjectionController {
         };
 
         this.resolvedOptions = options;
-
-        const inputCacheKey = TreeProjectionController.getInputCacheKey(
-            options.input
-        );
-
         const isCacheValid = (
             this.cacheSource?.table === table &&
-            this.cacheSource.versionTag === versionTag &&
-            this.cacheSource.idColumn === idColumn &&
-            this.cacheSource.inputCacheKey === inputCacheKey
+            this.cacheSource?.versionTag === versionTag &&
+            this.cacheSource?.idColumn === idColumn &&
+            isDeepEqual(this.cacheSource?.input, options.input)
         );
 
         if (!isCacheValid) {
@@ -192,7 +186,7 @@ class TreeProjectionController {
                 table,
                 versionTag,
                 idColumn,
-                inputCacheKey
+                input: options.input
             };
         }
 
@@ -1138,30 +1132,6 @@ class TreeProjectionController {
     }
 
     /**
-     * Builds deterministic cache key for normalized input configuration.
-     *
-     * @param input
-     * Normalized input configuration.
-     *
-     * @returns
-     * Cache key representing input identity.
-     */
-    private static getInputCacheKey(input: NormalizedTreeInputOptions): string {
-        if (input.type === 'parentId') {
-            return JSON.stringify([
-                'parentId',
-                input.parentIdColumn
-            ]);
-        }
-
-        return JSON.stringify([
-            'path',
-            input.pathColumn,
-            input.separator
-        ]);
-    }
-
-    /**
      * Resolves effective tree input configuration for source columns.
      *
      * @param columns
@@ -1192,7 +1162,8 @@ class TreeProjectionController {
             return {
                 type: 'path',
                 pathColumn,
-                separator
+                separator,
+                showFullPath: false
             };
         }
 
