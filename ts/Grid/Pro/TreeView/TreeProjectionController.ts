@@ -48,6 +48,9 @@ import {
     buildIndexFromColumns as buildParentIdIndexFromColumns
 } from './InputAdapters/ParentIdTreeInputAdapter.js';
 import {
+    hasDataTableProvider
+} from '../../Core/Data/DataProvider.js';
+import {
     normalizeTreeViewOptions
 } from './TreeViewOptionsNormalizer.js';
 import { defined, fireEvent } from '../../../Shared/Utilities.js';
@@ -126,7 +129,7 @@ class TreeProjectionController {
         }
 
         const dataProvider = this.grid.dataProvider;
-        if (!TreeProjectionController.hasGetDataTable(dataProvider)) {
+        if (!hasDataTableProvider(dataProvider)) {
             // Remote provider runtime support is intentionally deferred.
             this.resolvedOptions = void 0;
             this.clearCache();
@@ -1228,29 +1231,6 @@ class TreeProjectionController {
         );
     }
 
-    /**
-     * Runtime type guard for providers exposing `getDataTable`.
-     *
-     * @param provider
-     * Data provider instance to test.
-     *
-     * @returns
-     * `true` when provider exposes `getDataTable`.
-     */
-    private static hasGetDataTable(
-        provider: unknown
-    ): provider is {
-        getDataTable: (presentation?: boolean) => DataTable | undefined;
-    } {
-        return !!(
-            provider &&
-            typeof (
-                provider as {
-                    getDataTable?: unknown;
-                }
-            ).getDataTable === 'function'
-        );
-    }
 }
 
 
