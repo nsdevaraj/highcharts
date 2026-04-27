@@ -2,8 +2,9 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import { strictEqual } from 'node:assert';
 
 import GridGlobals from '../../../ts/Grid/Core/Globals.js';
-import LicenseValidation, {
-    LicenseStatus
+import {
+    getStatus,
+    licenseStatus
 } from '../../../ts/Grid/Pro/License/LicenseValidation.js';
 
 /**
@@ -37,15 +38,15 @@ describe('Grid Pro license validation', () => {
 
         it('valid', () => {
             strictEqual(
-                LicenseValidation.getStatus(KEY_ANNUAL_VALID),
-                LicenseStatus.VALID
+                getStatus(KEY_ANNUAL_VALID),
+                licenseStatus.VALID
             );
         });
 
         it('expired', () => {
             strictEqual(
-                LicenseValidation.getStatus(KEY_ANNUAL_EXPIRED),
-                LicenseStatus.EXPIRED
+                getStatus(KEY_ANNUAL_EXPIRED),
+                licenseStatus.EXPIRED
             );
         });
     });
@@ -54,16 +55,16 @@ describe('Grid Pro license validation', () => {
         it('valid (build before support end in key)', () => {
             setBuildDateForTest('2000-01-01');
             strictEqual(
-                LicenseValidation.getStatus(KEY_PERPETUAL_SUPPORT_ENDED),
-                LicenseStatus.VALID
+                getStatus(KEY_PERPETUAL_SUPPORT_ENDED),
+                licenseStatus.VALID
             );
         });
 
         it('expired (build after support end in key)', () => {
             setBuildDateForTest('2026-04-13');
             strictEqual(
-                LicenseValidation.getStatus(KEY_PERPETUAL_SUPPORT_ENDED),
-                LicenseStatus.EXPIRED
+                getStatus(KEY_PERPETUAL_SUPPORT_ENDED),
+                licenseStatus.EXPIRED
             );
         });
     });
@@ -71,15 +72,15 @@ describe('Grid Pro license validation', () => {
     describe('Invalid / missing', () => {
         it('missing', () => {
             strictEqual(
-                LicenseValidation.getStatus(void 0),
-                LicenseStatus.MISSING
+                getStatus(void 0),
+                licenseStatus.MISSING
             );
         });
 
         it('invalid (malformed)', () => {
             strictEqual(
-                LicenseValidation.getStatus('not-a-grid-key'),
-                LicenseStatus.INVALID
+                getStatus('not-a-grid-key'),
+                licenseStatus.INVALID
             );
         });
     });

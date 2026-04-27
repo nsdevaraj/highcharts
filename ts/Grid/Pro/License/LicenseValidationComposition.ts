@@ -24,7 +24,7 @@
 
 import type Grid from '../../Core/Grid';
 
-import LicenseValidation from './LicenseValidation.js';
+import { validate } from './LicenseValidation.js';
 import Globals from '../../Core/Globals.js';
 import { addEvent, pushUnique } from '../../../Shared/Utilities.js';
 
@@ -57,7 +57,7 @@ function compose(GridClass: typeof Grid): void {
  * @param this Grid instance.
  */
 function validateLicense(this: Grid): void {
-    LicenseValidation.validate(this);
+    validate(this);
 }
 
 /* *
