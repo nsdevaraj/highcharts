@@ -1,21 +1,20 @@
 ---
-sidebar_label: "Tree view"
 tags: ["grid-pro"]
 ---
 
 # Tree view
 
 Tree view is a Highcharts Grid Pro feature that turns flat row data into an
-expandable hierarchy inside the Grid. Use it when your data represents
+expandable hierarchy inside the grid. Use it when your data represents
 parent-child relationships such as organization structures, folders, product
 categories, account trees, or multi-level budgets.
 
-TreeView is configured in `data.treeView` and works with the local/client-side
+Tree view is configured using `data.treeView` and works with the local
 data provider. Grid builds a tree index from the source table, then projects
 the queried row set into visible parent and child rows before pagination is
 applied.
 
-## Requirements
+## Minimum requirements
 
 - Tree view is available in Highcharts Grid Pro.
 - Set `data.idColumn` to a column containing stable string or number row IDs.
@@ -42,7 +41,7 @@ Grid.grid('container', {
 
 ## Input models
 
-TreeView supports two input models:
+Tree view supports two input models:
 
 - `parentId`: explicit parent references in a dedicated column
 - `path`: hierarchical paths such as `Root/Sales/EMEA`
@@ -119,7 +118,7 @@ Grid.grid('container', {
 
 With `path` input, intermediate nodes do not need to exist as source rows. If
 your dataset contains `Root/Sales/EMEA` but does not contain separate source
-rows for `Root` or `Root/Sales`, TreeView can generate those ancestors
+rows for `Root` or `Root/Sales`, Tree view can generate those ancestors
 automatically so the visible hierarchy stays complete.
 
 Generated rows are structural rows. Their path value is available, but other
@@ -149,8 +148,8 @@ treeView: {
 
 ## Initial expansion state
 
-Use `expandedRowIds` to seed which branches are expanded when TreeView is
-initialized or when TreeView configuration changes.
+Use `expandedRowIds` to seed which branches are expanded when Tree view is
+initialized or when Tree view configuration changes.
 
 ```js
 treeView: {
@@ -177,7 +176,7 @@ hierarchies and [row virtualization](https://www.highcharts.com/docs/grid/rows/v
 
 ## Runtime API
 
-The TreeView controller is available on `grid.treeView`.
+The Tree view controller is available on `grid.treeView`.
 
 ```js
 await grid.treeView?.expandAll();
@@ -186,11 +185,11 @@ await grid.treeView?.toggleRow(2);
 ```
 
 Use this API for toolbar actions, external buttons, or synchronized UI outside
-the Grid.
+the grid.
 
 ## Events
 
-TreeView exposes row toggle lifecycle events at the root `events` option:
+Tree view exposes row toggle lifecycle events at the root `events` option:
 
 - `beforeTreeRowToggle`
 - `afterTreeRowToggle`
@@ -221,7 +220,7 @@ Both events include:
 
 ## Sorting, filtering, and pagination
 
-TreeView is applied after sorting and filtering, and before pagination. In
+Tree view is applied after sorting and filtering, and before pagination. In
 practice this means:
 
 - sorting changes the visible sibling order inside the tree
@@ -229,7 +228,7 @@ practice this means:
   the visible result still forms a valid hierarchy
 - pagination counts projected visible tree rows, not only raw source rows
 
-This behavior makes TreeView work naturally with Grid querying without breaking
+This behavior makes Tree view work naturally with Grid querying without breaking
 parent-child context.
 
 ## Custom separators
@@ -246,7 +245,7 @@ treeView: {
 }
 ```
 
-This is useful for camel-cased hierarchy keys such as
+This is useful for e.g. PascalCase hierarchy keys such as
 `CompanySalesEMEA`, where the intended path is `Company / Sales / EMEA`.
 
 Use a callback when path segmentation depends on custom parsing logic that is
