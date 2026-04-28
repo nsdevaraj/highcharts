@@ -9,7 +9,7 @@ expandable hierarchy inside the grid. Use it when your data represents
 parent-child relationships such as organization structures, folders, product
 categories, account trees, or multi-level budgets.
 
-TreeView is configured in `data.treeView` and works with the local/client-side
+Tree view is configured using `data.treeView` and works with the local
 data provider. Grid builds a tree index from the source table, then projects
 the queried row set into visible parent and child rows before pagination is
 applied.
