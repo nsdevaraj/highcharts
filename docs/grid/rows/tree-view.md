@@ -14,7 +14,7 @@ data provider. Grid builds a tree index from the source table, then projects
 the queried row set into visible parent and child rows before pagination is
 applied.
 
-## Requirements
+## Minimum requirements
 
 - Tree view is available in Highcharts Grid Pro.
 - Set `data.idColumn` to a column containing stable string or number row IDs.
