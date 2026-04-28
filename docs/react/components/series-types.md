@@ -23,7 +23,9 @@ export default function ColumnChart() {
 
 ### Dedicated series options
 
-Each dedicated series component accepts all options available for its corresponding series type - for example, `LineSeries` supports all [series.line](https://api.highcharts.com/highcharts/series.line) options. Options can be passed either as direct props or via the `options` prop:
+Each dedicated series component accepts all options available for its corresponding series type — for example, `LineSeries` supports all [series.line](https://api.highcharts.com/highcharts/series.line) options.
+
+You can provide the most common options as direct props, and all of them via the `options` prop:
 
 ```tsx
 // Via direct props
@@ -45,12 +47,16 @@ Each dedicated series component accepts all options available for its correspond
 
 ### Props
 
-In addition to dedicated series options set directly as props, all dedicated series components also accept the following props:
-
-| Prop    | Type     | Default | Description                                                                                                                                      |
-| ------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| data    | `array`  | -       | Data points for the series. Format depends on the series type (see [series.line.data](https://api.highcharts.com/highcharts/series.line.data)).  |
-| options | `object` | -       | Configuration options for the series. Available options depend on `type` (see [series.line](https://api.highcharts.com/highcharts/series.line)). |
+| Prop      | Type     | Default | Description                                                                                                                                      |
+| --------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| data      | `array`  | -       | Data points for the series. Format depends on the series type (see [series.line.data](https://api.highcharts.com/highcharts/series.line.data)).  |
+| name      | `string` | -       | The name of the series as shown in the legend, tooltip etc. (see [series.line.name](https://api.highcharts.com/highcharts/series.line.name)).    |
+| id        | `string` | -       | The id of the series (see [series.line.id](https://api.highcharts.com/highcharts/series.line.id)).                                               |
+| className | `string` | -       | The className of the series (see [series.line.className](https://api.highcharts.com/highcharts/series.line.className)).                          |
+| color     | `string` | -       | The main color of the series (see [series.line.color](https://api.highcharts.com/highcharts/series.line.color)).                                 |
+| index     | `number` | -       | The index of the series (see [series.line.index](https://api.highcharts.com/highcharts/series.line.index)).                                      |
+| events    | `object` | -       | The events of the series (see [series.line.events](https://api.highcharts.com/highcharts/series.line.events)).                                   |
+| options   | `object` | -       | Configuration options for the series. Available options depend on `type` (see [series.line](https://api.highcharts.com/highcharts/series.line)). |
 
 ## Generic series
 
@@ -72,7 +78,7 @@ When using the `Series` component, some series types require you to import an ad
 
 ```tsx
 import { Chart, Series } from "@highcharts/react";
-import "highcharts/esm/modules/venn.js";
+import "highcharts/es-modules/masters/modules/venn.src.js";
 
 export default function VennChart() {
   return (

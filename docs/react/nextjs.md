@@ -65,9 +65,9 @@ In combination with this `chart.tsx`:
 
 import { use } from "react";
 
+import { Title } from "@highcharts/react";
 import { StockChart } from "@highcharts/react/Stock";
 import { LineSeries } from "@highcharts/react/series/Line";
-import { Title } from "@highcharts/react/options";
 import { Accessibility } from "@highcharts/react/modules/Accessibility";
 
 export default function DataChart({ data }) {

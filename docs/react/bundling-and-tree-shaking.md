@@ -21,11 +21,11 @@ import { Accessibility } from "@highcharts/react/modules/Accessibility";
 import { Exporting } from "@highcharts/react/modules/Exporting";
 ```
 
-If you use additional modules, import only those you need using the `highcharts/esm` path:
+If you use additional modules, import only those you need using the `/es-modules/masters` path to use ESM:
 
 ```tsx
-import "highcharts/esm/modules/venn.js";
-import "highcharts/esm/modules/draggable-points.js";
+import "highcharts/es-modules/masters/modules/venn.src.js";
+import "highcharts/es-modules/masters/modules/draggable-points.src.js";
 ```
 
 ## Keep Highcharts lean with core + modules
