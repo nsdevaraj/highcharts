@@ -182,7 +182,7 @@ the Grid.
 
 ## Events
 
-TreeView exposes row toggle lifecycle events at the root `events` option:
+Tree view exposes row toggle lifecycle events at the root `events` option:
 
 - `beforeTreeRowToggle`
 - `afterTreeRowToggle`
