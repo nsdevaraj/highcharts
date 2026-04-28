@@ -34,7 +34,7 @@ Grid.grid('container', {
 
 ## Input models
 
-TreeView supports two input models:
+Tree view supports two input models:
 
 - `parentId`: explicit parent references in a dedicated column
 - `path`: hierarchical paths such as `Root/Sales/EMEA`
