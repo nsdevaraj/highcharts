@@ -1,5 +1,4 @@
 ---
-sidebar_label: "Tree view"
 tags: ["grid-pro"]
 ---
 
