@@ -25,9 +25,16 @@ applied.
 ```js
 Grid.grid('container', {
     data: {
+        columns: {
+            path: [
+                'Root/Sales',
+                'Root/Marketing'
+            ],
+            id: [1, 2]
+        },
         idColumn: 'id',
         treeView: {
-            treeColumn: 'name'
+            enabled: true
         }
     }
 });
