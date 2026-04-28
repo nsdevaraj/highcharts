@@ -141,8 +141,8 @@ treeView: {
 
 ## Initial expansion state
 
-Use `expandedRowIds` to seed which branches are expanded when TreeView is
-initialized or when TreeView configuration changes.
+Use `expandedRowIds` to seed which branches are expanded when Tree view is
+initialized or when Tree view configuration changes.
 
 ```js
 treeView: {
