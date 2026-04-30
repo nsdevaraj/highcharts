@@ -27,9 +27,12 @@ import type Table from '../../Core/Table/Table';
 import type { RestoreCellFocusEvent } from '../../Core/Table/Table';
 import type TableRow from '../../Core/Table/Body/TableRow';
 import type TableCell from '../../Core/Table/Body/TableCell';
-import type { TreeViewOptions } from './TreeViewTypes';
 import type {
-    NormalizedTreeViewOptions
+    TreeInputPathSeparator,
+    TreeViewOptions
+} from './TreeViewTypes';
+import type {
+    ResolvedTreeViewOptions
 } from './TreeViewOptionsNormalizer';
 import type {
     AfterTreeRowToggleEvent,
@@ -379,6 +382,60 @@ function getTreeToggleContext(
 }
 
 /**
+ * Returns the last path segment rendered for a path-based tree node.
+ *
+ * @param value
+ * Raw path value.
+ *
+ * @param separator
+ * Path separator definition.
+ */
+function getLastPathSegment(
+    value: string,
+    separator: TreeInputPathSeparator
+): string {
+    if (typeof separator === 'function') {
+        const segments = separator(value);
+        const lastSegment = Array.isArray(segments) ?
+            segments[segments.length - 1] :
+            void 0;
+
+        return typeof lastSegment === 'string' && lastSegment.length ?
+            lastSegment :
+            value;
+    }
+
+    if (separator instanceof RegExp) {
+        const regex = new RegExp(
+            separator.source,
+            separator.flags.includes('g') ?
+                separator.flags :
+                separator.flags + 'g'
+        );
+        let lastMatch: string | undefined;
+        let match: RegExpExecArray | null;
+
+        while ((match = regex.exec(value)) !== null) {
+            if (match[0]) {
+                lastMatch = match[0];
+            } else {
+                ++regex.lastIndex;
+            }
+        }
+
+        return lastMatch || value;
+    }
+
+    const separatorIndex = value.lastIndexOf(separator);
+
+    if (separatorIndex < 0) {
+        return value;
+    }
+
+    return value.slice(separatorIndex + separator.length);
+}
+
+/**
  * Returns the path segment that should be rendered in the tree column.
  *
  * @param value
@@ -393,11 +450,12 @@ function getTreeToggleContext(
 function getPathSegmentDisplayValue(
     value: unknown,
     columnId: string,
-    options: NormalizedTreeViewOptions
+    options: ResolvedTreeViewOptions
 ): string | undefined {
     const input = options.input;
 
     if (
+        !input ||
         input.type !== 'path' ||
         input.showFullPath ||
         columnId !== input.pathColumn ||
@@ -406,12 +464,7 @@ function getPathSegmentDisplayValue(
         return;
     }
 
-    const separatorIndex = value.lastIndexOf(input.separator);
-    if (separatorIndex < 0) {
-        return value;
-    }
-
-    return value.slice(separatorIndex + input.separator.length);
+    return getLastPathSegment(value, input.separator);
 }
 
 /**

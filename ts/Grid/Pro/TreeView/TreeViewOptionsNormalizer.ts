@@ -22,6 +22,7 @@
  * */
 
 import type {
+    TreeInputPathSeparator,
     TreeExpandedRowIds,
     TreeViewOptions
 } from './TreeViewTypes';
@@ -42,7 +43,7 @@ export interface NormalizedTreeInputParentIdOptions {
 export interface NormalizedTreeInputPathOptions {
     type: 'path';
     pathColumn: string;
-    separator: string;
+    separator: TreeInputPathSeparator;
     showFullPath: boolean;
 }
 
@@ -52,6 +53,13 @@ export type NormalizedTreeInputOptions = (
 );
 
 export interface NormalizedTreeViewOptions {
+    input?: NormalizedTreeInputOptions;
+    treeColumn?: string;
+    expandedRowIds: TreeExpandedRowIds;
+    stickyParents: boolean;
+}
+
+export interface ResolvedTreeViewOptions {
     input: NormalizedTreeInputOptions;
     treeColumn?: string;
     expandedRowIds: TreeExpandedRowIds;
@@ -94,10 +102,12 @@ export function normalizeTreeViewOptions(
     }
 
     const expandedRowIds: TreeExpandedRowIds = treeView.expandedRowIds ?? [];
-    const normalizedInput: NormalizedTreeInputOptions = (
-        treeView.input?.type === 'path' ?
-            merge(defaultPathInput, treeView.input) :
-            merge(defaultParentIdInput, treeView.input)
+    const normalizedInput: (NormalizedTreeInputOptions|undefined) = (
+        !treeView.input ?
+            void 0 :
+            treeView.input.type === 'path' ?
+                merge(defaultPathInput, treeView.input) :
+                merge(defaultParentIdInput, treeView.input)
     );
 
     return {
