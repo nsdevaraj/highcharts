@@ -75,25 +75,21 @@ Grid.grid('container', {
         }
     },
     columns: [
-        {
-            id: 'recordId',
-            enabled: false
-        },
-        {
-            id: 'Regions',
-            width: 300
-        },
-        {
-            id: 'Status',
-            className: 'hcg-center',
-            cells: {
-                formatter() {
-                    const value = this.value;
-                    if (value !== null) {
-                        return `<span class="status ${value.toLowerCase()}">${value}</span>`;
-                    }
+        id: 'recordId',
+        enabled: false
+    }, {
+        id: 'Regions',
+        width: 300
+    }, {
+        id: 'Status',
+        className: 'hcg-center',
+        cells: {
+            formatter() {
+                const value = this.value;
+                if (value !== null) {
+                    return `<span class="status ${value.toLowerCase()}">${value}</span>`;
                 }
             }
         }
-    ]
+    }]
 });
