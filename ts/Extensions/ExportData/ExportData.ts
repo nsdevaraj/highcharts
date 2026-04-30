@@ -1252,6 +1252,8 @@ namespace ExportData {
                 attributes: HTMLAttributes,
                 value: (number | string)
             ): AST.Node {
+                const children: Array<AST.Node> = [];
+
                 let textContent = pick(value, ''),
                     className =
                         'highcharts-text' + (classes ? ' ' + classes : '');
@@ -1270,17 +1272,39 @@ namespace ExportData {
                     className = 'highcharts-empty';
                 }
 
+                if (tagName === 'th' && attributes.scope === 'col') {
+                    children.push({
+                        tagName: 'button',
+                        textContent,
+                        style: {
+                            color: 'inherit',
+                            borderWidth: 0,
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            padding: 0,
+                            fontSize: 'inherit',
+                            fontWeight: 'inherit'
+                        }
+                    });
+                }
+
                 attributes = extend(
                     { 'class': className },
                     attributes
                 );
 
-                return {
+                const result: AST.Node = {
                     tagName,
-                    attributes,
-                    textContent
+                    attributes
                 };
 
+                if (children.length > 0) {
+                    result.children = children;
+                } else {
+                    result.textContent = textContent;
+                }
+
+                return result;
             },
             // Get table header markup from row data
             getTableHeaderHTML = function (
@@ -1372,7 +1396,12 @@ namespace ExportData {
                         if (typeof subheaders[i] !== 'undefined') {
                             trChildren.push(
                                 getCellHTMLFromValue(
-                                    'th', null, { scope: 'col' }, subheaders[i]
+                                    'th',
+                                    null,
+                                    {
+                                        scope: 'col'
+                                    },
+                                    subheaders[i]
                                 )
                             );
                         }
@@ -1654,21 +1683,32 @@ namespace ExportData {
                                 tableBody?.appendChild(tr);
                             });
 
-                            headers.forEach((th): void => {
+                            headers.forEach((header): void => {
                                 [
                                     'highcharts-sort-ascending',
                                     'highcharts-sort-descending'
                                 ].forEach((className): void => {
-                                    if (th.classList.contains(className)) {
-                                        th.classList.remove(className);
+                                    if (header.classList.contains(className)) {
+                                        header.classList.remove(className);
                                     }
                                 });
+
+                                if (header !== th) {
+                                    header.removeAttribute('aria-sort');
+                                }
                             });
 
                             th.classList.add(
                                 exporting.ascendingOrderInTable ?
                                     'highcharts-sort-ascending' :
                                     'highcharts-sort-descending'
+                            );
+
+                            th.setAttribute(
+                                'aria-sort',
+                                exporting.ascendingOrderInTable ?
+                                    'ascending' :
+                                    'descending'
                             );
                         }
                     });
