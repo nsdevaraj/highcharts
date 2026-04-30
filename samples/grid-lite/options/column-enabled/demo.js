@@ -1,13 +1,14 @@
 const visibilityToggle = document.getElementById('toggle-internal-column');
 
-const data = {
-    product: ['Apples', 'Pears', 'Plums', 'Bananas'],
-    stock: [120, 85, 40, 200],
-    internalCode: ['APL-01', 'PER-02', 'PLU-03', 'BAN-04']
-};
-
-function getColumns(showInternalColumn) {
-    return [{
+const grid = Grid.grid('container', {
+    data: {
+        columns: {
+            product: ['Apples', 'Pears', 'Plums', 'Bananas'],
+            stock: [120, 85, 40, 200],
+            internalCode: ['APL-01', 'PER-02', 'PLU-03', 'BAN-04']
+        }
+    },
+    columns: [{
         id: 'product',
         header: {
             format: 'Product'
@@ -22,19 +23,15 @@ function getColumns(showInternalColumn) {
         header: {
             format: 'Internal code'
         },
-        enabled: showInternalColumn
-    }];
-}
-
-const grid = Grid.grid('container', {
-    data: {
-        columns: data
-    },
-    columns: getColumns(false)
+        enabled: false
+    }]
 });
 
 visibilityToggle.addEventListener('change', () => {
     grid.update({
-        columns: getColumns(visibilityToggle.checked)
+        columns: [{
+            id: 'internalCode',
+            enabled: visibilityToggle.checked
+        }]
     });
 });

@@ -1,6 +1,6 @@
-const captionInput = document.getElementById('caption-text');
+const captionText = 'Quarterly fruit inventory';
 
-const grid = Grid.grid('container', {
+Grid.grid('container', {
     data: {
         columns: {
             product: ['Apples', 'Pears', 'Plums', 'Bananas'],
@@ -9,14 +9,6 @@ const grid = Grid.grid('container', {
         }
     },
     caption: {
-        text: captionInput.value
+        text: captionText
     }
-});
-
-captionInput.addEventListener('input', () => {
-    grid.update({
-        caption: {
-            text: captionInput.value
-        }
-    });
 });

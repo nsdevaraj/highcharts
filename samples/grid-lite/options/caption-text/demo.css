@@ -14,18 +14,16 @@ body {
         sans-serif;
 }
 
-.content {
-    padding: 8px;
+.content,
+.highcharts-controls-wrapper {
+    margin: 10px;
 }
 
-.editor {
-    display: inline-flex;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 12px;
+.content p {
+    margin: 0 0 12px;
+    line-height: 1.5em;
 }
 
-.editor input {
-    min-width: 280px;
-    padding: 6px 8px;
+highcharts-controls {
+    display: inline-block;
 }

@@ -18,9 +18,15 @@ body {
     padding: 8px;
 }
 
+.content p {
+    margin: 0 0 12px;
+    line-height: 1.5em;
+}
+
 .toggle {
     display: inline-flex;
     gap: 8px;
     align-items: center;
     margin-bottom: 12px;
+    cursor: pointer;
 }
