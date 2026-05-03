@@ -40,7 +40,7 @@ Grid.grid('container', {
 
 Purchase or manage Grid Pro licensing through the [Highsoft shop](https://shop.highcharts.com). The Grid Key is located in the provided License Statement. A new Grid Key is issued on each renewal, and the key in your application must be updated.
 
-Customers who purchased a Grid Pro or Dashboards license before **May 6, 2026** can find their Grid Key in the updated license statement.
+Customers who purchased a Grid Pro or Dashboards license before **May 6, 2026** can find their Grid Key in the updated license statement at [https://shop.highcharts.com/login](https://shop.highcharts.com/login).
 
 From **May 6, 2026**, Grid Pro is no longer included with new Dashboards licenses, but if you
 purchased Dashboards prior to this date you are still entitled to use Grid Pro.

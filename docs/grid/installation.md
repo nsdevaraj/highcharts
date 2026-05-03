@@ -113,6 +113,7 @@ For Grid Pro, swap the filenames:
 ## Use Grid Pro
 
 Switch to Grid Pro for editing, validation, sparklines, and advanced features.
+Note that [Grid Pro requires a Grid Key](https://www.highcharts.com/docs/grid/grid-key).
 
 ### Install Grid Pro
 
@@ -129,6 +130,7 @@ import '@highcharts/grid-pro/css/grid-pro.css';
 
 // Create grid with Pro features
 Grid.grid('container', {
+    gridKey: 'YOUR-GRID-KEY-HERE',
     data: {
         columns: {
             product: ['Apple', 'Pear', 'Plum', 'Banana'],
