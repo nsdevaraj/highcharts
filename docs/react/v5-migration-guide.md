@@ -20,10 +20,10 @@ We migrated to the pure ESM paths, replacing the webpack-bundled `/esm` imports 
 
 ```ts
 // Before
-import "highcharts/esm/modules/boost.src.js";
+import "highcharts/esm/modules/marker-clusters.src.js";
 
 // After
-import "highcharts/es-modules/masters/modules/boost.src.js";
+import "highcharts/es-modules/masters/modules/marker-clusters.src.js";
 ```
 
 > **Note:** We recommend using [module-related components](https://www.highcharts.com/docs/react/components/modules/accessibility) wherever possible. Only import modules directly if Highcharts React does not yet provide a corresponding module component.

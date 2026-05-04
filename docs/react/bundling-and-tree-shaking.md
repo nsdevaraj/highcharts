@@ -1,6 +1,6 @@
 # Bundling and tree shaking
 
-The React integration is ESM-first and designed to work with modern bundlers.
+Highcharts React is ESM-first and designed to work with modern bundlers.
 ESM uses static imports, allowing bundlers to analyze and resolve dependencies at build time.
 When you only import the pieces you use, bundlers like Webpack, Vite, Rollup,
 and esbuild can tree shake unused code.

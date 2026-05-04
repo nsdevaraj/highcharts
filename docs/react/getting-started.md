@@ -8,9 +8,9 @@ The release has been tested with:
 - [Vite](https://vite.dev/) with [plugin-react](https://www.npmjs.com/package/@vitejs/plugin-react) version 4.3.3 and newer
 - React and react-dom version 18.3.1 and newer
 
-## 1. Install the Highcharts React integration:
+## 1. Install Highcharts React:
 
-Install our Highcharts [React integration](https://www.npmjs.com/package/@highcharts/react) by running:
+Install [Highcharts React](https://www.npmjs.com/package/@highcharts/react) by running:
 
 ```sh
 npm install @highcharts/react
@@ -96,21 +96,22 @@ export default function ModulesChart() {
 To explore modules with dedicated components, see the [Modules components](https://www.highcharts.com/docs/react/components/modules/accessibility) documentation. If a module doesn't have a dedicated component, it's recommended to import it directly from Highcharts using its ESM version:
 
 ```tsx
-import { Chart } from "@highcharts/react";
-import { LineSeries } from "@highcharts/react/series/Line";
+import { Chart, YAxis } from "@highcharts/react";
+import { ScatterSeries } from "@highcharts/react/series/Scatter";
 
-import "highcharts/es-modules/masters/modules/draggable-points.src.js";
+import "highcharts/es-modules/masters/modules/marker-clusters.src.js";
 
-export default function ModulesChart() {
+export default function MarkerClustersChart() {
   return (
     <Chart>
-      <LineSeries
-        data={[3, 4, 1, 5, 2]}
-        cursor="move"
-        dragDrop={{
-          draggableX: true,
-          draggableY: true,
-        }}
+      <YAxis min={0} max={10} />
+      <ScatterSeries
+        data={[
+          [1, 4],
+          [1, 5],
+          [1, 6],
+        ]}
+        cluster={{ enabled: true }}
       />
     </Chart>
   );

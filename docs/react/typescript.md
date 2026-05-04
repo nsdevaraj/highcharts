@@ -1,6 +1,6 @@
 # TypeScript
 
-The React integration exports TypeScript helpers for common chart patterns. This page documents the recommended types to use with `@highcharts/react`.
+Highcharts React exports TypeScript helpers for common chart patterns. This page documents the recommended types to use with `@highcharts/react`.
 
 ## `ChartOptions` for the `Chart` `options` prop
 
