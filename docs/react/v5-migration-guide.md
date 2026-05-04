@@ -16,7 +16,7 @@ import { Accessibility } from "@highcharts/react/modules/accessibility";
 
 ## Pure ESM migration
 
-We migrated to the pure ESM paths, replacing the webpack-bundled `/esm` imports with `/es-modules/masters` for better compatibility with modern bundlers.
+We migrated to the pure ESM paths, replacing the webpack-bundled `/esm` imports with `/es-modules/masters` for better compatibility with modern bundlers. For example, the [Boost module](https://www.highcharts.com/docs/react/components/modules/boost):
 
 ```ts
 // Before
@@ -26,7 +26,7 @@ import "highcharts/esm/modules/boost.src.js";
 import "highcharts/es-modules/masters/modules/boost.src.js";
 ```
 
-> **Note:** We recommend using [module-related components](https://www.highcharts.com/docs/react/components/modules/accessibility) wherever possible. Only import modules directly if the integration does not yet provide a corresponding module component.
+> **Note:** We recommend using [module-related components](https://www.highcharts.com/docs/react/components/modules/accessibility) wherever possible. Only import modules directly if Highcharts React does not yet provide a corresponding module component.
 
 ### Vite users
 

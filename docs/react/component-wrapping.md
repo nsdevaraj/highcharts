@@ -1,6 +1,6 @@
 # Component wrapping
 
-You can wrap components supported by the integration to better organize your code:
+You can wrap components supported by Highcharts React to better organize your code:
 
 ```tsx
 import { useState } from "react";
@@ -53,4 +53,4 @@ export default function FinancialChart() {
 }
 ```
 
-Using [React hooks](https://react.dev/reference/react/hooks) is not supported within wrapped components. The integration calls wrapper functions directly, outside of React's rendering cycle, to minimize chart rendering overhead. We recommend defining state in the parent component and providing it to wrapped components via props.
+Using [React hooks](https://react.dev/reference/react/hooks) is not supported within wrapped components. Highcharts React calls wrapper functions directly, outside of React's rendering cycle, to minimize chart rendering overhead. We recommend defining state in the parent component and providing it to wrapped components via props.

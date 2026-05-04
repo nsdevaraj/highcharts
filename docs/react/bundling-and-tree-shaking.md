@@ -14,14 +14,14 @@ import { Chart, LineSeries, Title } from "@highcharts/react";
 ```
 
 If you use components for Highcharts modules (for example [Accessibility](https://www.highcharts.com/docs/react/components/modules/accessibility) or
-[Exporting](https://www.highcharts.com/docs/react/components/modules/exporting)), import them directly so only those modules are included:
+[Exporting](https://www.highcharts.com/docs/react/components/modules/exporting)), directly import only the modules you need:
 
 ```jsx
 import { Accessibility } from "@highcharts/react/modules/Accessibility";
 import { Exporting } from "@highcharts/react/modules/Exporting";
 ```
 
-If you use additional modules, import only those you need using the `/es-modules/masters` path to use ESM:
+If you use modules without a dedicated Highcharts React component, import only those you need using the `/es-modules/masters` path to use ESM:
 
 ```tsx
 import "highcharts/es-modules/masters/modules/venn.src.js";

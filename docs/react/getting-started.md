@@ -93,7 +93,7 @@ export default function ModulesChart() {
 
 > **Note:** Each component automatically includes the corresponding Highcharts module.
 
-To explore supported modules, see the [Modules components](https://www.highcharts.com/docs/react/components/modules/accessibility) documentation. If you need a module that isn’t supported yet, you can import it directly from Highcharts:
+To explore modules with dedicated components, see the [Modules components](https://www.highcharts.com/docs/react/components/modules/accessibility) documentation. If a module doesn't have a dedicated component, it's recommended to import it directly from Highcharts using its ESM version:
 
 ```tsx
 import { Chart } from "@highcharts/react";
@@ -117,4 +117,4 @@ export default function ModulesChart() {
 }
 ```
 
-> **Note:** You should import additional modules using their ESM versions. See the [Bundling and tree shaking](https://www.highcharts.com/docs/react/bundling-and-tree-shaking) documentation.
+> **Note:** For more information on ESM imports, see the [Bundling and tree shaking](https://www.highcharts.com/docs/react/bundling-and-tree-shaking) documentation.
