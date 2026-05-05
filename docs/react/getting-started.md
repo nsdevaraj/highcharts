@@ -18,35 +18,24 @@ npm install @highcharts/react
 
 > **Note:** [Highcharts](https://www.npmjs.com/package/highcharts) is included as a peer dependency and is installed automatically with npm v7+.
 
-## 2. Add basic components
+## 2. Create your chart
 
-Start by importing the React components you need:
+Start by creating a simple chart using a series component:
 
 ```tsx
-import { Chart, Title } from "@highcharts/react";
+import { Chart } from "@highcharts/react";
 import { LineSeries } from "@highcharts/react/series/Line";
-```
 
-## 3. Create your chart
-
-Now, you can create a simple chart like this:
-
-```tsx
 export default function LineChart() {
   return (
     <Chart>
-      <Title>Line chart</Title>
-      <LineSeries data={[1, 2, 3]} />
+      <LineSeries data={[3, 4, 1, 5, 2]} />
     </Chart>
   );
 }
 ```
 
-The result should look like this:
-
-<iframe src="https://www.highcharts.com/samples/embed/highcharts/react/basic" title="Basic Highcharts React chart example"></iframe>
-
-## 4. Customize your chart
+## 3. Customize your chart
 
 Highcharts React provides dedicated React components for chart elements and modules to customize your chart.
 
@@ -74,6 +63,10 @@ Learn more about the concepts used:
 - See the [Chart](https://www.highcharts.com/docs/react/components/chart) documentation to configure your chart.
 - See the [Series types](https://www.highcharts.com/docs/react/components/series-types) documentation to work with different series types.
 - See the [Legend](https://www.highcharts.com/docs/react/components/chart-elements/legend) documentation as an example of working with chart elements.
+
+The result should look like this:
+
+<iframe src="https://www.highcharts.com/samples/embed/highcharts/react/basic" title="Basic Highcharts React chart example"></iframe>
 
 ### Modules (optional)
 
